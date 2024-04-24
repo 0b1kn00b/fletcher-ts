@@ -1,0 +1,15 @@
+{
+	"name": "fletcher-ts",
+	"version": "0.1.0",
+	"description": "arrowlet library for typescript",
+	"dependencies": {
+		"fp-ts": "^2.16.5",
+		"ts-deferred": "^1.0.4",
+		"typescript": "^5.4.5"
+	},
+	"main": "dist/index.js",
+	"types": "dist/index.d.ts",
+	"files": [
+		"/dist"
+	]
+}
