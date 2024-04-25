@@ -5,6 +5,6 @@ export { Cycle } from "./Cycle";
 export { Handler } from "./Handler";
 export { Payload } from "./Payload";
 export { Result } from "./Result";
-export { Receiver, ReceiverInput } from "./Receiver"; 
+export { Receiver, ReceiverInput, ReceiverSink } from "./Receiver"; 
 export { Settler } from "./Settler";
 export { Terminal, TerminalInput, TerminalSink } from "./Terminal";

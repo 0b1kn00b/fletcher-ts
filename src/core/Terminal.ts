@@ -15,6 +15,26 @@ export type TerminalSink<R,E>       = Apply<TerminalInput<R,E>,Cycle>;
  * @template E
  */
 export class Terminal<R, E> extends Settler<TerminalInput<R, E>> {
+  receive(receiver:Receiver<R,E>):Cycle{
+    return receiver.apply(
+      new Apply(
+        (a:ReceiverInput<R,E>):Cycle => {
+          return this.apply(
+            new Apply(
+              (b:TerminalInput<R,E>):Cycle => {
+                a.then(
+                  (v) => {
+                    b.resolve(v);
+                  }
+                );
+                return new Cycle(null);
+              }
+            )
+          );
+        }
+      )
+    )
+  }
   static later<R, E>(payload: Payload<R, E>): Receiver<R, E> {
     return new Receiver(
       (fn: Apply<ReceiverInput<R, E>, Cycle>): Cycle => {

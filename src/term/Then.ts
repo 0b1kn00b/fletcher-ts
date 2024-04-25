@@ -19,10 +19,10 @@ export class Then<Pi, Pii, R, E> extends Arrowlet<Pi,R,E>{
     this.rhs = rhs;
   }
   defer(p: Pi, cont: Terminal<R, E>) {
-    var a = forward(this.lhs,p);
-    return receive(cont,
+    var a = this.lhs.forward(p);
+    return cont.receive(
       a.flat_fold(
-        ok => forward(this.rhs,ok),
+        ok => this.rhs.forward(ok),
         no => Terminal.error(no)
       )
     );

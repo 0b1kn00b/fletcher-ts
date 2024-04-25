@@ -3,6 +3,7 @@ import * as E from "fp-ts/Either";
 
 /**Type only createable through Terminal that resolves a Arrowlet*/
 export type ReceiverInput<R, E>   = Promise<Result<R, E>>;
+export type ReceiverSink<R,E>     = Apply<ReceiverInput<R,E>,Cycle>;
 export class Receiver<R, E> extends Settler<ReceiverInput<R, E>>{
   flat_fold<Ri>(ok:(r:R)=>Receiver<Ri,E>,no:(e:E)=>Receiver<Ri,E>):Receiver<Ri,E>{
     return new Receiver(

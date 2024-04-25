@@ -7,6 +7,6 @@ export class Fun<P,R,E> extends Arrowlet<P,R,E>{
     this._apply = _apply;
   }
   defer(p: P, cont: Terminal<R, E>): Cycle {
-    return receive(cont,Terminal.value(this._apply(p)));
+    return cont.receive(Terminal.value(this._apply(p)));
   }
 }
