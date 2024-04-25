@@ -5,7 +5,9 @@
 	"dependencies": {
 		"fp-ts": "^2.16.5",
 		"injex": "^1.0.15",
+		"madge": "^7.0.0",
 		"ts-deferred": "^1.0.4",
+		"ts-pattern": "^5.1.1",
 		"typescript": "^5.4.5"
 	},
 	"main": "dist/index.js",

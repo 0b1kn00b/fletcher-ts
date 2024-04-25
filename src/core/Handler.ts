@@ -1,3 +1,3 @@
-import { Apply } from '@fletcher-ts/core';
+import { Apply } from './Apply';
 
 export type Handler<T>         = Apply<T,void>;

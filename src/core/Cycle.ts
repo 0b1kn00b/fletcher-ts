@@ -1,11 +1,11 @@
 import { Deferred } from "ts-deferred";
-
+import { match } from "ts-pattern";
 export class Cycle {
   private _after: (() => (Promise<Cycle> | null)) | null = null;
   constructor(_after: ((() => (Promise<Cycle> | null)) | null)) { this._after = _after; }
   get after() { return this._after == null ? null : this._after(); }
 
-  static seq(lhs:Cycle,rhs:Cycle):Cycle{
+  static Seq(lhs:Cycle,rhs:Cycle):Cycle{
     //console.log('seq');
     return new Cycle(
       () => {
@@ -16,7 +16,7 @@ export class Cycle {
             (resolve) => a.then(
               x => {
                 //console.log(x);
-                return Cycle.seq(x,rhs);
+                return Cycle.Seq(x,rhs);
               }
             ).then(resolve)
           );
@@ -26,6 +26,12 @@ export class Cycle {
         }
       }
     );
+  }
+  seq(rhs:Cycle){
+    return Cycle.Par(this,rhs);
+  }
+  par(rhs:Cycle){
+    return Cycle.Par(this,rhs);
   }
   submit(){
     //console.log('submit');
@@ -52,5 +58,27 @@ export class Cycle {
       }
     );
     return deferred.promise;
+  }
+  static Par(self:Cycle,that:Cycle):Cycle{
+    let l = self.after ?? Promise.resolve(Cycle.Unit());
+    let r = that.after ?? Promise.resolve(Cycle.Unit());
+    let a = Promise.all([l,r]);
+    return Cycle.Pure(a.then(
+      ([l,r]) => {
+        if(l != null && r != null) {
+          return Cycle.Par(l,r);
+        }else if(l != null){
+          return l;
+        }else{
+          return r;
+        }
+      }
+    ));
+  }
+  static Unit(){
+    return new Cycle(null);
+  }
+  static Pure(self:Promise<Cycle>){
+    return new Cycle(() => self);
   }
 }

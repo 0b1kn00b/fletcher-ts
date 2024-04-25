@@ -1,4 +1,7 @@
-import {Arrowlet, Cycle, Terminal} from "@fletcher-ts/core";
+import { Arrowlet } from "../core/Arrowlet";
+import { Cycle } from "../core/Cycle";
+import { Terminal } from "../core/Terminal";
+
 
 export class Fun<P,R,E> extends Arrowlet<P,R,E>{
   private _apply:(p:P) => R;

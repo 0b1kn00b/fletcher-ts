@@ -1,6 +1,12 @@
 import { Deferred } from "ts-deferred";
 import * as E from "fp-ts/Either";
-import { Payload, Cycle, Result, Apply, Settler, Receiver, ReceiverInput  } from "@fletcher-ts/core";
+import { Payload } from "src/core/Payload";
+import { Receiver, ReceiverInput } from "src/core/Receiver";
+import { Settler } from "src/core/Settler";
+import { Result } from "src/core/Result";
+import { Apply } from "src/core/Apply";
+import { Cycle } from "src/core/Cycle";
+
 
 export type TerminalInput<T, E>     = Deferred<Result<T, E>>;
 export type TerminalSink<R,E>       = Apply<TerminalInput<R,E>,Cycle>;

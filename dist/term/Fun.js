@@ -1,14 +1,15 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Fun = void 0;
-const core_1 = require("@fletcher-ts/core");
-class Fun extends core_1.Arrowlet {
+const Arrowlet_1 = require("../core/Arrowlet");
+const Terminal_1 = require("../core/Terminal");
+class Fun extends Arrowlet_1.Arrowlet {
     constructor(_apply) {
         super();
         this._apply = _apply;
     }
     defer(p, cont) {
-        return cont.receive(core_1.Terminal.value(this._apply(p)));
+        return cont.receive(Terminal_1.Terminal.value(this._apply(p)));
     }
 }
 exports.Fun = Fun;
