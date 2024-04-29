@@ -6,6 +6,7 @@ const Terminal_1 = require("./core/Terminal");
 const Fun_1 = require("./term/Fun");
 const util_1 = require("./util");
 const Event_1 = require("./term/Event");
+const Arrow_1 = require("./core/Arrow");
 /** Returns Cycle from Continuation */
 /**Takes a resolver to use later that may return Cycle to be done in a scheduler once all inputs are known*/
 class Fletcher {
@@ -14,14 +15,17 @@ class Fletcher {
             return a.apply(new ts_deferred_1.Deferred());
         });
     }
+    static Arrow() {
+        return Arrow_1.Arrow;
+    }
     static Fun1R(fn) {
-        return new Fun_1.Fun(fn);
+        return Fletcher.Arrow().Pure(new Fun_1.Fun(fn));
     }
     static Unit() {
-        return new Fun_1.Fun((x) => x);
+        return Fletcher.Arrow().Pure(new Fun_1.Fun((x) => x));
     }
     static Pure(r) {
-        return new Fun_1.Fun((_) => r);
+        return Fletcher.Arrow().Pure(new Fun_1.Fun((_) => r));
     }
     static Resolve(self, input) {
         return (0, util_1.resolve)(self, input);
@@ -31,6 +35,27 @@ class Fletcher {
     }
     static Event(self) {
         return new Event_1.EventArrowlet(self);
+    }
+    static Then(that) {
+        return Fletcher.Arrow().Then(that);
+    }
+    static Pair(that) {
+        return Fletcher.Arrow().Pair(that);
+    }
+    static FlatMap(fn) {
+        return Fletcher.Arrow().FlatMap(fn);
+    }
+    static First() {
+        return Fletcher.Arrow().First();
+    }
+    static Second() {
+        return Fletcher.Arrow().Second();
+    }
+    static Pinch(that) {
+        return Fletcher.Arrow().Pinch(that);
+    }
+    static Joint(that) {
+        return Fletcher.Arrow().Joint(that);
     }
 }
 exports.Fletcher = Fletcher;

@@ -1,6 +1,5 @@
 import { ArrowletApi } from "../core/ArrowletApi";
 import { Terminal } from "../core/Terminal";
-import { Fletcher } from "../Fletcher";
 import { forward } from "src/util"; 
 /**
  * Creates an arrowlet that outputs the result of the first into the second and returns the result.

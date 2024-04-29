@@ -2,10 +2,9 @@ import { Then } from "../term/Then";
 import { ArrowletApi } from "./ArrowletApi"
 import { Anon } from "../term/Anon";
 import { Terminal } from "./Terminal";
-import { forward } from "../util";
+import { forward, resolve, unit } from "../util";
 import { Fun } from "../term/Fun";
 import { Unit } from "../term/Unit";
-import { Fletcher } from "src";
 
 export class Arrow<Pi,Ri,Pii,Rii,E>{
   private _apply : (self:ArrowletApi<Pi,Ri,E>) => ArrowletApi<Pii,Rii,E>;
@@ -25,6 +24,9 @@ export class Arrow<Pi,Ri,Pii,Rii,E>{
       let next = this.apply(self);
       return that.apply(next);
     });
+  }
+  static Make<Pi,Ri,Pii,Rii,E>(apply:(self:ArrowletApi<Pi,Ri,E>) => ArrowletApi<Pii,Rii,E>):Arrow<Pi,Ri,Pii,Rii,E>{
+    return new Arrow(apply);
   }
   static Unit<Pi,Ri,E>():Arrow<Pi,Ri,Pi,Ri,E>{
     return new Arrow(
@@ -165,7 +167,7 @@ export class Arrow<Pi,Ri,Pii,Rii,E>{
   public broach(){
     return this.next(Arrow.Broach());
   }
-  public resolve(){
-    
+  public resolve(p:Pii){
+    return resolve(this.apply(unit()),p);
   }
 }

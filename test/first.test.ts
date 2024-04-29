@@ -8,7 +8,7 @@ test(
     let fn = F.Fun1R((x:number) => x * 10);
     expect(false);
     let a = await vi.waitFor(
-      async () => F.Resolve(fn,1)
+      async () => fn.resolve(1)
     );
     console.log(a);
     expect(false);

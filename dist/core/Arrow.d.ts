@@ -9,6 +9,7 @@ export declare class Arrow<Pi, Ri, Pii, Rii, E> {
      * @returns
      */
     next<Piii, Riii>(that: Arrow<Pii, Rii, Piii, Riii, E>): Arrow<Pi, Ri, Piii, Riii, E>;
+    static Make<Pi, Ri, Pii, Rii, E>(apply: (self: ArrowletApi<Pi, Ri, E>) => ArrowletApi<Pii, Rii, E>): Arrow<Pi, Ri, Pii, Rii, E>;
     static Unit<Pi, Ri, E>(): Arrow<Pi, Ri, Pi, Ri, E>;
     static Pure<Pi, Ri, Pii, Rii, E>(self: ArrowletApi<Pii, Rii, E>): Arrow<Pi, Ri, Pii, Rii, E>;
     static Then<Pi, Ri, Rii, E>(that: ArrowletApi<Ri, Rii, E>): Arrow<Pi, Ri, Pi, Rii, E>;
@@ -31,5 +32,5 @@ export declare class Arrow<Pi, Ri, Pii, Rii, E> {
     bound<Riii>(that: ArrowletApi<[Pii, Rii], Riii, E>): Arrow<Pi, Ri, Rii, Riii, E>;
     static Broach<Pi, Ri, E>(): Arrow<Pi, Ri, Ri, [Pi, Ri], unknown>;
     broach(): Arrow<Pi, Ri, Rii, [Pii, Rii], E>;
-    resolve(): void;
+    resolve(p: Pii): Promise<import("./Result").Result<Rii, E>>;
 }

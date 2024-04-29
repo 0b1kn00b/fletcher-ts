@@ -1,10 +1,11 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.resolve = exports.forward = void 0;
+exports.unit = exports.resolve = exports.forward = void 0;
 const Receiver_1 = require("./core/Receiver");
 const ts_deferred_1 = require("ts-deferred");
 const Cycle_1 = require("./core/Cycle");
 const Terminal_1 = require("./core/Terminal");
+const Fun_1 = require("./term/Fun");
 function forward(self, p) {
     return new Receiver_1.Receiver((k) => {
         let deferred = new ts_deferred_1.Deferred();
@@ -33,3 +34,11 @@ function resolve(self, input) {
     });
 }
 exports.resolve = resolve;
+/**
+ * normallly as ArrowletApi<void,void> to drive Arrow
+ * @returns
+ */
+function unit() {
+    return new Fun_1.Fun((pi) => { return null; });
+}
+exports.unit = unit;

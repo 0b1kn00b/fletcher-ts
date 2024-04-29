@@ -7,6 +7,7 @@ import { TerminalInput } from "./core/Terminal";
 import { Apply } from "./core/Apply";
 import { Terminal } from "./core/Terminal";
 import { Result } from "./core/Result";
+import { Fun } from "./term/Fun";
 
 export function forward<P,R,E>(self:ArrowletApi<P,R,E>, p: P) {
   return new Receiver(
@@ -47,4 +48,11 @@ export function resolve<P,R,E>(self:ArrowletApi<P,R,E>,input:P):Promise<Result<R
       );
     }
   );
+}
+/**
+ * normallly as ArrowletApi<void,void> to drive Arrow
+ * @returns 
+ */
+export function unit<Pi,Ri,E>():ArrowletApi<Pi,Ri,E>{
+  return new Fun((pi:Pi) => {return (null as Ri)});
 }

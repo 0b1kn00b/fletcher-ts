@@ -25,6 +25,9 @@ class Arrow {
             return that.apply(next);
         });
     }
+    static Make(apply) {
+        return new Arrow(apply);
+    }
     static Unit() {
         return new Arrow((self) => self);
     }
@@ -129,7 +132,8 @@ class Arrow {
     broach() {
         return this.next(Arrow.Broach());
     }
-    resolve() {
+    resolve(p) {
+        return (0, util_1.resolve)(this.apply((0, util_1.unit)()), p);
     }
 }
 exports.Arrow = Arrow;
