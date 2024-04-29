@@ -6,7 +6,9 @@ import { Receiver, ReceiverSink } from "./Receiver";
 import { Then } from "../term/Then";
 import { Deferred } from "ts-deferred";
 import { Fletcher } from "..";
-
+import { Payload } from "./Payload";
+import { Result } from "./Result";
+import * as E from 'fp-ts/Either';
 interface ArrowletApi<P, R, E> {
   defer(p: P, cont: Terminal<R, E>): Cycle;
   toArrowlet(): Arrowlet<P, R, E>;
@@ -75,7 +77,35 @@ export class Arrowlet<P, R, E> implements ArrowletApi<P, R, E>{
     let u : Arrowlet<P,P,E> = Fletcher.Unit();
     return Fletcher.Joint(u,this).then(that);
   }
-  broach<Ri>(self:Arrowlet<R,Ri,E>):Arrowlet<R,[R,Ri],E>{
-    return Fletcher.Bound(self,Fletcher.Fun1R(x => x));
+  broach():Arrowlet<P,[P,R],E>{
+    return Fletcher.Bound(this,Fletcher.Fun1R(x => x));
+  }
+  resolve(input:P):Promise<Result<R,E>>{
+    //console.log('resolve init');
+    let deferred : Deferred<Result<R,E>> = new Deferred();
+    let all = this.then(
+      Fletcher.Fun1R(
+      (ok:R) => {
+        //console.log('resolve:::', ok);
+        deferred.resolve(E.left(ok));
+        return ok;
+      })
+    );
+    //console.log('resolve: pre defer');
+    let cycle   = all.defer(input,Fletcher.Terminal())
+    //console.log('resolve: post defer');
+    let finish  = cycle.submit();
+    //console.log('resolve: post submit')
+    return finish.then(
+      () => {
+        //console.log('resolve resolved')
+        return deferred.promise.then(
+          x => {
+            //console.log('deferred resolved');
+            return x;
+          }
+        );
+      }
+    );
   }
 }
