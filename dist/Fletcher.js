@@ -6,6 +6,7 @@ const Terminal_1 = require("./core/Terminal");
 const Fun_1 = require("./term/Fun");
 const Anon_1 = require("./term/Anon");
 const Then_1 = require("./term/Then");
+const Event_1 = require("./term/Event");
 /** Returns Cycle from Continuation */
 /**Takes a resolver to use later that may return Cycle to be done in a scheduler once all inputs are known*/
 class Fletcher {
@@ -64,6 +65,9 @@ class Fletcher {
     }
     static Broach(self) {
         return Fletcher.Bound(self, Fletcher.Fun1R(x => x));
+    }
+    static Event(self) {
+        return new Event_1.EventArrowlet(self);
     }
 }
 exports.Fletcher = Fletcher;

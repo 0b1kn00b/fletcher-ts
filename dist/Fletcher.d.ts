@@ -18,4 +18,5 @@ export declare class Fletcher {
     static Joint<Pi, Ri, Rii, E>(lhs: Arrowlet<Pi, Ri, E>, rhs: Arrowlet<Ri, Rii, E>): Arrowlet<Pi, [Ri, Rii], E>;
     static Bound<P, Ri, Rii, E>(self: Arrowlet<P, Ri, E>, that: Arrowlet<[P, Ri], Rii, E>): Arrowlet<P, Rii, E>;
     static Broach<Ri, Rii, E>(self: Arrowlet<Ri, Rii, E>): Arrowlet<Ri, [Ri, Rii], E>;
+    static Event<R extends Event, E>(self: EventTarget): Arrowlet<string, R, E>;
 }

@@ -6,6 +6,7 @@ import { Arrowlet } from "./core/Arrowlet";
 import { Fun } from "./term/Fun";
 import { Anon } from "./term/Anon";
 import { Then } from "./term/Then";
+import { EventArrowlet } from "./term/Event";
 /** Returns Cycle from Continuation */
 
 /**Takes a resolver to use later that may return Cycle to be done in a scheduler once all inputs are known*/
@@ -80,6 +81,9 @@ export class Fletcher{
   }
   static Broach<Ri,Rii,E>(self:Arrowlet<Ri,Rii,E>):Arrowlet<Ri,[Ri,Rii],E>{
     return Fletcher.Bound(self,Fletcher.Fun1R(x => x));
+  }
+  static Event<R extends Event,E>(self:EventTarget):Arrowlet<string,R,E>{
+    return new EventArrowlet(self);
   }
 }
 
