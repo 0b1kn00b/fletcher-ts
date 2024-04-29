@@ -135,5 +135,11 @@ class Arrow {
     resolve(p) {
         return (0, util_1.resolve)(this.apply((0, util_1.unit)()), p);
     }
+    static Compose(lhs, rhs) {
+        return rhs.next(lhs);
+    }
+    compose(before) {
+        return Arrow.Compose(this, before);
+    }
 }
 exports.Arrow = Arrow;

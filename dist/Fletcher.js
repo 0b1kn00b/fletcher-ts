@@ -58,6 +58,9 @@ class Fletcher {
     static Joint(that) {
         return Fletcher.Arrow().Joint(that);
     }
+    static Next(lhs, rhs) {
+        return lhs.next(rhs);
+    }
 }
 exports.Fletcher = Fletcher;
 // function then<A,B,C>(lhs: (a:A) => B, rhs : (b:B) => C) : (a:A) => C {

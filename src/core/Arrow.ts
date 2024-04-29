@@ -170,4 +170,10 @@ export class Arrow<Pi,Ri,Pii,Rii,E>{
   public resolve(p:Pii){
     return resolve(this.apply(unit()),p);
   }
+  static Compose<Pi,Pii,Piii,Ri,Rii,Riii,E>(lhs:Arrow<Ri,Rii,Piii,Riii,E>,rhs:Arrow<Pi,Pii,Ri,Rii,E>){
+    return rhs.next(lhs);
+  }
+  public compose<P,R>(before:Arrow<P,R,Pi,Ri,E>){
+    return Arrow.Compose(this,before);
+  }
 }

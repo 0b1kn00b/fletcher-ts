@@ -33,4 +33,6 @@ export declare class Arrow<Pi, Ri, Pii, Rii, E> {
     static Broach<Pi, Ri, E>(): Arrow<Pi, Ri, Ri, [Pi, Ri], unknown>;
     broach(): Arrow<Pi, Ri, Rii, [Pii, Rii], E>;
     resolve(p: Pii): Promise<import("./Result").Result<Rii, E>>;
+    static Compose<Pi, Pii, Piii, Ri, Rii, Riii, E>(lhs: Arrow<Ri, Rii, Piii, Riii, E>, rhs: Arrow<Pi, Pii, Ri, Rii, E>): Arrow<Pi, Pii, Piii, Riii, E>;
+    compose<P, R>(before: Arrow<P, R, Pi, Ri, E>): Arrow<P, R, Pii, Rii, E>;
 }

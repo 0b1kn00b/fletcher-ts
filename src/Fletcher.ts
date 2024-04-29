@@ -66,6 +66,9 @@ export class Fletcher{
   static Joint<Pi,Ri,Rii,E>(that:ArrowletApi<Ri,Rii,E>):Arrow<Pi,Ri,Pi,[Ri,Rii],E>{
     return Fletcher.Arrow().Joint(that);
   }
+  static Next<Pi,Pii,Piii,Ri,Rii,Riii,E>(lhs:Arrow<Pi,Pii,Ri,Rii,E>,rhs:Arrow<Ri,Rii,Piii,Riii,E>){
+    return lhs.next(rhs);
+  }
 }
 
 

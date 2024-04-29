@@ -23,4 +23,5 @@ export declare class Fletcher {
     static Second<Pi, Ri, Pii, E>(): Arrow<unknown, unknown, [unknown, unknown], [unknown, unknown], unknown>;
     static Pinch<Pi, Ri, Rii, E>(that: ArrowletApi<Pi, Rii, E>): Arrow<Pi, unknown, Pi, [unknown, Rii], E>;
     static Joint<Pi, Ri, Rii, E>(that: ArrowletApi<Ri, Rii, E>): Arrow<Pi, Ri, Pi, [Ri, Rii], E>;
+    static Next<Pi, Pii, Piii, Ri, Rii, Riii, E>(lhs: Arrow<Pi, Pii, Ri, Rii, E>, rhs: Arrow<Ri, Rii, Piii, Riii, E>): Arrow<Pi, Pii, Piii, Riii, E>;
 }
