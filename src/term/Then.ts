@@ -1,5 +1,5 @@
-import { Arrowlet } from "src/core/Arrowlet";
-import { Terminal } from "src/core/Terminal";
+import { Arrowlet } from "../core/Arrowlet";
+import { Terminal } from "../core/Terminal";
 /**
  * Creates an arrowlet that outputs the result of the first into the second and returns the result.
  *

@@ -1,9 +1,9 @@
-import { Arrowlet } from "src/core/Arrowlet";
-import { Terminal } from "src/core/Terminal";
+import { Arrowlet } from "../core/Arrowlet";
+import { Terminal } from "../core/Terminal";
 import { Deferred } from "ts-deferred";
 import * as E from 'fp-ts/Either';
-import { Payload } from "src/core/Payload";
-import { Result } from "src/core/Result";
+import { Payload } from "../core/Payload";
+import { Result } from "../core/Result";
 export class EventArrowlet<T extends Event,E> extends Arrowlet<string,T,E>{
   private _emiter : EventTarget;
   constructor(_emiter:EventTarget){
