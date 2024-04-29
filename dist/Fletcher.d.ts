@@ -11,4 +11,5 @@ export declare class Fletcher {
     static Pure<P, R, E>(r: R): ArrowletApi<P, R, E>;
     static Resolve<P, R, E>(self: ArrowletApi<P, R, E>, input: P): Promise<Result<R, E>>;
     static Forward<P, R, E>(self: ArrowletApi<P, R, E>, input: P): Receiver<R, E>;
+    static Event<R extends Event, E>(self: EventTarget): ArrowletApi<string, R, E>;
 }

@@ -7,6 +7,7 @@ import { ArrowletApi } from "./core/ArrowletApi";
 import { Result } from "./core/Result";
 import { forward, resolve } from "./util";
 import { Receiver } from "./core/Receiver";
+import { EventArrowlet } from "./term/Event";
 
 /** Returns Cycle from Continuation */
 
@@ -34,6 +35,9 @@ export class Fletcher{
   }
   static Forward<P,R,E>(self:ArrowletApi<P,R,E>,input:P):Receiver<R,E>{
     return forward(self,input);
+  }
+  static Event<R extends Event,E>(self:EventTarget):ArrowletApi<string,R,E>{
+    return new EventArrowlet(self)
   }
 }
 

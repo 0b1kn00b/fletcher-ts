@@ -5,6 +5,7 @@ const ts_deferred_1 = require("ts-deferred");
 const Terminal_1 = require("./core/Terminal");
 const Fun_1 = require("./term/Fun");
 const util_1 = require("./util");
+const Event_1 = require("./term/Event");
 /** Returns Cycle from Continuation */
 /**Takes a resolver to use later that may return Cycle to be done in a scheduler once all inputs are known*/
 class Fletcher {
@@ -27,6 +28,9 @@ class Fletcher {
     }
     static Forward(self, input) {
         return (0, util_1.forward)(self, input);
+    }
+    static Event(self) {
+        return new Event_1.EventArrowlet(self);
     }
 }
 exports.Fletcher = Fletcher;
