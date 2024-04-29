@@ -2,7 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Then = void 0;
 const Terminal_1 = require("../core/Terminal");
-const Fletcher_1 = require("../Fletcher");
+const util_1 = require("src/util");
 /**
  * Creates an arrowlet that outputs the result of the first into the second and returns the result.
  *
@@ -19,8 +19,8 @@ class Then {
         this.rhs = rhs;
     }
     defer(p, cont) {
-        var a = Fletcher_1.Fletcher.forward(this.lhs, p);
-        return cont.receive(a.flat_fold(ok => Fletcher_1.Fletcher.forward(this.rhs, ok), no => Terminal_1.Terminal.error(no)));
+        var a = (0, util_1.forward)(this.lhs, p);
+        return cont.receive(a.flat_fold(ok => (0, util_1.forward)(this.rhs, ok), no => Terminal_1.Terminal.error(no)));
     }
 }
 exports.Then = Then;

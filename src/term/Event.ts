@@ -1,13 +1,12 @@
-import { Arrowlet } from "../core/Arrowlet";
+import { ArrowletApi } from "../core/ArrowletApi";
 import { Terminal } from "../core/Terminal";
 import { Deferred } from "ts-deferred";
 import * as E from 'fp-ts/Either';
 import { Payload } from "../core/Payload";
 import { Result } from "../core/Result";
-export class EventArrowlet<T extends Event,E> extends Arrowlet<string,T,E>{
+export class EventArrowlet<T extends Event,E> implements ArrowletApi<string,T,E>{
   private _emiter : EventTarget;
   constructor(_emiter:EventTarget){
-    super();
     this._emiter = _emiter;
   }
   public defer(eventname:string,cont:Terminal<T,E>){

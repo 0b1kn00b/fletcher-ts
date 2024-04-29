@@ -1,6 +1,7 @@
 import { ArrowletApi } from "../core/ArrowletApi";
 import { Terminal } from "../core/Terminal";
 import { Fletcher } from "../Fletcher";
+import { forward } from "src/util"; 
 /**
  * Creates an arrowlet that outputs the result of the first into the second and returns the result.
  *
@@ -19,10 +20,10 @@ export class Then<Pi, Pii, R, E> implements ArrowletApi<Pi,R,E>{
     this.rhs = rhs;
   }
   defer(p: Pi, cont: Terminal<R, E>) {
-    var a = Fletcher.forward(this.lhs,p);
+    var a = forward(this.lhs,p);
     return cont.receive(
       a.flat_fold(
-        ok => Fletcher.forward(this.rhs,ok),
+        ok => forward(this.rhs,ok),
         no => Terminal.error(no)
       )
     );

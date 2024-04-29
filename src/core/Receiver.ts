@@ -5,7 +5,6 @@ import { Settler } from "./Settler";
 import { Apply } from "./Apply";
 
 import * as E from "fp-ts/Either";
-import { Fletcher } from '..';
 
 /**Type only createable through Terminal that resolves a Arrowlet*/
 export type ReceiverInput<R, E>   = Promise<Result<R, E>>;
