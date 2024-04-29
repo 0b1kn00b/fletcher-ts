@@ -9,7 +9,7 @@ import { Fletcher } from "..";
 import { Payload } from "./Payload";
 import { Result } from "./Result";
 import * as E from 'fp-ts/Either';
-import { Delegate } from "src/term/Delegate";
+import { Delegate } from "../term/Delegate";
 
 export class Arrowlet<P, R, E> implements ArrowletApi<P, R, E>{
   constructor(){

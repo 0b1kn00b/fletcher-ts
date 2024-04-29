@@ -7,7 +7,7 @@ const Then_1 = require("../term/Then");
 const ts_deferred_1 = require("ts-deferred");
 const __1 = require("..");
 const E = require("fp-ts/Either");
-const Delegate_1 = require("src/term/Delegate");
+const Delegate_1 = require("../term/Delegate");
 class Arrowlet {
     constructor() {
     }
