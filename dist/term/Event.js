@@ -1,8 +1,8 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.EventArrowlet = void 0;
-const Arrowlet_1 = require("src/core/Arrowlet");
-const Terminal_1 = require("src/core/Terminal");
+const Arrowlet_1 = require("../core/Arrowlet");
+const Terminal_1 = require("../core/Terminal");
 const ts_deferred_1 = require("ts-deferred");
 const E = require("fp-ts/Either");
 class EventArrowlet extends Arrowlet_1.Arrowlet {

@@ -1,8 +1,8 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Then = void 0;
-const Arrowlet_1 = require("src/core/Arrowlet");
-const Terminal_1 = require("src/core/Terminal");
+const Arrowlet_1 = require("../core/Arrowlet");
+const Terminal_1 = require("../core/Terminal");
 /**
  * Creates an arrowlet that outputs the result of the first into the second and returns the result.
  *

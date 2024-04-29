@@ -1,7 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Anon = void 0;
-const Arrowlet_1 = require("src/core/Arrowlet");
+const Arrowlet_1 = require("../core/Arrowlet");
 class Anon extends Arrowlet_1.Arrowlet {
     constructor(_defer) {
         super();

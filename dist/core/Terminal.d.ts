@@ -1,10 +1,10 @@
 import { Deferred } from "ts-deferred";
-import { Payload } from "src/core/Payload";
-import { Receiver } from "src/core/Receiver";
-import { Settler } from "src/core/Settler";
-import { Result } from "src/core/Result";
-import { Apply } from "src/core/Apply";
-import { Cycle } from "src/core/Cycle";
+import { Payload } from "./Payload";
+import { Receiver } from "./Receiver";
+import { Settler } from "./Settler";
+import { Result } from "./Result";
+import { Apply } from "./Apply";
+import { Cycle } from "./Cycle";
 export type TerminalInput<T, E> = Deferred<Result<T, E>>;
 export type TerminalSink<R, E> = Apply<TerminalInput<R, E>, Cycle>;
 /**

@@ -2,10 +2,10 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Terminal = void 0;
 const E = require("fp-ts/Either");
-const Receiver_1 = require("src/core/Receiver");
-const Settler_1 = require("src/core/Settler");
-const Apply_1 = require("src/core/Apply");
-const Cycle_1 = require("src/core/Cycle");
+const Receiver_1 = require("./Receiver");
+const Settler_1 = require("./Settler");
+const Apply_1 = require("./Apply");
+const Cycle_1 = require("./Cycle");
 /**
  * Terminal represents the contiuation passed through the Arrowlets to run them
  *
