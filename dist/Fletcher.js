@@ -4,6 +4,7 @@ exports.Fletcher = void 0;
 const ts_deferred_1 = require("ts-deferred");
 const Terminal_1 = require("./core/Terminal");
 const Fun_1 = require("./term/Fun");
+const Anon_1 = require("./term/Anon");
 const util_1 = require("./util");
 const Event_1 = require("./term/Event");
 const Arrow_1 = require("./core/Arrow");
@@ -19,13 +20,13 @@ class Fletcher {
         return Arrow_1.Arrow;
     }
     static Fun1R(fn) {
-        return Fletcher.Arrow().Pure(new Fun_1.Fun(fn));
-    }
-    static Unit() {
-        return Fletcher.Arrow().Pure(new Fun_1.Fun((x) => x));
+        return new Fun_1.Fun(fn);
     }
     static Pure(r) {
-        return Fletcher.Arrow().Pure(new Fun_1.Fun((_) => r));
+        return Fletcher.Fun1R((_) => r);
+    }
+    static Anon(fn) {
+        return new Anon_1.Anon(fn);
     }
     static Resolve(self, input) {
         return (0, util_1.resolve)(self, input);

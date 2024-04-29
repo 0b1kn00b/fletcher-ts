@@ -1,6 +1,6 @@
 {
 	"name": "fletcher-ts",
-	"version": "0.5.1",
+	"version": "0.5.2",
 	"description": "arrowlet library for typescript",
 	"dependencies": {
 		"fp-ts": "^2.16.5",

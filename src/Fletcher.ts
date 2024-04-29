@@ -3,6 +3,7 @@ import { Terminal, TerminalInput } from "./core/Terminal";
 import { Apply } from "./core/Apply";
 import { Cycle } from "./core/Cycle";
 import { Fun } from "./term/Fun";
+import { Anon } from "./term/Anon";
 import { ArrowletApi } from "./core/ArrowletApi";
 import { Result } from "./core/Result";
 import { forward, resolve } from "./util";
@@ -25,14 +26,14 @@ export class Fletcher{
   static Arrow(){
     return Arrow;
   }
-  static Fun1R<P,R,E>(fn:(p:P)=>R):Arrow<void,void,P,R,E>{
-    return Fletcher.Arrow().Pure(new Fun(fn));
+  static Fun1R<Pi,Ri,E>(fn:(p:Pi)=>Ri):ArrowletApi<Pi,Ri,E>{
+    return new Fun(fn);
   }
-  static Unit<P,E>():Arrow<void,void,P,P,E>{
-    return Fletcher.Arrow().Pure(new Fun((x) => x));
+  static Pure<Pi,Ri,E>(r:Ri):ArrowletApi<Pi,Ri,E>{
+    return Fletcher.Fun1R((_:Pi) =>r);
   }
-  static Pure<P,R,E>(r:R):Arrow<void,void,P,R,E>{
-    return Fletcher.Arrow().Pure(new Fun((_:P) => r));
+  static Anon<Pi,Ri,E>(fn:(p:Pi,cont:Terminal<Ri,E>)=>Cycle){
+    return new Anon(fn)
   }
   static Resolve<P,R,E>(self:ArrowletApi<P,R,E>,input:P):Promise<Result<R,E>>{
     return resolve(self,input);
