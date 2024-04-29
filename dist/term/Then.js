@@ -2,7 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Then = void 0;
 const Terminal_1 = require("../core/Terminal");
-const util_1 = require("src/util");
+const util_1 = require("../util");
 /**
  * Creates an arrowlet that outputs the result of the first into the second and returns the result.
  *

@@ -1,6 +1,6 @@
 import { ArrowletApi } from "../core/ArrowletApi";
 import { Terminal } from "../core/Terminal";
-import { forward } from "src/util"; 
+import { forward } from "../util"; 
 /**
  * Creates an arrowlet that outputs the result of the first into the second and returns the result.
  *
