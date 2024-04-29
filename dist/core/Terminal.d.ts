@@ -22,4 +22,5 @@ export declare class Terminal<R, E> extends Settler<TerminalInput<R, E>> {
     static issue<R, E>(self: Result<R, E>): Receiver<R, E>;
     static value<R, E>(self: R): Receiver<R, never>;
     static error<R, E>(self: E): Receiver<never, E>;
+    static Pure<R, E>(deferred: Deferred<Result<R, E>>): Terminal<R, E>;
 }

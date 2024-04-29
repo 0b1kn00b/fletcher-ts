@@ -7,6 +7,7 @@ const Receiver_1 = require("./Receiver");
 const Then_1 = require("../term/Then");
 const ts_deferred_1 = require("ts-deferred");
 const __1 = require("..");
+const E = require("fp-ts/Either");
 class Arrowlet {
     constructor() {
     }
@@ -56,8 +57,29 @@ class Arrowlet {
         let u = __1.Fletcher.Unit();
         return __1.Fletcher.Joint(u, this).then(that);
     }
-    broach(self) {
-        return __1.Fletcher.Bound(self, __1.Fletcher.Fun1R(x => x));
+    broach() {
+        return __1.Fletcher.Bound(this, __1.Fletcher.Fun1R(x => x));
+    }
+    resolve(input) {
+        //console.log('resolve init');
+        let deferred = new ts_deferred_1.Deferred();
+        let all = this.then(__1.Fletcher.Fun1R((ok) => {
+            //console.log('resolve:::', ok);
+            deferred.resolve(E.left(ok));
+            return ok;
+        }));
+        //console.log('resolve: pre defer');
+        let cycle = all.defer(input, __1.Fletcher.Terminal());
+        //console.log('resolve: post defer');
+        let finish = cycle.submit();
+        //console.log('resolve: post submit')
+        return finish.then(() => {
+            //console.log('resolve resolved')
+            return deferred.promise.then(x => {
+                //console.log('deferred resolved');
+                return x;
+            });
+        });
     }
 }
 exports.Arrowlet = Arrowlet;

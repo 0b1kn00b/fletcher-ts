@@ -17,12 +17,20 @@ const Cycle_1 = require("src/core/Cycle");
  */
 class Terminal extends Settler_1.Settler {
     receive(receiver) {
+        //console.log('receiver called');``
         return receiver.apply(new Apply_1.Apply((a) => {
             return this.apply(new Apply_1.Apply((b) => {
-                a.then((v) => {
+                let result = a.then((v) => {
+                    //console.log('receiver inner',v);
                     b.resolve(v);
                 });
-                return new Cycle_1.Cycle(null);
+                return new Cycle_1.Cycle(() => {
+                    //console.log('receiver done');
+                    return result.then(_ => {
+                        //console.log('receiver unit');
+                        return Cycle_1.Cycle.Unit();
+                    });
+                });
             }));
         }));
     }
@@ -44,6 +52,11 @@ class Terminal extends Settler_1.Settler {
     }
     static error(self) {
         return Terminal.issue(E.right(self));
+    }
+    static Pure(deferred) {
+        return new Terminal((a) => {
+            return a.apply(deferred);
+        });
     }
 }
 exports.Terminal = Terminal;
