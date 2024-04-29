@@ -1,4 +1,4 @@
-import { ArrowletApi } from "src/core/ArrowletApi";
+import { ArrowletApi } from "../core/ArrowletApi";
 import { Terminal } from "../core/Terminal";
 /**
  * Creates an arrowlet that outputs the result of the first into the second and returns the result.

@@ -1,4 +1,4 @@
-import { ArrowletApi } from "src/core/ArrowletApi";
+import { ArrowletApi } from "../core/ArrowletApi";
 import { Terminal } from "../core/Terminal";
 import { Fletcher } from "../Fletcher";
 /**

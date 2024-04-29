@@ -1,7 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Delegate = void 0;
-const Arrowlet_1 = require("src/core/Arrowlet");
+const Arrowlet_1 = require("../core/Arrowlet");
 class Delegate extends Arrowlet_1.Arrowlet {
     constructor(_delegate) {
         super();

@@ -1,4 +1,4 @@
-import { ArrowletApi } from "src/core/ArrowletApi";
+import { ArrowletApi } from "../core/ArrowletApi";
 import { Cycle } from "../core/Cycle";
 import { Terminal } from "../core/Terminal";
 
