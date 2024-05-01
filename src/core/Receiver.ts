@@ -54,8 +54,8 @@ export class Receiver<R, E> extends Settler<ReceiverInput<R, E>>{
   static Zip<R,Ri,E>(self:Receiver<R,E>,that:Receiver<Ri,E>):Receiver<[R,Ri],E>{
     return new Receiver(
       (f:Apply<ReceiverInput<[R,Ri],E>,Cycle>) => {
-          var lhs        = null;
-          var rhs        = null;
+          var lhs  : ReceiverInput<R, E>     | null = null;
+          var rhs  : ReceiverInput<Ri, E>    | null = null;
           let work_left  = self.apply(
             new Apply((ocI)   => {
               lhs = ocI;
@@ -71,8 +71,34 @@ export class Receiver<R, E> extends Settler<ReceiverInput<R, E>>{
           return work_left.par(work_right).seq(
             new Cycle(
               () => {
-                let ipt = lhs.zip(rhs);
-                let res = f.apply(ipt);
+                let lhs_ : ReceiverInput<R,E>   = lhs!;
+                let rhs_ : ReceiverInput<Ri,E>  = rhs!;
+                let ipt = 
+                  lhs_.then(
+                    (okI:Result<R, E>) => rhs_.then(
+                      (okII:Result<Ri, E>) => { 
+                        return {fst : okI, snd : okII} 
+                      }
+                    )
+                  );
+
+                let nxt = ipt.then(
+                  (p:{ fst : Result<R,E>,snd : Result<Ri,E>}):Result<[R,Ri],E> => {
+                    return Either.fold(
+                      (l:R) => {
+                        return Either.fold(
+                          (lI:Ri) => {
+                            let res : [R,Ri] = [l,lI]; 
+                            return Either.left(res);
+                          },
+                          (r:E)   => Either.right(r)
+                        )(p.snd)
+                      },
+                      (r:E) => Either.right(r)
+                    )(p.fst);
+                  }
+                );
+                let res = f.apply(nxt);
                 return new Promise(
                   resolve => resolve(res)
                 );

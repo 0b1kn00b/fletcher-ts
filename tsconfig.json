@@ -1,16 +1,25 @@
 {
   "compilerOptions": {
-    "moduleResolution": "NodeNext", // or "nodenext"
-    "module": "NodeNext",
+    "lib": ["DOM", "DOM.Iterable", "ESNext"],
+    "allowJs": false,
+    "moduleResolution": "Node", // or "nodenext"
+    "forceConsistentCasingInFileNames": true,
+    "module": "ESNext",
     "target": "ESNext",
     "declaration": true,
     "outDir": "./dist",
-    "baseUrl" : ".",
+    "baseUrl" : "./",
     "paths" : {
       "fletcher-ts/*": ["fletcher-ts/dist/*"],
-    }
+    },
+    "skipLibCheck": true,
+    "types": ["vite/client","node"],
+    "strict": false,
   },
   "include": [
     "src/**/*"
   ],
+  "exclude": [
+    "node_modules"
+  ]
 }

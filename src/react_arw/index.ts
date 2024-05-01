@@ -1,5 +1,5 @@
 // https://chwastek.eu/blog/async-actions-with-usereducer-in-react
-import { useReducer, useCallback } from 'react';
+import { useReducer, useCallback, Reducer } from 'react';
 import { ArrowletApi } from "src/core/ArrowletApi";
 import { Fletcher } from "../Fletcher";
 import { Dispatch} from 'react'; 
@@ -11,10 +11,10 @@ export function react<P,R,E>(self:ArrowletApi<P,R,E>,p:P){
     dispatch(result);
   }
 }
-function useReducerWithThunk(reducer, initialState) {
+function useReducerWithThunk<S,A>(reducer:Reducer<S,A>, initialState:S) {
   const [state, dispatch] = useReducer(reducer, initialState);
 
-  function customDispatch(action) {
+  function customDispatch(action:any) {
     if (typeof action === 'function') {
       return action(customDispatch);
     } else {

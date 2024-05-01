@@ -48,7 +48,7 @@ export class Arrow<Pi,Ri,Pii,Rii,E>{
   public then<Riii>(that:ArrowletApi<Rii,Riii,E>){
     return this.next(Arrow.Then(that));
   }
-  static Pair<Pi,Pii,Ri,Rii,E>(that:ArrowletApi<Pii,Rii,E>){
+  static Pair<Pi,Pii,Ri,Rii,E>(that:ArrowletApi<Pii,Rii,E>):Arrow<Pi,Ri,[Pi,Pii],[Ri,Rii],E>{
     return new Arrow(
       (self:ArrowletApi<Pi,Ri,E>) => new Anon(
         (p:[Pi,Pii],cont:Terminal<[Ri,Rii],E>) => {
@@ -107,7 +107,7 @@ export class Arrow<Pi,Ri,Pii,Rii,E>{
   static Second<Pi,Ri,Pii,E>(){
     return new Arrow((self:ArrowletApi<Pi,Ri,E>):ArrowletApi<[Pii,Pi],[Pii,Ri],E> => {
       let l : Arrow<Pi,Ri,Pii,Pii,E> = Arrow.Pure(new Fun((x:Pii) => x));
-      let r = Arrow.Pair(self).apply(l.apply(self));
+      let r : ArrowletApi<[Pii,Pi],[Pii,Ri],E> = Arrow.Pair(self).apply(l.apply(self));
       return r;
     });
   }
@@ -159,7 +159,7 @@ export class Arrow<Pi,Ri,Pii,Rii,E>{
   static Broach<Pi,Ri,E>(){
     return new Arrow(
       (self:ArrowletApi<Pi,Ri,E>) => {
-        let unit = new Fun( (p:[Pi,Ri]) => p);
+        let unit : ArrowletApi<[Pi,Ri],[Pi,Ri],E> = new Fun( (p:[Pi,Ri]) => p);
         return Arrow.Bound(unit).apply(self);
       } 
     );

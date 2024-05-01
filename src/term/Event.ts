@@ -11,9 +11,12 @@ export class EventArrowlet<T extends Event,E> implements ArrowletApi<string,T,E>
   }
   public defer(eventname:string,cont:Terminal<T,E>){
     let deferred : Deferred<Result<T,E>> = new Deferred();
-    let handler = function (evt:T){
-      deferred.resolve(E.left(evt));
-      this._emiter.removeEventListener(handler);
+    let self = this;
+    let handler : EventListenerObject = {
+      handleEvent : function (evt:T):void{
+        deferred.resolve(E.left(evt));
+        self._emiter.removeEventListener(eventname,handler);
+      }
     }
     this._emiter.addEventListener(
       eventname,

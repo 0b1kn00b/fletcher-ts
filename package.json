@@ -1,6 +1,6 @@
 {
 	"name": "fletcher-ts",
-	"version": "0.5.14",
+	"version": "0.5.15",
 	"description": "arrowlet library for typescript",
 	"dependencies": {
 		"fp-ts": "^2.16.5",
@@ -9,28 +9,42 @@
 		"react": "^18.3.1",
 		"ts-deferred": "^1.0.4",
 		"ts-pattern": "^5.1.1",
-		"typescript": "^5.4.5",
 		"xstate": "^5.12.0",
 		"xstate-react": "^0.1.1"
 	},
-	"main": "dist/index.js",
-	"types": "dist/index.d.ts",
+	"type": "module",
+	"main": "./dist/index.js",
+	"module": "./dist/index.js",
+	"types": "./dist/index.d.ts",
 	"files": [
 		"/dist"
 	],
 	"devDependencies": {
+		"@rollup/plugin-typescript": "^11.1.6",
+		"@types/node": "^20.12.7",
+		"@types/react": "^18.3.1",
+		"prettier": "2.6.2",
+		"rollup-plugin-typescript-paths": "^1.3.0",
+		"tslib": "^2.4.0",
 		"typedoc": "^0.25.13",
+		"typescript": "^5.4.5",
+		"vite": "^5.2.10",
 		"vitest": "^1.5.2"
 	},
 	"scripts": {
 		"test": "vitest",
-		"build": "rm -rf dist && tsc"
+		"build": "rm -rf dist && tsc && vite build"
 	},
 	"exports": {
-		"./react" : {
-			"import"  	: "./dist/react/index.js",
-			"require" 	: "./dist/react/index.js",
-			"types" 		: "./dist/react/index.d.ts"
+		".": {
+			"import": "./dist/index.es.js",
+			"require": "./dist/index.cjs.js",
+			"types": "./dist/index.d.ts"
+		},
+		"./react_arw": {
+			"import": "./dist/react_arw/index.js",
+			"require": "./dist/react_arw/index.js",
+			"types": "./dist/react_arw/index.d.ts"
 		}
-  }
+	}
 }

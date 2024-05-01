@@ -20,7 +20,7 @@ export declare class Terminal<R, E> extends Settler<TerminalInput<R, E>> {
     receive(receiver: Receiver<R, E>): Cycle;
     static later<R, E>(payload: Payload<R, E>): Receiver<R, E>;
     static issue<R, E>(self: Result<R, E>): Receiver<R, E>;
-    static value<R, E>(self: R): Receiver<R, never>;
-    static error<R, E>(self: E): Receiver<never, E>;
+    static value<R, E>(self: R): Receiver<R, E>;
+    static error<R, E>(self: E): Receiver<R, E>;
     static Pure<R, E>(deferred: Deferred<Result<R, E>>): Terminal<R, E>;
 }

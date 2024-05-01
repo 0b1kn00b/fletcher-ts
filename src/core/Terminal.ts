@@ -70,10 +70,10 @@ export class Terminal<R, E> extends Settler<TerminalInput<R, E>> {
       }
     )
   }
-  static value<R, E>(self: R) {
+  static value<R, E>(self: R):Receiver<R,E> {
     return Terminal.issue(E.left(self));
   }
-  static error<R, E>(self: E) {
+  static error<R, E>(self: E) :Receiver<R,E>{
     return Terminal.issue(E.right(self));
   }
   static Pure<R,E>(deferred:Deferred<Result<R,E>>):Terminal<R,E>{

@@ -30,7 +30,7 @@ export declare class Arrow<Pi, Ri, Pii, Rii, E> {
     joint<Riii>(that: ArrowletApi<Rii, Riii, E>): Arrow<Pi, Ri, Pii, [Rii, Riii], E>;
     static Bound<Pi, Ri, Rii, E>(that: ArrowletApi<[Pi, Ri], Rii, E>): Arrow<Pi, Ri, Ri, Rii, E>;
     bound<Riii>(that: ArrowletApi<[Pii, Rii], Riii, E>): Arrow<Pi, Ri, Rii, Riii, E>;
-    static Broach<Pi, Ri, E>(): Arrow<Pi, Ri, Ri, [Pi, Ri], unknown>;
+    static Broach<Pi, Ri, E>(): Arrow<Pi, Ri, Ri, [Pi, Ri], E>;
     broach(): Arrow<Pi, Ri, Rii, [Pii, Rii], E>;
     resolve(p: Pii): Promise<import("./Result").Result<Rii, E>>;
     static Compose<Pi, Pii, Piii, Ri, Rii, Riii, E>(lhs: Arrow<Ri, Rii, Piii, Riii, E>, rhs: Arrow<Pi, Pii, Ri, Rii, E>): Arrow<Pi, Pii, Piii, Riii, E>;
