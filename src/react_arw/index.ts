@@ -1,9 +1,9 @@
 // https://chwastek.eu/blog/async-actions-with-usereducer-in-react
 import { useReducer, useCallback, Reducer } from 'react';
-import { ArrowletApi } from "src/core/ArrowletApi";
+import { ArrowletApi } from "../core/ArrowletApi";
 import { Fletcher } from "../Fletcher";
 import { Dispatch} from 'react'; 
-import { Result } from "src/core/Result";
+import { Result } from "../core/Result";
 
 export function react<P,R,E>(self:ArrowletApi<P,R,E>,p:P){
   return async function(dispatch:Dispatch<Result<R,E>>) {

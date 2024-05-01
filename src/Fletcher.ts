@@ -10,6 +10,7 @@ import { forward, resolve } from "./util";
 import { Receiver } from "./core/Receiver";
 import { EventArrowlet } from "./term/Event";
 import { Arrow } from "./core/Arrow";
+import { react, useReducerWithThunk } from "./react_arw"
 
 /** Returns Cycle from Continuation */
 
@@ -69,8 +70,11 @@ export class Fletcher{
   static Next<Pi,Pii,Piii,Ri,Rii,Riii,E>(lhs:Arrow<Pi,Pii,Ri,Rii,E>,rhs:Arrow<Ri,Rii,Piii,Riii,E>){
     return lhs.next(rhs);
   }
+  static React<P,R,E>(self:ArrowletApi<P,R,E>,p:P){  
+    return react(self,p);
+  }
 }
-
+export { useReducerWithThunk }
 
 // function then<A,B,C>(lhs: (a:A) => B, rhs : (b:B) => C) : (a:A) => C {
 //   return (a:A) => {

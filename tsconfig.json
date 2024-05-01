@@ -2,7 +2,7 @@
   "compilerOptions": {
     "lib": ["DOM", "DOM.Iterable", "ESNext"],
     "allowJs": false,
-    "moduleResolution": "Node", // or "nodenext"
+    "moduleResolution": "Bundler", // or "nodenext"
     "forceConsistentCasingInFileNames": true,
     "module": "ESNext",
     "target": "ESNext",
