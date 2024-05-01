@@ -3,6 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.Fun = void 0;
 const Terminal_1 = require("../core/Terminal");
 class Fun {
+    _apply;
     constructor(_apply) {
         this._apply = _apply;
     }

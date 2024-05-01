@@ -14,6 +14,8 @@ const util_1 = require("../util");
  * @template E error typeq
  */
 class Then {
+    lhs;
+    rhs;
     constructor(lhs, rhs) {
         this.lhs = lhs;
         this.rhs = rhs;

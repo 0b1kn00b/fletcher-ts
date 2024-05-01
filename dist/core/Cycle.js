@@ -3,15 +3,13 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.Cycle = void 0;
 const ts_deferred_1 = require("ts-deferred");
 class Cycle {
-    constructor(_after) {
-        this._after = null;
-        this._after = _after;
-    }
+    _after = null;
+    constructor(_after) { this._after = _after; }
     get after() { return this._after == null ? null : this._after(); }
     static Seq(lhs, rhs) {
         //console.log('seq');
         return new Cycle(() => {
-            let a = lhs === null || lhs === void 0 ? void 0 : lhs.after;
+            let a = lhs?.after;
             if (a != null) {
                 //console.log('after done');
                 return new Promise((resolve) => a.then(x => {
@@ -21,7 +19,7 @@ class Cycle {
             }
             else {
                 //console.log('rhs', rhs?.after);
-                return rhs === null || rhs === void 0 ? void 0 : rhs.after;
+                return rhs?.after;
             }
         });
     }
@@ -68,9 +66,8 @@ class Cycle {
         return deferred.promise;
     }
     static Par(self, that) {
-        var _a, _b;
-        let l = (_a = self.after) !== null && _a !== void 0 ? _a : Promise.resolve(Cycle.Unit());
-        let r = (_b = that.after) !== null && _b !== void 0 ? _b : Promise.resolve(Cycle.Unit());
+        let l = self.after ?? Promise.resolve(Cycle.Unit());
+        let r = that.after ?? Promise.resolve(Cycle.Unit());
         let a = Promise.all([l, r]);
         return Cycle.Pure(a.then(([l, r]) => {
             if (l != null && r != null) {

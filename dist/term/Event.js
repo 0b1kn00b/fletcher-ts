@@ -28,6 +28,7 @@ const Terminal_1 = require("../core/Terminal");
 const ts_deferred_1 = require("ts-deferred");
 const E = __importStar(require("fp-ts/Either"));
 class EventArrowlet {
+    _emiter;
     constructor(_emiter) {
         this._emiter = _emiter;
     }

@@ -8,6 +8,7 @@ const util_1 = require("../util");
 const Fun_1 = require("../term/Fun");
 const Unit_1 = require("../term/Unit");
 class Arrow {
+    _apply;
     constructor(_apply) {
         this._apply = _apply;
     }
