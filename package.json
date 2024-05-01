@@ -1,6 +1,6 @@
 {
 	"name": "fletcher-ts",
-	"version": "0.5.9",
+	"version": "0.5.10",
 	"description": "arrowlet library for typescript",
 	"dependencies": {
 		"fp-ts": "^2.16.5",
@@ -23,6 +23,10 @@
 		"vitest": "^1.5.2"
 	},
 	"scripts": {
-		"test": "vitest"
-	}
+		"test": "vitest",
+		"build": "rm -rf dist && tsc"
+	},
+	"exports": {
+    "./": "./dist"
+  }
 }
