@@ -4,13 +4,13 @@ exports.Receiver = void 0;
 const Cycle_1 = require("./Cycle");
 const Settler_1 = require("./Settler");
 const Apply_1 = require("./Apply");
-const E = require("fp-ts/Either");
+const Either = require("fp-ts/Either");
 class Receiver extends Settler_1.Settler {
     flat_fold(ok, no) {
         return new Receiver((cont) => {
             return this.apply(new Apply_1.Apply((p) => {
                 let a = p.then((outcome) => {
-                    let a = E.match(ok, no)(outcome);
+                    let a = Either.match(ok, no)(outcome);
                     return a;
                 });
                 let b = a.then((x) => {
@@ -20,6 +20,16 @@ class Receiver extends Settler_1.Settler {
                 let c = new Cycle_1.Cycle(() => b);
                 return c;
             }));
+        });
+    }
+    handler(ok, no) {
+        return Either.match(result => ok(result), error => {
+            if (no) {
+                no(error);
+            }
+            else {
+                throw no;
+            }
         });
     }
     zip(that) {

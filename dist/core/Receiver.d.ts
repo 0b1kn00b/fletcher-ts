@@ -7,6 +7,7 @@ export type ReceiverInput<R, E> = Promise<Result<R, E>>;
 export type ReceiverSink<R, E> = Apply<ReceiverInput<R, E>, Cycle>;
 export declare class Receiver<R, E> extends Settler<ReceiverInput<R, E>> {
     flat_fold<Ri>(ok: (r: R) => Receiver<Ri, E>, no: (e: E) => Receiver<Ri, E>): Receiver<Ri, E>;
+    handler(ok: (result: R) => void, no?: (error: E) => void): (result: Result<R, E>) => void;
     zip<Ri>(that: Receiver<Ri, E>): Receiver<[R, Ri], E>;
     static Zip<R, Ri, E>(self: Receiver<R, E>, that: Receiver<Ri, E>): Receiver<[R, Ri], E>;
 }

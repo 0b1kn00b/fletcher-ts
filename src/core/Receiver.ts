@@ -4,7 +4,7 @@ import { Result } from "./Result";
 import { Settler } from "./Settler";
 import { Apply } from "./Apply";
 
-import * as E from "fp-ts/Either";
+import * as Either from "fp-ts/Either";
 
 /**Type only createable through Terminal that resolves a Arrowlet*/
 export type ReceiverInput<R, E>   = Promise<Result<R, E>>;
@@ -18,7 +18,7 @@ export class Receiver<R, E> extends Settler<ReceiverInput<R, E>>{
             (p:ReceiverInput<R,E>) => {
               let a = p.then(
                 (outcome:Result<R,E>) : Receiver<Ri,E> => {
-                  let a = E.match(ok,no)(outcome);
+                  let a = Either.match(ok,no)(outcome);
                   return a;
                 }
               );
@@ -34,6 +34,18 @@ export class Receiver<R, E> extends Settler<ReceiverInput<R, E>>{
           )
        ); 
       }
+    );
+  }
+  public handler(ok:(result:R)=>void,no?:(error:E)=>void):(result:Result<R,E>) => void{
+    return Either.match(
+      result => ok(result),
+      error  => {
+        if(no){
+          no(error)
+        }else{
+          throw no;
+        }
+      } 
     );
   }
   zip<Ri>(that:Receiver<Ri,E>){
