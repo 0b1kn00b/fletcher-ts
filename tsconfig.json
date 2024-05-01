@@ -7,7 +7,7 @@
     "outDir": "./dist",
     "baseUrl" : ".",
     "paths" : {
-
+      "fletcher-ts/*": ["fletcher-ts/dist/*"],
     }
   },
   "include": [
