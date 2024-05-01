@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.useReducerWithThunk = void 0;
+exports.useReducerWithThunk = exports.react = void 0;
 // https://chwastek.eu/blog/async-actions-with-usereducer-in-react
 const react_1 = require("react");
 const Fletcher_1 = require("../Fletcher");
@@ -21,7 +21,7 @@ function react(self, p) {
         });
     };
 }
-exports.default = react;
+exports.react = react;
 function useReducerWithThunk(reducer, initialState) {
     const [state, dispatch] = (0, react_1.useReducer)(reducer, initialState);
     function customDispatch(action) {
