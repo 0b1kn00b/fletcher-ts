@@ -4,13 +4,13 @@ import { Deferred } from "ts-deferred";
 import * as E from 'fp-ts/Either';
 import { Payload } from "../core/Payload";
 import { Result } from "../core/Result";
-export class EventArrowlet<T extends Event,E> implements ArrowletApi<string,T,E>{
+export class EventArrowlet<T extends Event> implements ArrowletApi<string,T>{
   private _emiter : EventTarget;
   constructor(_emiter:EventTarget){
     this._emiter = _emiter;
   }
-  public defer(eventname:string,cont:Terminal<T,E>){
-    let deferred : Deferred<Result<T,E>> = new Deferred();
+  public defer(eventname:string,cont:Terminal<T>){
+    let deferred : Deferred<Result<T>> = new Deferred();
     let self = this;
     let handler : EventListenerObject = {
       handleEvent : function (evt:T):void{

@@ -9,21 +9,21 @@ import { Dispatch } from "react";
 /** Returns Cycle from Continuation */
 /**Takes a resolver to use later that may return Cycle to be done in a scheduler once all inputs are known*/
 export declare class Fletcher {
-    static Terminal<P, E>(): Terminal<P, E>;
+    static Terminal<P>(): Terminal<P>;
     static Arrow(): typeof Arrow;
-    static Fun1R<Pi, Ri, E>(fn: (p: Pi) => Ri): ArrowletApi<Pi, Ri, E>;
-    static Pure<Pi, Ri, E>(r: Ri): ArrowletApi<Pi, Ri, E>;
-    static Anon<Pi, Ri, E>(fn: (p: Pi, cont: Terminal<Ri, E>) => Cycle): Anon<Pi, Ri, E>;
-    static Resolve<P, R, E>(self: ArrowletApi<P, R, E>, input: P): Promise<Result<R, E>>;
-    static Forward<P, R, E>(self: ArrowletApi<P, R, E>, input: P): Receiver<R, E>;
-    static Event<R extends Event, E>(self: EventTarget): ArrowletApi<string, R, E>;
-    static Then<Pi, Ri, Rii, E>(that: ArrowletApi<Ri, Rii, E>): Arrow<Pi, Ri, Pi, Rii, E>;
-    static Pair<Pi, Pii, Ri, Rii, E>(that: ArrowletApi<Pii, Rii, E>): Arrow<unknown, unknown, [unknown, Pii], [unknown, Rii], E>;
-    static FlatMap<Pi, Ri, Rii, E>(fn: (p: Ri) => ArrowletApi<Pi, Rii, E>): Arrow<Pi, Ri, Pi, Rii, E>;
-    static First<Pi, Ri, Pii, E>(): Arrow<unknown, unknown, [unknown, unknown], [unknown, unknown], unknown>;
-    static Second<Pi, Ri, Pii, E>(): Arrow<unknown, unknown, [unknown, unknown], [unknown, unknown], unknown>;
-    static Pinch<Pi, Ri, Rii, E>(that: ArrowletApi<Pi, Rii, E>): Arrow<Pi, unknown, Pi, [unknown, Rii], E>;
-    static Joint<Pi, Ri, Rii, E>(that: ArrowletApi<Ri, Rii, E>): Arrow<Pi, Ri, Pi, [Ri, Rii], E>;
-    static Next<Pi, Pii, Piii, Ri, Rii, Riii, E>(lhs: Arrow<Pi, Pii, Ri, Rii, E>, rhs: Arrow<Ri, Rii, Piii, Riii, E>): Arrow<Pi, Pii, Piii, Riii, E>;
-    static React<R, E>(dispatch: Dispatch<R>): ArrowletApi<R, void, E>;
+    static Fun1R<Pi, Ri>(fn: (p: Pi) => Ri): ArrowletApi<Pi, Ri>;
+    static Pure<Pi, Ri>(r: Ri): ArrowletApi<Pi, Ri>;
+    static Anon<Pi, Ri>(fn: (p: Pi, cont: Terminal<Ri>) => Cycle): Anon<Pi, Ri>;
+    static Resolve<P, R>(self: ArrowletApi<P, R>, input: P): Promise<Result<R>>;
+    static Forward<P, R>(self: ArrowletApi<P, R>, input: P): Receiver<R>;
+    static Event<R extends Event>(self: EventTarget): ArrowletApi<string, R>;
+    static Then<Pi, Ri, Rii>(that: ArrowletApi<Ri, Rii>): Arrow<Pi, Ri, Pi, Rii>;
+    static Pair<Pi, Pii, Ri, Rii>(that: ArrowletApi<Pii, Rii>): Arrow<unknown, unknown, [unknown, Pii], [unknown, Rii]>;
+    static FlatMap<Pi, Ri, Rii>(fn: (p: Ri) => ArrowletApi<Pi, Rii>): Arrow<Pi, Ri, Pi, Rii>;
+    static First<Pi, Ri, Pii>(): Arrow<unknown, unknown, [unknown, unknown], [unknown, unknown]>;
+    static Second<Pi, Ri, Pii>(): Arrow<unknown, unknown, [unknown, unknown], [unknown, unknown]>;
+    static Pinch<Pi, Ri, Rii>(that: ArrowletApi<Pi, Rii>): Arrow<Pi, unknown, Pi, [unknown, Rii]>;
+    static Joint<Pi, Ri, Rii>(that: ArrowletApi<Ri, Rii>): Arrow<Pi, Ri, Pi, [Ri, Rii]>;
+    static Next<Pi, Pii, Piii, Ri, Rii, Riii>(lhs: Arrow<Pi, Pii, Ri, Rii>, rhs: Arrow<Ri, Rii, Piii, Riii>): Arrow<Pi, Pii, Piii, Riii>;
+    static React<R>(dispatch: Dispatch<R>): ArrowletApi<R, void>;
 }

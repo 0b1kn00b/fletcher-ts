@@ -8,27 +8,27 @@ import { Apply } from "./Apply";
 import { Cycle } from "./Cycle";
 
 
-export type TerminalInput<T, E>     = Deferred<Result<T, E>>;
-export type TerminalSink<R,E>       = Apply<TerminalInput<R,E>,Cycle>;
+export type TerminalInput<T>      = Deferred<Result<T>>;
+export type TerminalSink<R>       = Apply<TerminalInput<R>,Cycle>;
 
 /**
  * Terminal represents the contiuation passed through the Arrowlets to run them
  *
  * @class Terminal
- * @extends {SettlerCls<TerminalInput<R, E>>}
- * @implements {TerminalApi<R, E>}
+ * @extends {SettlerCls<TerminalInput<R>>}
+ * @implements {TerminalApi<R>}
  * @template R
  * @template E
  */
-export class Terminal<R, E> extends Settler<TerminalInput<R, E>> {
-  receive(receiver:Receiver<R,E>):Cycle{
+export class Terminal<R> extends Settler<TerminalInput<R>> {
+  receive(receiver:Receiver<R>):Cycle{
     //console.log('receiver called');``
     return receiver.apply(
       new Apply(
-        (a:ReceiverInput<R,E>):Cycle => {
+        (a:ReceiverInput<R>):Cycle => {
           return this.apply(
             new Apply(
-              (b:TerminalInput<R,E>):Cycle => {
+              (b:TerminalInput<R>):Cycle => {
                 let result = a.then(
                   (v) => {
                     //console.log('receiver inner',v);
@@ -51,17 +51,17 @@ export class Terminal<R, E> extends Settler<TerminalInput<R, E>> {
       )
     )
   }
-  static later<R, E>(payload: Payload<R, E>): Receiver<R, E> {
+  static later<R>(payload: Payload<R>): Receiver<R> {
     return new Receiver(
-      (fn: Apply<ReceiverInput<R, E>, Cycle>): Cycle => {
+      (fn: Apply<ReceiverInput<R>, Cycle>): Cycle => {
         return fn.apply(payload);
       }
     );
   }
-  static issue<R, E>(self: Result<R, E>) {
+  static issue<R>(self: Result<R>) {
     return new Receiver(
-      function (fn: Apply<ReceiverInput<R, E>, Cycle>): Cycle {
-        let promise: ReceiverInput<R, E> = new Promise(
+      function (fn: Apply<ReceiverInput<R>, Cycle>): Cycle {
+        let promise: ReceiverInput<R> = new Promise(
           (resolve) => {
             resolve(self);
           }
@@ -70,15 +70,15 @@ export class Terminal<R, E> extends Settler<TerminalInput<R, E>> {
       }
     )
   }
-  static value<R, E>(self: R):Receiver<R,E> {
+  static value<R>(self: R):Receiver<R> {
     return Terminal.issue(E.left(self));
   }
-  static error<R, E>(self: E) :Receiver<R,E>{
+  static error<R>(self: Error) :Receiver<R>{
     return Terminal.issue(E.right(self));
   }
-  static Pure<R,E>(deferred:Deferred<Result<R,E>>):Terminal<R,E>{
+  static Pure<R>(deferred:Deferred<Result<R>>):Terminal<R>{
     return new Terminal(
-      (a:Apply<TerminalInput<R,E>,Cycle>)=>{
+      (a:Apply<TerminalInput<R>,Cycle>)=>{
         return a.apply(deferred);
       }
     );

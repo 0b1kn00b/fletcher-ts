@@ -9,9 +9,9 @@ import { Terminal } from 'src/core/Terminal';
 import { Anon } from 'src/term/Anon';
 import { Cycle } from 'src/core/Cycle';
 
-export function react<P,R,E>(dispatch:Dispatch<R>):ArrowletApi<R,void,E>{
+export function react<P,R>(dispatch:Dispatch<R>):ArrowletApi<R,void>{
   return new Anon(
-    (p:R,cont:Terminal<void,E>) => {
+    (p:R,cont:Terminal<void>) => {
       dispatch(p);
       return Cycle.Unit();
     }

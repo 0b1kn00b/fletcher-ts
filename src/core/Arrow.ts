@@ -6,12 +6,12 @@ import { forward, resolve, unit } from "../util";
 import { Fun } from "../term/Fun";
 import { Unit } from "../term/Unit";
 
-export class Arrow<Pi,Ri,Pii,Rii,E>{
-  private _apply : (self:ArrowletApi<Pi,Ri,E>) => ArrowletApi<Pii,Rii,E>;
-  constructor(_apply:(self:ArrowletApi<Pi,Ri,E>) => ArrowletApi<Pii,Rii,E>){
+export class Arrow<Pi,Ri,Pii,Rii>{
+  private _apply : (self:ArrowletApi<Pi,Ri>) => ArrowletApi<Pii,Rii>;
+  constructor(_apply:(self:ArrowletApi<Pi,Ri>) => ArrowletApi<Pii,Rii>){
     this._apply = _apply;
   }  
-  apply(self:ArrowletApi<Pi,Ri,E>):ArrowletApi<Pii,Rii,E>{
+  apply(self:ArrowletApi<Pi,Ri>):ArrowletApi<Pii,Rii>{
     return this._apply(self);
   }
   /**
@@ -19,39 +19,39 @@ export class Arrow<Pi,Ri,Pii,Rii,E>{
    * @param that You
    * @returns 
    */
-  next<Piii,Riii>(that:Arrow<Pii,Rii,Piii,Riii,E>):Arrow<Pi,Ri,Piii,Riii,E>{
-    return new Arrow((self:ArrowletApi<Pi,Ri,E>) => {
+  next<Piii,Riii>(that:Arrow<Pii,Rii,Piii,Riii>):Arrow<Pi,Ri,Piii,Riii>{
+    return new Arrow((self:ArrowletApi<Pi,Ri>) => {
       let next = this.apply(self);
       return that.apply(next);
     });
   }
-  static Make<Pi,Ri,Pii,Rii,E>(apply:(self:ArrowletApi<Pi,Ri,E>) => ArrowletApi<Pii,Rii,E>):Arrow<Pi,Ri,Pii,Rii,E>{
+  static Make<Pi,Ri,Pii,Rii>(apply:(self:ArrowletApi<Pi,Ri>) => ArrowletApi<Pii,Rii>):Arrow<Pi,Ri,Pii,Rii>{
     return new Arrow(apply);
   }
-  static Unit<Pi,Ri,E>():Arrow<Pi,Ri,Pi,Ri,E>{
+  static Unit<Pi,Ri>():Arrow<Pi,Ri,Pi,Ri>{
     return new Arrow(
-      (self:ArrowletApi<Pi,Ri,E>) => self
+      (self:ArrowletApi<Pi,Ri>) => self
     )
   }
-  static Pure<Pi,Ri,Pii,Rii,E>(self:ArrowletApi<Pii,Rii,E>):Arrow<Pi,Ri,Pii,Rii,E>{
+  static Pure<Pi,Ri,Pii,Rii>(self:ArrowletApi<Pii,Rii>):Arrow<Pi,Ri,Pii,Rii>{
     return new Arrow(
-      (_:ArrowletApi<Pi,Ri,E>) => {
+      (_:ArrowletApi<Pi,Ri>) => {
         return self;
       }
     );
   }
-  static Then<Pi,Ri,Rii,E>(that:ArrowletApi<Ri,Rii,E>):Arrow<Pi,Ri,Pi,Rii,E>{
+  static Then<Pi,Ri,Rii>(that:ArrowletApi<Ri,Rii>):Arrow<Pi,Ri,Pi,Rii>{
     return new Arrow(
-      (self:ArrowletApi<Pi,Ri,E>) => new Then(self,that)
+      (self:ArrowletApi<Pi,Ri>) => new Then(self,that)
     );
   }
-  public then<Riii>(that:ArrowletApi<Rii,Riii,E>){
+  public then<Riii>(that:ArrowletApi<Rii,Riii>){
     return this.next(Arrow.Then(that));
   }
-  static Pair<Pi,Pii,Ri,Rii,E>(that:ArrowletApi<Pii,Rii,E>):Arrow<Pi,Ri,[Pi,Pii],[Ri,Rii],E>{
+  static Pair<Pi,Pii,Ri,Rii>(that:ArrowletApi<Pii,Rii>):Arrow<Pi,Ri,[Pi,Pii],[Ri,Rii]>{
     return new Arrow(
-      (self:ArrowletApi<Pi,Ri,E>) => new Anon(
-        (p:[Pi,Pii],cont:Terminal<[Ri,Rii],E>) => {
+      (self:ArrowletApi<Pi,Ri>) => new Anon(
+        (p:[Pi,Pii],cont:Terminal<[Ri,Rii]>) => {
           let [l, r] = p;
           let lhs = forward(self,l);
           let rhs = forward(that,r);
@@ -60,28 +60,28 @@ export class Arrow<Pi,Ri,Pii,Rii,E>{
       )
     );
   }
-  public pair(that:ArrowletApi<Pii,Rii,E>){
+  public pair(that:ArrowletApi<Pii,Rii>){
     return this.next(Arrow.Pair(that));
   }
-  static Split<Pi,Ri,Rii,E>(that:ArrowletApi<Pi,Rii,E>):Arrow<Pi,Ri,Pi,[Ri,Rii],E>{
+  static Split<Pi,Ri,Rii>(that:ArrowletApi<Pi,Rii>):Arrow<Pi,Ri,Pi,[Ri,Rii]>{
     return new Arrow(
-      (self:ArrowletApi<Pi,Ri,E>) => {
+      (self:ArrowletApi<Pi,Ri>) => {
         return new Anon(
-          (p:Pi,cont:Terminal<[Ri,Rii],E>) => {
+          (p:Pi,cont:Terminal<[Ri,Rii]>) => {
             return Arrow.Pair(that).apply(self).defer([p,p],cont);
           }
         )       
       }
     );
   }
-  public split<Riii>(that:ArrowletApi<Pii,Riii,E>){
+  public split<Riii>(that:ArrowletApi<Pii,Riii>){
     return this.next(Arrow.Split(that));
   }
-  static FlatMap<Pi,Ri,Rii,E>(fn:(p:Ri)=>ArrowletApi<Pi,Rii,E>){
+  static FlatMap<Pi,Ri,Rii>(fn:(p:Ri)=>ArrowletApi<Pi,Rii>){
     return new Arrow(
-      (self:ArrowletApi<Pi,Ri,E>) => {
+      (self:ArrowletApi<Pi,Ri>) => {
         return new Anon(
-          (p:Pi,cont:Terminal<Rii,E>) => {
+          (p:Pi,cont:Terminal<Rii>) => {
             return cont.receive(forward(self,p).flat_fold(
               ok => forward(fn(ok),p),
               no => Terminal.error(no) 
@@ -91,12 +91,12 @@ export class Arrow<Pi,Ri,Pii,Rii,E>{
       }
     );
   }
-  public flat_map<Riii>(fn:(p:Rii)=>ArrowletApi<Pii,Riii,E>){
+  public flat_map<Riii>(fn:(p:Rii)=>ArrowletApi<Pii,Riii>){
     return this.next(Arrow.FlatMap(fn));
   }
-  static First<Pi,Ri,Pii,E>(){
-    return new Arrow((self:ArrowletApi<Pi,Ri,E>):ArrowletApi<[Pi,Pii],[Ri,Pii],E> => {
-      let l : Arrow<Pi,Ri,Pii,Pii,E> = Arrow.Pure(new Fun((x:Pii) => x));
+  static First<Pi,Ri,Pii>(){
+    return new Arrow((self:ArrowletApi<Pi,Ri>):ArrowletApi<[Pi,Pii],[Ri,Pii]> => {
+      let l : Arrow<Pi,Ri,Pii,Pii> = Arrow.Pure(new Fun((x:Pii) => x));
       let r = Arrow.Pair(l.apply(self)).apply(self);
       return r;
     });
@@ -104,21 +104,21 @@ export class Arrow<Pi,Ri,Pii,Rii,E>{
   public first(){
     return this.next(Arrow.First());
   }
-  static Second<Pi,Ri,Pii,E>(){
-    return new Arrow((self:ArrowletApi<Pi,Ri,E>):ArrowletApi<[Pii,Pi],[Pii,Ri],E> => {
-      let l : Arrow<Pi,Ri,Pii,Pii,E> = Arrow.Pure(new Fun((x:Pii) => x));
-      let r : ArrowletApi<[Pii,Pi],[Pii,Ri],E> = Arrow.Pair(self).apply(l.apply(self));
+  static Second<Pi,Ri,Pii>(){
+    return new Arrow((self:ArrowletApi<Pi,Ri>):ArrowletApi<[Pii,Pi],[Pii,Ri]> => {
+      let l : Arrow<Pi,Ri,Pii,Pii> = Arrow.Pure(new Fun((x:Pii) => x));
+      let r : ArrowletApi<[Pii,Pi],[Pii,Ri]> = Arrow.Pair(self).apply(l.apply(self));
       return r;
     });
   }
   public second(){
     return this.next(Arrow.Second());
   }
-  static Pinch<Pi,Ri,Rii,E>(that:ArrowletApi<Pi,Rii,E>){
+  static Pinch<Pi,Ri,Rii>(that:ArrowletApi<Pi,Rii>){
     return new Arrow(
-      (self:ArrowletApi<Pi,Ri,E>) => {
+      (self:ArrowletApi<Pi,Ri>) => {
         return new Anon(
-          (p:Pi,cont:Terminal<[Ri,Rii],E>) =>{
+          (p:Pi,cont:Terminal<[Ri,Rii]>) =>{
             return cont.receive(
               forward(self,p).zip(forward(that,p))
             )
@@ -127,39 +127,39 @@ export class Arrow<Pi,Ri,Pii,Rii,E>{
       }
     );
   }
-  public pinch<Riii>(that:ArrowletApi<Pii,Riii,E>){
+  public pinch<Riii>(that:ArrowletApi<Pii,Riii>){
     return this.next(Arrow.Pinch(that));
   }
-  static Joint<Pi,Ri,Rii,E>(that:ArrowletApi<Ri,Rii,E>):Arrow<Pi,Ri,Pi,[Ri,Rii],E>{
+  static Joint<Pi,Ri,Rii>(that:ArrowletApi<Ri,Rii>):Arrow<Pi,Ri,Pi,[Ri,Rii]>{
     return new Arrow(
-      (self:ArrowletApi<Pi,Ri,E>):ArrowletApi<Pi,[Ri,Rii],E> => {
+      (self:ArrowletApi<Pi,Ri>):ArrowletApi<Pi,[Ri,Rii]> => {
         return Arrow.Then(
           Arrow.Pure(Arrow.Split(that).apply(new Unit())).apply(new Unit())
         ).apply(self);
       }
     );
   }
-  public joint<Riii>(that:ArrowletApi<Rii,Riii,E>):Arrow<Pi,Ri,Pii,[Rii,Riii],E>{
+  public joint<Riii>(that:ArrowletApi<Rii,Riii>):Arrow<Pi,Ri,Pii,[Rii,Riii]>{
     return this.next(Arrow.Joint(that));
   }
-  static Bound<Pi,Ri,Rii,E>(that:ArrowletApi<[Pi,Ri],Rii,E>){
+  static Bound<Pi,Ri,Rii>(that:ArrowletApi<[Pi,Ri],Rii>){
     return new Arrow(
-      (self:ArrowletApi<Pi,Ri,E>) => {
-        let u : ArrowletApi<Pi,Pi,E>              = new Unit();
-        let l : Arrow<Pi, [Pi, Ri], Ri, Rii, E>   = Arrow.Then(that); 
+      (self:ArrowletApi<Pi,Ri>) => {
+        let u : ArrowletApi<Pi,Pi>              = new Unit();
+        let l : Arrow<Pi, [Pi, Ri], Ri, Rii>   = Arrow.Then(that); 
         let r                                     = Arrow.Joint(self).apply(u);
         let n = l.apply(r);
         return n;
       }
     );
   }
-  public bound<Riii>(that:ArrowletApi<[Pii,Rii],Riii,E>){
+  public bound<Riii>(that:ArrowletApi<[Pii,Rii],Riii>){
     return this.next(Arrow.Bound(that));
   }
-  static Broach<Pi,Ri,E>(){
+  static Broach<Pi,Ri>(){
     return new Arrow(
-      (self:ArrowletApi<Pi,Ri,E>) => {
-        let unit : ArrowletApi<[Pi,Ri],[Pi,Ri],E> = new Fun( (p:[Pi,Ri]) => p);
+      (self:ArrowletApi<Pi,Ri>) => {
+        let unit : ArrowletApi<[Pi,Ri],[Pi,Ri]> = new Fun( (p:[Pi,Ri]) => p);
         return Arrow.Bound(unit).apply(self);
       } 
     );
@@ -170,10 +170,10 @@ export class Arrow<Pi,Ri,Pii,Rii,E>{
   public resolve(p:Pii){
     return resolve(this.apply(unit()),p);
   }
-  static Compose<Pi,Pii,Piii,Ri,Rii,Riii,E>(lhs:Arrow<Ri,Rii,Piii,Riii,E>,rhs:Arrow<Pi,Pii,Ri,Rii,E>){
+  static Compose<Pi,Pii,Piii,Ri,Rii,Riii>(lhs:Arrow<Ri,Rii,Piii,Riii>,rhs:Arrow<Pi,Pii,Ri,Rii>){
     return rhs.next(lhs);
   }
-  public compose<P,R>(before:Arrow<P,R,Pi,Ri,E>){
+  public compose<P,R>(before:Arrow<P,R,Pi,Ri>){
     return Arrow.Compose(this,before);
   }
 }

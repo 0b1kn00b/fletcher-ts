@@ -18,9 +18,9 @@ import { Dispatch } from "react";
 /**Takes a resolver to use later that may return Cycle to be done in a scheduler once all inputs are known*/
 
 export class Fletcher{
-  static Terminal<P,E>(){
+  static Terminal<P>(){
     return new Terminal(
-      (a:Apply<TerminalInput<P,E>,Cycle>):Cycle => {
+      (a:Apply<TerminalInput<P>,Cycle>):Cycle => {
         return a.apply(new Deferred());
       }
     )
@@ -28,50 +28,50 @@ export class Fletcher{
   static Arrow(){
     return Arrow;
   }
-  static Fun1R<Pi,Ri,E>(fn:(p:Pi)=>Ri):ArrowletApi<Pi,Ri,E>{
+  static Fun1R<Pi,Ri>(fn:(p:Pi)=>Ri):ArrowletApi<Pi,Ri>{
     return new Fun(fn);
   }
-  static Pure<Pi,Ri,E>(r:Ri):ArrowletApi<Pi,Ri,E>{
+  static Pure<Pi,Ri>(r:Ri):ArrowletApi<Pi,Ri>{
     return Fletcher.Fun1R((_:Pi) =>r);
   }
-  static Anon<Pi,Ri,E>(fn:(p:Pi,cont:Terminal<Ri,E>)=>Cycle){
+  static Anon<Pi,Ri>(fn:(p:Pi,cont:Terminal<Ri>)=>Cycle){
     return new Anon(fn)
   }
-  static Resolve<P,R,E>(self:ArrowletApi<P,R,E>,input:P):Promise<Result<R,E>>{
+  static Resolve<P,R>(self:ArrowletApi<P,R>,input:P):Promise<Result<R>>{
     return resolve(self,input);
   }
-  static Forward<P,R,E>(self:ArrowletApi<P,R,E>,input:P):Receiver<R,E>{
+  static Forward<P,R>(self:ArrowletApi<P,R>,input:P):Receiver<R>{
     return forward(self,input);
   }
-  static Event<R extends Event,E>(self:EventTarget):ArrowletApi<string,R,E>{
+  static Event<R extends Event>(self:EventTarget):ArrowletApi<string,R>{
     return new EventArrowlet(self)
   }
 
-  static Then<Pi,Ri,Rii,E>(that:ArrowletApi<Ri,Rii,E>):Arrow<Pi,Ri,Pi,Rii,E>{
+  static Then<Pi,Ri,Rii>(that:ArrowletApi<Ri,Rii>):Arrow<Pi,Ri,Pi,Rii>{
     return Fletcher.Arrow().Then(that);
   }
-  static Pair<Pi,Pii,Ri,Rii,E>(that:ArrowletApi<Pii,Rii,E>){
+  static Pair<Pi,Pii,Ri,Rii>(that:ArrowletApi<Pii,Rii>){
     return Fletcher.Arrow().Pair(that);
   }
-  static FlatMap<Pi,Ri,Rii,E>(fn:(p:Ri)=>ArrowletApi<Pi,Rii,E>){
+  static FlatMap<Pi,Ri,Rii>(fn:(p:Ri)=>ArrowletApi<Pi,Rii>){
     return Fletcher.Arrow().FlatMap(fn);
   }
-  static First<Pi,Ri,Pii,E>(){
+  static First<Pi,Ri,Pii>(){
     return Fletcher.Arrow().First();
   }
-  static Second<Pi,Ri,Pii,E>(){
+  static Second<Pi,Ri,Pii>(){
     return Fletcher.Arrow().Second();
   }
-  static Pinch<Pi,Ri,Rii,E>(that:ArrowletApi<Pi,Rii,E>){
+  static Pinch<Pi,Ri,Rii>(that:ArrowletApi<Pi,Rii>){
     return Fletcher.Arrow().Pinch(that);
   }
-  static Joint<Pi,Ri,Rii,E>(that:ArrowletApi<Ri,Rii,E>):Arrow<Pi,Ri,Pi,[Ri,Rii],E>{
+  static Joint<Pi,Ri,Rii>(that:ArrowletApi<Ri,Rii>):Arrow<Pi,Ri,Pi,[Ri,Rii]>{
     return Fletcher.Arrow().Joint(that);
   }
-  static Next<Pi,Pii,Piii,Ri,Rii,Riii,E>(lhs:Arrow<Pi,Pii,Ri,Rii,E>,rhs:Arrow<Ri,Rii,Piii,Riii,E>){
+  static Next<Pi,Pii,Piii,Ri,Rii,Riii>(lhs:Arrow<Pi,Pii,Ri,Rii>,rhs:Arrow<Ri,Rii,Piii,Riii>){
     return lhs.next(rhs);
   }
-  static React<R,E>(dispatch:Dispatch<R>):ArrowletApi<R,void,E>{  
+  static React<R>(dispatch:Dispatch<R>):ArrowletApi<R,void>{  
     return react(useReducerWithThunk(dispatch));
   }
 }

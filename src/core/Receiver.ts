@@ -7,23 +7,23 @@ import { Apply } from "./Apply";
 import * as Either from "fp-ts/Either";
 
 /**Type only createable through Terminal that resolves a Arrowlet*/
-export type ReceiverInput<R, E>   = Promise<Result<R, E>>;
-export type ReceiverSink<R,E>     = Apply<ReceiverInput<R,E>,Cycle>;
-export class Receiver<R, E> extends Settler<ReceiverInput<R, E>>{
-  flat_fold<Ri>(ok:(r:R)=>Receiver<Ri,E>,no:(e:E)=>Receiver<Ri,E>):Receiver<Ri,E>{
+export type ReceiverInput<R>   = Promise<Result<R>>;
+export type ReceiverSink<R>     = Apply<ReceiverInput<R>,Cycle>;
+export class Receiver<R> extends Settler<ReceiverInput<R>>{
+  flat_fold<Ri>(ok:(r:R)=>Receiver<Ri>,no:(e:Error)=>Receiver<Ri>):Receiver<Ri>{
     return new Receiver(
-      (cont:Apply<ReceiverInput<Ri,E>,Cycle>) => {
+      (cont:Apply<ReceiverInput<Ri>,Cycle>) => {
         return this.apply(
           new Apply(
-            (p:ReceiverInput<R,E>) => {
+            (p:ReceiverInput<R>) => {
               let a = p.then(
-                (outcome:Result<R,E>) : Receiver<Ri,E> => {
+                (outcome:Result<R>) : Receiver<Ri> => {
                   let a = Either.match(ok,no)(outcome);
                   return a;
                 }
               );
               let b = a.then(
-                (x:Receiver<Ri,E>):Cycle => {
+                (x:Receiver<Ri>):Cycle => {
                   let a : Cycle = x.apply(cont);
                   return a;
                 }
@@ -36,7 +36,7 @@ export class Receiver<R, E> extends Settler<ReceiverInput<R, E>>{
       }
     );
   }
-  public handler(ok:(result:R)=>void,no?:(error:E)=>void):(result:Result<R,E>) => void{
+  public handler(ok:(result:R)=>void,no?:(error:Error)=>void):(result:Result<R>) => void{
     return Either.match(
       result => ok(result),
       error  => {
@@ -48,14 +48,14 @@ export class Receiver<R, E> extends Settler<ReceiverInput<R, E>>{
       } 
     );
   }
-  zip<Ri>(that:Receiver<Ri,E>){
+  zip<Ri>(that:Receiver<Ri>){
     return Receiver.Zip(this,that);
   }
-  static Zip<R,Ri,E>(self:Receiver<R,E>,that:Receiver<Ri,E>):Receiver<[R,Ri],E>{
+  static Zip<R,Ri>(self:Receiver<R>,that:Receiver<Ri>):Receiver<[R,Ri]>{
     return new Receiver(
-      (f:Apply<ReceiverInput<[R,Ri],E>,Cycle>) => {
-          var lhs  : ReceiverInput<R, E>     | null = null;
-          var rhs  : ReceiverInput<Ri, E>    | null = null;
+      (f:Apply<ReceiverInput<[R,Ri]>,Cycle>) => {
+          var lhs  : ReceiverInput<R>     | null = null;
+          var rhs  : ReceiverInput<Ri>    | null = null;
           let work_left  = self.apply(
             new Apply((ocI)   => {
               lhs = ocI;
@@ -71,19 +71,19 @@ export class Receiver<R, E> extends Settler<ReceiverInput<R, E>>{
           return work_left.par(work_right).seq(
             new Cycle(
               () => {
-                let lhs_ : ReceiverInput<R,E>   = lhs!;
-                let rhs_ : ReceiverInput<Ri,E>  = rhs!;
+                let lhs_ : ReceiverInput<R>   = lhs!;
+                let rhs_ : ReceiverInput<Ri>  = rhs!;
                 let ipt = 
                   lhs_.then(
-                    (okI:Result<R, E>) => rhs_.then(
-                      (okII:Result<Ri, E>) => { 
+                    (okI:Result<R>) => rhs_.then(
+                      (okII:Result<Ri>) => { 
                         return {fst : okI, snd : okII} 
                       }
                     )
                   );
 
                 let nxt = ipt.then(
-                  (p:{ fst : Result<R,E>,snd : Result<Ri,E>}):Result<[R,Ri],E> => {
+                  (p:{ fst : Result<R>,snd : Result<Ri>}):Result<[R,Ri]> => {
                     return Either.fold(
                       (l:R) => {
                         return Either.fold(
@@ -91,10 +91,10 @@ export class Receiver<R, E> extends Settler<ReceiverInput<R, E>>{
                             let res : [R,Ri] = [l,lI]; 
                             return Either.left(res);
                           },
-                          (r:E)   => Either.right(r)
+                          (r:Error)   => Either.right(r)
                         )(p.snd)
                       },
-                      (r:E) => Either.right(r)
+                      (r:Error) => Either.right(r)
                     )(p.fst);
                   }
                 );

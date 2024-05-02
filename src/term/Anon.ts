@@ -2,12 +2,12 @@ import { ArrowletApi } from "../core/ArrowletApi";
 import { Cycle } from "../core/Cycle";
 import { Terminal } from "../core/Terminal";
 
-export class Anon<Pi,R,E> implements ArrowletApi<Pi,R,E>{
-  private _defer :   ( (p:Pi,cont:Terminal<R,E>) => Cycle);
-  constructor(_defer:( (p:Pi,cont:Terminal<R,E>) => Cycle)){
+export class Anon<Pi,R> implements ArrowletApi<Pi,R>{
+  private _defer :   ( (p:Pi,cont:Terminal<R>) => Cycle);
+  constructor(_defer:( (p:Pi,cont:Terminal<R>) => Cycle)){
     this._defer = _defer;
   }
-  defer(p:Pi,cont:Terminal<R,E>):Cycle{
+  defer(p:Pi,cont:Terminal<R>):Cycle{
     return this._defer(p,cont);
   }
 }
