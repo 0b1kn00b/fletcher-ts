@@ -11,20 +11,23 @@ export function react<P,R,E>(self:ArrowletApi<P,R,E>,p:P){
     dispatch(result);
   }
 }
-function useReducerWithThunk<S,A>(reducer:Reducer<S,A>, initialState:S) {
-  const [state, dispatch] = useReducer(reducer, initialState);
+type AsyncAction<A> = (action: A | ((a: A) => void)) => void;
+//<Reducer<S, A>>(reducer: Reducer<S, A>, initialState: S, initializer?: undefined): [S, Dispatch<A>] (+4 overloads) import useReducer
+function useReducerWithThunk<S,A>(reducer:Reducer<S,A>, initialState:S) : [S,AsyncAction<A>] {
+  const [state, dispatch] : [S, Dispatch<A>]= useReducer(reducer, initialState);
 
-  function customDispatch(action:any) {
-    if (typeof action === 'function') {
-      return action(customDispatch);
-    } else {
-      dispatch(action);
+  function customDispatch(action:((a:A)=>void) | A):void{
+    switch  (typeof action ) {
+      case 'function' :
+        return (action as ( (fn:((a:A) => void)) => void))(customDispatch);
+      default : 
+        dispatch(action);
     }
   };
 
   // Memoize so you can include it in the dependency array without causing infinite loops
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  const stableDispatch = useCallback(customDispatch, [dispatch]);
+  const stableDispatch : (action: A | ((a: A) => void)) => void = useCallback(customDispatch, [dispatch]);
 
   return [state, stableDispatch];
 }
