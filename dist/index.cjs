@@ -1,1 +1,528 @@
-"use strict";var E=Object.defineProperty;var J=(s,e,t)=>e in s?E(s,e,{enumerable:!0,configurable:!0,writable:!0,value:t}):s[e]=t;var f=(s,e,t)=>(J(s,typeof e!="symbol"?e+"":e,t),t);Object.defineProperty(exports,Symbol.toStringTag,{value:"Module"});var R=function(){function s(){var e=this;this.resolve=function(t){e._resolve(t)},this.reject=function(t){e._reject(t)},this._promise=new Promise(function(t,r){e._resolve=t,e._reject=r})}return Object.defineProperty(s.prototype,"promise",{get:function(){return this._promise},enumerable:!0,configurable:!0}),s}(),g=R,D=function(s){return s._tag==="Left"},z=function(s){return{_tag:"Left",left:s}},W=function(s){return{_tag:"Right",right:s}},F=z,U=W,$=D,O=function(s,e){return function(t){return $(t)?s(t.left):e(t.right)}},j=O,L=j;class l{constructor(e){f(this,"_after",null);this._after=e}get after(){return this._after==null?null:this._after()}static Seq(e,t){return new l(()=>{let r=e==null?void 0:e.after;return r!=null?new Promise(n=>r.then(i=>l.Seq(i,t)).then(n)):t==null?void 0:t.after})}seq(e){return l.Par(this,e)}par(e){return l.Par(this,e)}submit(){return l.Submit(this)}static Submit(e){let t=new g;if(e!=null){const r=e.after;r!=null?r.then(n=>{n!=null?l.Submit(n).then(i=>t.resolve(i),i=>t.reject(i)):t.resolve(null)}):t.resolve(null)}else t.resolve(null);return t.promise}static Par(e,t){let r=e.after??Promise.resolve(l.Unit()),n=t.after??Promise.resolve(l.Unit()),i=Promise.all([r,n]);return l.Pure(i.then(([a,o])=>a!=null&&o!=null?l.Par(a,o):a??o))}static Unit(){return new l(null)}static Pure(e){return new l(()=>e)}}class w{constructor(e){f(this,"_apply");this._apply=e}apply(e){return this._apply(e)}}class Z extends w{}class M extends Z{}class v extends M{flat_fold(e,t){return new v(r=>this.apply(new w(n=>{let a=n.then(c=>j(e,t)(c)).then(c=>c.apply(r));return new l(()=>a)})))}handler(e,t){return j(r=>e(r),r=>{if(t)t(r);else throw t})}zip(e){return v.Zip(this,e)}static Zip(e,t){return new v(r=>{var n=null,i=null;let a=e.apply(new w(c=>(n=c,l.Unit())));var o=t.apply(new w(c=>(i=c,l.Unit())));return a.par(o).seq(new l(()=>{let c=n,S=i,q=c.then(y=>S.then(m=>({fst:y,snd:m}))).then(y=>L(m=>L(b=>F([m,b]),b=>U(b))(y.snd),m=>U(m))(y.fst)),B=r.apply(q);return new Promise(y=>y(B))}))})}}class p extends M{receive(e){return e.apply(new w(t=>this.apply(new w(r=>{let n=t.then(i=>{r.resolve(i)});return new l(()=>n.then(i=>l.Unit()))}))))}static later(e){return new v(t=>t.apply(e))}static issue(e){return new v(function(t){let r=new Promise(n=>{n(e)});return t.apply(r)})}static value(e){return p.issue(F(e))}static error(e){return p.issue(U(e))}static Pure(e){return new p(t=>t.apply(e))}}class P{constructor(e){f(this,"_apply");this._apply=e}defer(e,t){return t.receive(p.value(this._apply(e)))}}class x{constructor(e){f(this,"_defer");this._defer=e}defer(e,t){return this._defer(e,t)}}function d(s,e){return new v(t=>{let r=new g,n=s.defer(e,new p(a=>a.apply(r))),i=t.apply(r.promise);return l.Seq(n,i)})}function k(s,e){let t=new g;return s.defer(e,p.Pure(t)).submit().then(()=>t.promise.then(i=>i))}function N(){return new P(s=>null)}class G{constructor(e){f(this,"_emiter");this._emiter=e}defer(e,t){let r=new g,n=this,i={handleEvent:function(a){r.resolve(F(a)),n._emiter.removeEventListener(e,i)}};return this._emiter.addEventListener(e,i),t.receive(p.later(r.promise))}}class H{constructor(e,t){f(this,"lhs");f(this,"rhs");this.lhs=e,this.rhs=t}defer(e,t){var r=d(this.lhs,e);return t.receive(r.flat_fold(n=>d(this.rhs,n),n=>p.error(n)))}}class T extends P{constructor(){super(e=>e)}}class u{constructor(e){f(this,"_apply");this._apply=e}apply(e){return this._apply(e)}next(e){return new u(t=>{let r=this.apply(t);return e.apply(r)})}static Make(e){return new u(e)}static Unit(){return new u(e=>e)}static Pure(e){return new u(t=>e)}static Then(e){return new u(t=>new H(t,e))}then(e){return this.next(u.Then(e))}static Pair(e){return new u(t=>new x((r,n)=>{let[i,a]=r,o=d(t,i),c=d(e,a);return n.receive(o.zip(c))}))}pair(e){return this.next(u.Pair(e))}static Split(e){return new u(t=>new x((r,n)=>u.Pair(e).apply(t).defer([r,r],n)))}split(e){return this.next(u.Split(e))}static FlatMap(e){return new u(t=>new x((r,n)=>n.receive(d(t,r).flat_fold(i=>d(e(i),r),i=>p.error(i)))))}flat_map(e){return this.next(u.FlatMap(e))}static First(){return new u(e=>{let t=u.Pure(new P(n=>n));return u.Pair(t.apply(e)).apply(e)})}first(){return this.next(u.First())}static Second(){return new u(e=>{let t=u.Pure(new P(n=>n));return u.Pair(e).apply(t.apply(e))})}second(){return this.next(u.Second())}static Pinch(e){return new u(t=>new x((r,n)=>n.receive(d(t,r).zip(d(e,r)))))}pinch(e){return this.next(u.Pinch(e))}static Joint(e){return new u(t=>u.Then(u.Pure(u.Split(e).apply(new T)).apply(new T)).apply(t))}joint(e){return this.next(u.Joint(e))}static Bound(e){return new u(t=>{let r=new T,n=u.Then(e),i=u.Joint(t).apply(r);return n.apply(i)})}bound(e){return this.next(u.Bound(e))}static Broach(){return new u(e=>{let t=new P(r=>r);return u.Bound(t).apply(e)})}broach(){return this.next(u.Broach())}resolve(e){return k(this.apply(N()),e)}static Compose(e,t){return t.next(e)}compose(e){return u.Compose(this,e)}}function I(s){function e(t){switch(typeof t){case"function":return t(e);default:s(t)}}return e}class h{static Terminal(){return new p(e=>e.apply(new g))}static Arrow(){return u}static Fun1R(e){return new P(e)}static Pure(e){return h.Fun1R(t=>e)}static Anon(e){return new x(e)}static Resolve(e,t){return k(e,t)}static Forward(e,t){return d(e,t)}static Event(e){return new G(e)}static Then(e){return h.Arrow().Then(e)}static Pair(e){return h.Arrow().Pair(e)}static FlatMap(e){return h.Arrow().FlatMap(e)}static First(){return h.Arrow().First()}static Second(){return h.Arrow().Second()}static Pinch(e){return h.Arrow().Pinch(e)}static Joint(e){return h.Arrow().Joint(e)}static Next(e,t){return e.next(t)}static React(e,t){}}exports.Fletcher=h;exports.useReducerWithThunk=I;
+"use strict";
+var __defProp = Object.defineProperty;
+var __defNormalProp = (obj, key, value) => key in obj ? __defProp(obj, key, { enumerable: true, configurable: true, writable: true, value }) : obj[key] = value;
+var __publicField = (obj, key, value) => {
+  __defNormalProp(obj, typeof key !== "symbol" ? key + "" : key, value);
+  return value;
+};
+Object.defineProperty(exports, Symbol.toStringTag, { value: "Module" });
+var Deferred = function() {
+  function Deferred2() {
+    var _this = this;
+    this.resolve = function(value) {
+      _this._resolve(value);
+    };
+    this.reject = function(reason) {
+      _this._reject(reason);
+    };
+    this._promise = new Promise(function(resolve2, reject) {
+      _this._resolve = resolve2;
+      _this._reject = reject;
+    });
+  }
+  Object.defineProperty(Deferred2.prototype, "promise", {
+    get: function() {
+      return this._promise;
+    },
+    enumerable: true,
+    configurable: true
+  });
+  return Deferred2;
+}();
+var Deferred_1 = Deferred;
+(function(to, from, pack) {
+  if (pack || arguments.length === 2)
+    for (var i = 0, l = from.length, ar; i < l; i++) {
+      if (ar || !(i in from)) {
+        if (!ar)
+          ar = Array.prototype.slice.call(from, 0, i);
+        ar[i] = from[i];
+      }
+    }
+  return to.concat(ar || Array.prototype.slice.call(from));
+});
+var isLeft$1 = function(ma) {
+  return ma._tag === "Left";
+};
+var left$1 = function(e) {
+  return { _tag: "Left", left: e };
+};
+var right$1 = function(a) {
+  return { _tag: "Right", right: a };
+};
+var left = left$1;
+var right = right$1;
+var isLeft = isLeft$1;
+var matchW = function(onLeft, onRight) {
+  return function(ma) {
+    return isLeft(ma) ? onLeft(ma.left) : onRight(ma.right);
+  };
+};
+var match = matchW;
+var fold = match;
+class Cycle {
+  constructor(_after) {
+    __publicField(this, "_after", null);
+    this._after = _after;
+  }
+  get after() {
+    return this._after == null ? null : this._after();
+  }
+  static Seq(lhs, rhs) {
+    return new Cycle(() => {
+      let a = lhs == null ? void 0 : lhs.after;
+      if (a != null) {
+        return new Promise((resolve2) => a.then((x) => {
+          return Cycle.Seq(x, rhs);
+        }).then(resolve2));
+      } else {
+        return rhs == null ? void 0 : rhs.after;
+      }
+    });
+  }
+  seq(rhs) {
+    return Cycle.Par(this, rhs);
+  }
+  par(rhs) {
+    return Cycle.Par(this, rhs);
+  }
+  submit() {
+    return Cycle.Submit(this);
+  }
+  static Submit(self) {
+    let deferred = new Deferred_1();
+    if (self != null) {
+      const after = self.after;
+      if (after != null) {
+        after.then((x) => {
+          if (x != null) {
+            Cycle.Submit(x).then((x2) => deferred.resolve(x2), (e) => deferred.reject(e));
+          } else {
+            deferred.resolve(null);
+          }
+        });
+      } else {
+        deferred.resolve(null);
+      }
+    } else {
+      deferred.resolve(null);
+    }
+    return deferred.promise;
+  }
+  static Par(self, that) {
+    let l = self.after ?? Promise.resolve(Cycle.Unit());
+    let r = that.after ?? Promise.resolve(Cycle.Unit());
+    let a = Promise.all([l, r]);
+    return Cycle.Pure(a.then(([l2, r2]) => {
+      if (l2 != null && r2 != null) {
+        return Cycle.Par(l2, r2);
+      } else if (l2 != null) {
+        return l2;
+      } else {
+        return r2;
+      }
+    }));
+  }
+  static Unit() {
+    return new Cycle(null);
+  }
+  static Pure(self) {
+    return new Cycle(() => self);
+  }
+}
+class Apply {
+  constructor(_apply) {
+    __publicField(this, "_apply");
+    this._apply = _apply;
+  }
+  apply(a) {
+    return this._apply(a);
+  }
+}
+class Cont extends Apply {
+}
+class Settler extends Cont {
+}
+class Receiver extends Settler {
+  flat_fold(ok, no) {
+    return new Receiver((cont) => {
+      return this.apply(new Apply((p) => {
+        let a = p.then((outcome) => {
+          let a2 = match(ok, no)(outcome);
+          return a2;
+        });
+        let b = a.then((x) => {
+          let a2 = x.apply(cont);
+          return a2;
+        });
+        let c = new Cycle(() => b);
+        return c;
+      }));
+    });
+  }
+  handler(ok, no) {
+    return match((result) => ok(result), (error) => {
+      if (no) {
+        no(error);
+      } else {
+        throw no;
+      }
+    });
+  }
+  zip(that) {
+    return Receiver.Zip(this, that);
+  }
+  static Zip(self, that) {
+    return new Receiver((f) => {
+      var lhs = null;
+      var rhs = null;
+      let work_left = self.apply(new Apply((ocI) => {
+        lhs = ocI;
+        return Cycle.Unit();
+      }));
+      var work_right = that.apply(new Apply((ocII) => {
+        rhs = ocII;
+        return Cycle.Unit();
+      }));
+      return work_left.par(work_right).seq(new Cycle(() => {
+        let lhs_ = lhs;
+        let rhs_ = rhs;
+        let ipt = lhs_.then((okI) => rhs_.then((okII) => {
+          return { fst: okI, snd: okII };
+        }));
+        let nxt = ipt.then((p) => {
+          return fold((l) => {
+            return fold((lI) => {
+              let res2 = [l, lI];
+              return left(res2);
+            }, (r) => right(r))(p.snd);
+          }, (r) => right(r))(p.fst);
+        });
+        let res = f.apply(nxt);
+        return new Promise((resolve2) => resolve2(res));
+      }));
+    });
+  }
+}
+class Terminal extends Settler {
+  receive(receiver) {
+    return receiver.apply(new Apply((a) => {
+      return this.apply(new Apply((b) => {
+        let result = a.then((v) => {
+          b.resolve(v);
+        });
+        return new Cycle(() => {
+          return result.then((_) => {
+            return Cycle.Unit();
+          });
+        });
+      }));
+    }));
+  }
+  static later(payload) {
+    return new Receiver((fn) => {
+      return fn.apply(payload);
+    });
+  }
+  static issue(self) {
+    return new Receiver(function(fn) {
+      let promise = new Promise((resolve2) => {
+        resolve2(self);
+      });
+      return fn.apply(promise);
+    });
+  }
+  static value(self) {
+    return Terminal.issue(left(self));
+  }
+  static error(self) {
+    return Terminal.issue(right(self));
+  }
+  static Pure(deferred) {
+    return new Terminal((a) => {
+      return a.apply(deferred);
+    });
+  }
+}
+class Fun {
+  constructor(_apply) {
+    __publicField(this, "_apply");
+    this._apply = _apply;
+  }
+  defer(p, cont) {
+    return cont.receive(Terminal.value(this._apply(p)));
+  }
+}
+class Anon {
+  constructor(_defer) {
+    __publicField(this, "_defer");
+    this._defer = _defer;
+  }
+  defer(p, cont) {
+    return this._defer(p, cont);
+  }
+}
+function forward(self, p) {
+  return new Receiver((k) => {
+    let deferred = new Deferred_1();
+    let fst = self.defer(p, new Terminal((t_sink) => {
+      let result = t_sink.apply(deferred);
+      return result;
+    }));
+    let snd = k.apply(deferred.promise);
+    return Cycle.Seq(fst, snd);
+  });
+}
+function resolve(self, input) {
+  let deferred = new Deferred_1();
+  let cycle = self.defer(input, Terminal.Pure(deferred));
+  let finish = cycle.submit();
+  return finish.then(() => {
+    return deferred.promise.then((x) => {
+      return x;
+    });
+  });
+}
+function unit() {
+  return new Fun((pi) => {
+    return null;
+  });
+}
+class EventArrowlet {
+  constructor(_emiter) {
+    __publicField(this, "_emiter");
+    this._emiter = _emiter;
+  }
+  defer(eventname, cont) {
+    let deferred = new Deferred_1();
+    let self = this;
+    let handler = {
+      handleEvent: function(evt) {
+        deferred.resolve(left(evt));
+        self._emiter.removeEventListener(eventname, handler);
+      }
+    };
+    this._emiter.addEventListener(eventname, handler);
+    return cont.receive(Terminal.later(deferred.promise));
+  }
+}
+class Then {
+  constructor(lhs, rhs) {
+    __publicField(this, "lhs");
+    __publicField(this, "rhs");
+    this.lhs = lhs;
+    this.rhs = rhs;
+  }
+  defer(p, cont) {
+    var a = forward(this.lhs, p);
+    return cont.receive(a.flat_fold((ok) => forward(this.rhs, ok), (no) => Terminal.error(no)));
+  }
+}
+class Unit extends Fun {
+  constructor() {
+    super((p) => p);
+  }
+}
+class Arrow {
+  constructor(_apply) {
+    __publicField(this, "_apply");
+    this._apply = _apply;
+  }
+  apply(self) {
+    return this._apply(self);
+  }
+  /**
+   * You liked arrows so much, we put arrows in your arrows.
+   * @param that You
+   * @returns
+   */
+  next(that) {
+    return new Arrow((self) => {
+      let next = this.apply(self);
+      return that.apply(next);
+    });
+  }
+  static Make(apply) {
+    return new Arrow(apply);
+  }
+  static Unit() {
+    return new Arrow((self) => self);
+  }
+  static Pure(self) {
+    return new Arrow((_) => {
+      return self;
+    });
+  }
+  static Then(that) {
+    return new Arrow((self) => new Then(self, that));
+  }
+  then(that) {
+    return this.next(Arrow.Then(that));
+  }
+  static Pair(that) {
+    return new Arrow((self) => new Anon((p, cont) => {
+      let [l, r] = p;
+      let lhs = forward(self, l);
+      let rhs = forward(that, r);
+      return cont.receive(lhs.zip(rhs));
+    }));
+  }
+  pair(that) {
+    return this.next(Arrow.Pair(that));
+  }
+  static Split(that) {
+    return new Arrow((self) => {
+      return new Anon((p, cont) => {
+        return Arrow.Pair(that).apply(self).defer([p, p], cont);
+      });
+    });
+  }
+  split(that) {
+    return this.next(Arrow.Split(that));
+  }
+  static FlatMap(fn) {
+    return new Arrow((self) => {
+      return new Anon((p, cont) => {
+        return cont.receive(forward(self, p).flat_fold((ok) => forward(fn(ok), p), (no) => Terminal.error(no)));
+      });
+    });
+  }
+  flat_map(fn) {
+    return this.next(Arrow.FlatMap(fn));
+  }
+  static First() {
+    return new Arrow((self) => {
+      let l = Arrow.Pure(new Fun((x) => x));
+      let r = Arrow.Pair(l.apply(self)).apply(self);
+      return r;
+    });
+  }
+  first() {
+    return this.next(Arrow.First());
+  }
+  static Second() {
+    return new Arrow((self) => {
+      let l = Arrow.Pure(new Fun((x) => x));
+      let r = Arrow.Pair(self).apply(l.apply(self));
+      return r;
+    });
+  }
+  second() {
+    return this.next(Arrow.Second());
+  }
+  static Pinch(that) {
+    return new Arrow((self) => {
+      return new Anon((p, cont) => {
+        return cont.receive(forward(self, p).zip(forward(that, p)));
+      });
+    });
+  }
+  pinch(that) {
+    return this.next(Arrow.Pinch(that));
+  }
+  static Joint(that) {
+    return new Arrow((self) => {
+      return Arrow.Then(Arrow.Pure(Arrow.Split(that).apply(new Unit())).apply(new Unit())).apply(self);
+    });
+  }
+  joint(that) {
+    return this.next(Arrow.Joint(that));
+  }
+  static Bound(that) {
+    return new Arrow((self) => {
+      let u = new Unit();
+      let l = Arrow.Then(that);
+      let r = Arrow.Joint(self).apply(u);
+      let n = l.apply(r);
+      return n;
+    });
+  }
+  bound(that) {
+    return this.next(Arrow.Bound(that));
+  }
+  static Broach() {
+    return new Arrow((self) => {
+      let unit2 = new Fun((p) => p);
+      return Arrow.Bound(unit2).apply(self);
+    });
+  }
+  broach() {
+    return this.next(Arrow.Broach());
+  }
+  resolve(p) {
+    return resolve(this.apply(unit()), p);
+  }
+  static Compose(lhs, rhs) {
+    return rhs.next(lhs);
+  }
+  compose(before) {
+    return Arrow.Compose(this, before);
+  }
+}
+function useReducerWithThunk(dispatch) {
+  function customDispatch(action) {
+    switch (typeof action) {
+      case "function":
+        return action(customDispatch);
+      default:
+        dispatch(action);
+    }
+  }
+  return customDispatch;
+}
+class Fletcher {
+  static Terminal() {
+    return new Terminal((a) => {
+      return a.apply(new Deferred_1());
+    });
+  }
+  static Arrow() {
+    return Arrow;
+  }
+  static Fun1R(fn) {
+    return new Fun(fn);
+  }
+  static Pure(r) {
+    return Fletcher.Fun1R((_) => r);
+  }
+  static Anon(fn) {
+    return new Anon(fn);
+  }
+  static Resolve(self, input) {
+    return resolve(self, input);
+  }
+  static Forward(self, input) {
+    return forward(self, input);
+  }
+  static Event(self) {
+    return new EventArrowlet(self);
+  }
+  static Then(that) {
+    return Fletcher.Arrow().Then(that);
+  }
+  static Pair(that) {
+    return Fletcher.Arrow().Pair(that);
+  }
+  static FlatMap(fn) {
+    return Fletcher.Arrow().FlatMap(fn);
+  }
+  static First() {
+    return Fletcher.Arrow().First();
+  }
+  static Second() {
+    return Fletcher.Arrow().Second();
+  }
+  static Pinch(that) {
+    return Fletcher.Arrow().Pinch(that);
+  }
+  static Joint(that) {
+    return Fletcher.Arrow().Joint(that);
+  }
+  static Next(lhs, rhs) {
+    return lhs.next(rhs);
+  }
+  static React(self, p) {
+  }
+}
+exports.Fletcher = Fletcher;
+exports.useReducerWithThunk = useReducerWithThunk;

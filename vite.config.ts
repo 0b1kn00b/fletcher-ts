@@ -20,10 +20,9 @@ export default defineConfig({
   },
   build: {
     manifest: true,
-    minify: true,
+    minify: false,
     reportCompressedSize: true,
     lib: {
-      name:"fletcher-ts",
       entry: path.resolve(__dirname, "src/index.ts"),
       fileName: "index",
       formats: ["es", "cjs"],
