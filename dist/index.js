@@ -382,7 +382,7 @@ class f {
   static Next(e, t) {
     return e.next(t);
   }
-  static React(e, t, r) {
+  static React(e, t) {
   }
 }
 export {

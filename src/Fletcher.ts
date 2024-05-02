@@ -70,7 +70,7 @@ export class Fletcher{
   static Next<Pi,Pii,Piii,Ri,Rii,Riii,E>(lhs:Arrow<Pi,Pii,Ri,Rii,E>,rhs:Arrow<Ri,Rii,Piii,Riii,E>){
     return lhs.next(rhs);
   }
-  static React<P,R,E>(self:ArrowletApi<P,R,E>,p:P,r:R){  
+  static React<P,R,E>(self:ArrowletApi<P,R,E>,p:P){  
     react(self,p);
   }
 }
