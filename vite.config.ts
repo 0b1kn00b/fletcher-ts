@@ -23,6 +23,7 @@ export default defineConfig({
     minify: true,
     reportCompressedSize: true,
     lib: {
+      name:"fletcher-ts",
       entry: path.resolve(__dirname, "src/index.ts"),
       fileName: "index",
       formats: ["es", "cjs"],
@@ -34,7 +35,7 @@ export default defineConfig({
           preserveExtensions: true,
         }),
         typescript({
-          sourceMap: false,
+          sourceMap: true,
           declaration: true,
           outDir: "dist",
         }),

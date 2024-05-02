@@ -1,6 +1,6 @@
 {
 	"name": "fletcher-ts",
-	"version": "0.5.17",
+	"version": "0.5.18",
 	"description": "arrowlet library for typescript",
 	"dependencies": {
 		"fp-ts": "^2.16.5",
@@ -17,7 +17,7 @@
 	"module": "./dist/index.js",
 	"types": "./dist/index.d.ts",
 	"files": [
-		"/dist"
+		"./dist"
 	],
 	"devDependencies": {
 		"@rollup/plugin-typescript": "^11.1.6",
@@ -38,13 +38,7 @@
 	"exports": {
 		".": {
 			"import": "./dist/index.js",
-			"require": "./dist/index.cjs.js",
-			"types": "./dist/index.d.ts"
-		},
-		"./react_arw": {
-			"import": "./dist/react_arw/index.js",
-			"require": "./dist/react_arw/index.js",
-			"types": "./dist/react_arw/index.d.ts"
+			"require": "./dist/index.js"
 		}
 	}
 }
