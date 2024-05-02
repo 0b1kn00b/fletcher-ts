@@ -26,4 +26,5 @@ export declare class Fletcher {
     static Joint<Pi, Ri, Rii>(that: ArrowletApi<Ri, Rii>): Arrow<Pi, Ri, Pi, [Ri, Rii]>;
     static Next<Pi, Pii, Piii, Ri, Rii, Riii>(lhs: Arrow<Pi, Pii, Ri, Rii>, rhs: Arrow<Ri, Rii, Piii, Riii>): Arrow<Pi, Pii, Piii, Riii>;
     static React<R>(dispatch: Dispatch<R>): ArrowletApi<R, void>;
+    static Dispatch<R>(self: ArrowletApi<R, void>): (r: R) => void;
 }

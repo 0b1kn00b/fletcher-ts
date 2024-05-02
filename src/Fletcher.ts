@@ -74,4 +74,9 @@ export class Fletcher{
   static React<R>(dispatch:Dispatch<R>):ArrowletApi<R,void>{  
     return react(useReducerWithThunk(dispatch));
   }
+  static Dispatch<R>(self:ArrowletApi<R,void>):(r:R) => void{
+    return (r:R) =>{
+      self.defer(null,Fletcher.Terminal()).submit();
+    } 
+  }
 }

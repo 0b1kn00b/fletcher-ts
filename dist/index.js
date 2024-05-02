@@ -528,6 +528,11 @@ class Fletcher {
   static React(dispatch) {
     return react(useReducerWithThunk(dispatch));
   }
+  static Dispatch(self) {
+    return (r) => {
+      self.defer(null, Fletcher.Terminal()).submit();
+    };
+  }
 }
 export {
   Fletcher
