@@ -1,6 +1,6 @@
 var Xr = Object.defineProperty;
 var Zr = (h, r, o) => r in h ? Xr(h, r, { enumerable: !0, configurable: !0, writable: !0, value: o }) : h[r] = o;
-var J = (h, r, o) => (Zr(h, typeof r != "symbol" ? r + "" : r, o), o);
+var G = (h, r, o) => (Zr(h, typeof r != "symbol" ? r + "" : r, o), o);
 var en = function() {
   function h() {
     var r = this;
@@ -32,7 +32,7 @@ var en = function() {
 }, et = un, Nt = et;
 class $ {
   constructor(r) {
-    J(this, "_after", null);
+    G(this, "_after", null);
     this._after = r;
   }
   get after() {
@@ -78,7 +78,7 @@ class $ {
 }
 class ve {
   constructor(r) {
-    J(this, "_apply");
+    G(this, "_apply");
     this._apply = r;
   }
   apply(r) {
@@ -113,7 +113,7 @@ class oe extends Bt {
       let S = r.apply(new ve((F) => (d = F, $.Unit())));
       var M = o.apply(new ve((F) => (y = F, $.Unit())));
       return S.par(M).seq(new $(() => {
-        let F = d, z = y, K = F.then((L) => z.then((V) => ({ fst: L, snd: V }))).then((L) => Nt((V) => Nt((Z) => rt([V, Z]), (Z) => Ze(Z))(L.snd), (V) => Ze(V))(L.fst)), ne = l.apply(K);
+        let F = d, z = y, H = F.then((L) => z.then((V) => ({ fst: L, snd: V }))).then((L) => Nt((V) => Nt((Z) => rt([V, Z]), (Z) => Ze(Z))(L.snd), (V) => Ze(V))(L.fst)), ne = l.apply(H);
         return new Promise((L) => L(ne));
       }));
     });
@@ -151,7 +151,7 @@ class B extends Bt {
 }
 class he {
   constructor(r) {
-    J(this, "_apply");
+    G(this, "_apply");
     this._apply = r;
   }
   defer(r, o) {
@@ -160,7 +160,7 @@ class he {
 }
 class Ee {
   constructor(r) {
-    J(this, "_defer");
+    G(this, "_defer");
     this._defer = r;
   }
   defer(r, o) {
@@ -182,7 +182,7 @@ function sn() {
 }
 class cn {
   constructor(r) {
-    J(this, "_emiter");
+    G(this, "_emiter");
     this._emiter = r;
   }
   defer(r, o) {
@@ -196,8 +196,8 @@ class cn {
 }
 class ln {
   constructor(r, o) {
-    J(this, "lhs");
-    J(this, "rhs");
+    G(this, "lhs");
+    G(this, "rhs");
     this.lhs = r, this.rhs = o;
   }
   defer(r, o) {
@@ -212,7 +212,7 @@ class Xe extends he {
 }
 class g {
   constructor(r) {
-    J(this, "_apply");
+    G(this, "_apply");
     this._apply = r;
   }
   apply(r) {
@@ -338,9 +338,9 @@ function fn() {
   if (Vt)
     return m;
   Vt = 1;
-  var h = Symbol.for("react.element"), r = Symbol.for("react.portal"), o = Symbol.for("react.fragment"), l = Symbol.for("react.strict_mode"), d = Symbol.for("react.profiler"), y = Symbol.for("react.provider"), S = Symbol.for("react.context"), M = Symbol.for("react.forward_ref"), F = Symbol.for("react.suspense"), z = Symbol.for("react.memo"), X = Symbol.for("react.lazy"), K = Symbol.iterator;
+  var h = Symbol.for("react.element"), r = Symbol.for("react.portal"), o = Symbol.for("react.fragment"), l = Symbol.for("react.strict_mode"), d = Symbol.for("react.profiler"), y = Symbol.for("react.provider"), S = Symbol.for("react.context"), M = Symbol.for("react.forward_ref"), F = Symbol.for("react.suspense"), z = Symbol.for("react.memo"), X = Symbol.for("react.lazy"), H = Symbol.iterator;
   function ne(n) {
-    return n === null || typeof n != "object" ? null : (n = K && n[K] || n["@@iterator"], typeof n == "function" ? n : null);
+    return n === null || typeof n != "object" ? null : (n = H && n[H] || n["@@iterator"], typeof n == "function" ? n : null);
   }
   var L = { isMounted: function() {
     return !1;
@@ -366,7 +366,7 @@ function fn() {
   }
   var se = ie.prototype = new Se();
   se.constructor = ie, V(se, q.prototype), se.isPureReactComponent = !0;
-  var G = Array.isArray, I = Object.prototype.hasOwnProperty, W = { current: null }, ee = { key: !0, ref: !0, __self: !0, __source: !0 };
+  var K = Array.isArray, I = Object.prototype.hasOwnProperty, W = { current: null }, ee = { key: !0, ref: !0, __self: !0, __source: !0 };
   function ae(n, i, b) {
     var E, w = {}, x = null, O = null;
     if (i != null)
@@ -421,10 +421,10 @@ function fn() {
           }
       }
     if (O)
-      return O = n, w = w(O), n = E === "" ? "." + me(O, 0) : E, G(w) ? (b = "", n != null && (b = n.replace(Pe, "$&/") + "/"), ce(w, i, b, "", function(U) {
+      return O = n, w = w(O), n = E === "" ? "." + me(O, 0) : E, K(w) ? (b = "", n != null && (b = n.replace(Pe, "$&/") + "/"), ce(w, i, b, "", function(U) {
         return U;
       })) : w != null && (ye(w) && (w = Ce(w, b + (!w.key || O && O.key === w.key ? "" : ("" + w.key).replace(Pe, "$&/") + "/") + n)), i.push(w)), 1;
-    if (O = 0, E = E === "" ? "." : E + ":", G(n))
+    if (O = 0, E = E === "" ? "." : E + ":", K(n))
       for (var k = 0; k < n.length; k++) {
         x = n[k];
         var C = E + me(x, k);
@@ -567,7 +567,7 @@ function pn() {
   return Wt || (Wt = 1, function(h, r) {
     process.env.NODE_ENV !== "production" && function() {
       typeof __REACT_DEVTOOLS_GLOBAL_HOOK__ < "u" && typeof __REACT_DEVTOOLS_GLOBAL_HOOK__.registerInternalModuleStart == "function" && __REACT_DEVTOOLS_GLOBAL_HOOK__.registerInternalModuleStart(new Error());
-      var o = "18.3.1", l = Symbol.for("react.element"), d = Symbol.for("react.portal"), y = Symbol.for("react.fragment"), S = Symbol.for("react.strict_mode"), M = Symbol.for("react.profiler"), F = Symbol.for("react.provider"), z = Symbol.for("react.context"), X = Symbol.for("react.forward_ref"), K = Symbol.for("react.suspense"), ne = Symbol.for("react.suspense_list"), L = Symbol.for("react.memo"), V = Symbol.for("react.lazy"), Z = Symbol.for("react.offscreen"), q = Symbol.iterator, Se = "@@iterator";
+      var o = "18.3.1", l = Symbol.for("react.element"), d = Symbol.for("react.portal"), y = Symbol.for("react.fragment"), S = Symbol.for("react.strict_mode"), M = Symbol.for("react.profiler"), F = Symbol.for("react.provider"), z = Symbol.for("react.context"), X = Symbol.for("react.forward_ref"), H = Symbol.for("react.suspense"), ne = Symbol.for("react.suspense_list"), L = Symbol.for("react.memo"), V = Symbol.for("react.lazy"), Z = Symbol.for("react.offscreen"), q = Symbol.iterator, Se = "@@iterator";
       function ie(e) {
         if (e === null || typeof e != "object")
           return null;
@@ -580,7 +580,7 @@ function pn() {
          * @type {ReactComponent}
          */
         current: null
-      }, G = {
+      }, K = {
         transition: null
       }, I = {
         current: null,
@@ -607,7 +607,7 @@ function pn() {
       };
       var ye = !1, Ue = !1, Pe = !1, me = !1, ce = !1, Y = {
         ReactCurrentDispatcher: se,
-        ReactCurrentBatchConfig: G,
+        ReactCurrentBatchConfig: K,
         ReactCurrentOwner: W
       };
       Y.ReactDebugCurrentFrame = ee, Y.ReactCurrentActQueue = I;
@@ -794,7 +794,7 @@ function pn() {
             return "Profiler";
           case S:
             return "StrictMode";
-          case K:
+          case H:
             return "Suspense";
           case ne:
             return "SuspenseList";
@@ -1233,7 +1233,7 @@ Your code should look like:
       var vt;
       vt = Symbol.for("react.module.reference");
       function ht(e) {
-        return !!(typeof e == "string" || typeof e == "function" || e === y || e === M || ce || e === S || e === K || e === ne || me || e === Z || ye || Ue || Pe || typeof e == "object" && e !== null && (e.$$typeof === V || e.$$typeof === L || e.$$typeof === F || e.$$typeof === z || e.$$typeof === X || // This needs to include all possible module reference object
+        return !!(typeof e == "string" || typeof e == "function" || e === y || e === M || ce || e === S || e === H || e === ne || me || e === Z || ye || Ue || Pe || typeof e == "object" && e !== null && (e.$$typeof === V || e.$$typeof === L || e.$$typeof === F || e.$$typeof === z || e.$$typeof === X || // This needs to include all possible module reference object
         // types supported by any Flight configuration anywhere since
         // we don't know which Flight build this will end up being used
         // with.
@@ -1502,7 +1502,7 @@ See https://reactjs.org/link/invalid-hook-call for tips about how to debug and f
         if (typeof e == "string")
           return De(e);
         switch (e) {
-          case K:
+          case H:
             return De("Suspense");
           case ne:
             return De("SuspenseList");
@@ -1693,14 +1693,14 @@ Check the top-level render call using <` + a + ">.");
         return xt(u), u;
       }
       function Yr(e, t) {
-        var a = G.transition;
-        G.transition = {};
-        var u = G.transition;
-        G.transition._updatedFibers = /* @__PURE__ */ new Set();
+        var a = K.transition;
+        K.transition = {};
+        var u = K.transition;
+        K.transition._updatedFibers = /* @__PURE__ */ new Set();
         try {
           e();
         } finally {
-          if (G.transition = a, a === null && u._updatedFibers) {
+          if (K.transition = a, a === null && u._updatedFibers) {
             var s = u._updatedFibers.size;
             s > 10 && te("Detected a large number of updates inside startTransition. If this is due to a subscription please re-write it to use React provided hooks. Otherwise concurrent mode guarantees are off the table."), u._updatedFibers.clear();
           }
@@ -1818,19 +1818,13 @@ Check the top-level render call using <` + a + ">.");
         toArray: sr,
         only: cr
       };
-      r.Children = Kr, r.Component = E, r.Fragment = y, r.Profiler = M, r.PureComponent = C, r.StrictMode = S, r.Suspense = K, r.__SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED = Y, r.act = At, r.cloneElement = qr, r.createContext = lr, r.createElement = zr, r.createFactory = Hr, r.createRef = qt, r.forwardRef = vr, r.isValidElement = fe, r.lazy = dr, r.memo = hr, r.startTransition = Yr, r.unstable_act = At, r.useCallback = Rr, r.useContext = yr, r.useDebugValue = Pr, r.useDeferredValue = Or, r.useEffect = _r, r.useId = kr, r.useImperativeHandle = Cr, r.useInsertionEffect = Er, r.useLayoutEffect = wr, r.useMemo = Sr, r.useReducer = gr, r.useRef = br, r.useState = mr, r.useSyncExternalStore = jr, r.useTransition = Tr, r.version = o, typeof __REACT_DEVTOOLS_GLOBAL_HOOK__ < "u" && typeof __REACT_DEVTOOLS_GLOBAL_HOOK__.registerInternalModuleStop == "function" && __REACT_DEVTOOLS_GLOBAL_HOOK__.registerInternalModuleStop(new Error());
+      r.Children = Kr, r.Component = E, r.Fragment = y, r.Profiler = M, r.PureComponent = C, r.StrictMode = S, r.Suspense = H, r.__SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED = Y, r.act = At, r.cloneElement = qr, r.createContext = lr, r.createElement = zr, r.createFactory = Hr, r.createRef = qt, r.forwardRef = vr, r.isValidElement = fe, r.lazy = dr, r.memo = hr, r.startTransition = Yr, r.unstable_act = At, r.useCallback = Rr, r.useContext = yr, r.useDebugValue = Pr, r.useDeferredValue = Or, r.useEffect = _r, r.useId = kr, r.useImperativeHandle = Cr, r.useInsertionEffect = Er, r.useLayoutEffect = wr, r.useMemo = Sr, r.useReducer = gr, r.useRef = br, r.useState = mr, r.useSyncExternalStore = jr, r.useTransition = Tr, r.version = o, typeof __REACT_DEVTOOLS_GLOBAL_HOOK__ < "u" && typeof __REACT_DEVTOOLS_GLOBAL_HOOK__.registerInternalModuleStop == "function" && __REACT_DEVTOOLS_GLOBAL_HOOK__.registerInternalModuleStop(new Error());
     }();
   }(we, we.exports)), we.exports;
 }
 process.env.NODE_ENV === "production" ? tt.exports = fn() : tt.exports = pn();
 var Yt = tt.exports;
-function dn(h, r) {
-  return async function(o) {
-    const l = await H.Resolve(h, r);
-    o(l);
-  };
-}
-function hn(h, r) {
+function vn(h, r) {
   const [o, l] = Yt.useReducer(h, r);
   function d(S) {
     switch (typeof S) {
@@ -1843,7 +1837,7 @@ function hn(h, r) {
   const y = Yt.useCallback(d, [l]);
   return [o, y];
 }
-class H {
+class J {
   static Terminal() {
     return new B((r) => r.apply(new Re()));
   }
@@ -1854,7 +1848,7 @@ class H {
     return new he(r);
   }
   static Pure(r) {
-    return H.Fun1R((o) => r);
+    return J.Fun1R((o) => r);
   }
   static Anon(r) {
     return new Ee(r);
@@ -1869,34 +1863,33 @@ class H {
     return new cn(r);
   }
   static Then(r) {
-    return H.Arrow().Then(r);
+    return J.Arrow().Then(r);
   }
   static Pair(r) {
-    return H.Arrow().Pair(r);
+    return J.Arrow().Pair(r);
   }
   static FlatMap(r) {
-    return H.Arrow().FlatMap(r);
+    return J.Arrow().FlatMap(r);
   }
   static First() {
-    return H.Arrow().First();
+    return J.Arrow().First();
   }
   static Second() {
-    return H.Arrow().Second();
+    return J.Arrow().Second();
   }
   static Pinch(r) {
-    return H.Arrow().Pinch(r);
+    return J.Arrow().Pinch(r);
   }
   static Joint(r) {
-    return H.Arrow().Joint(r);
+    return J.Arrow().Joint(r);
   }
   static Next(r, o) {
     return r.next(o);
   }
-  static React(r, o) {
-    return dn(r, o);
+  static React(r, o, l) {
   }
 }
 export {
-  H as Fletcher,
-  hn as useReducerWithThunk
+  J as Fletcher,
+  vn as useReducerWithThunk
 };

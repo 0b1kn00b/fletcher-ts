@@ -11,7 +11,7 @@ import { Receiver } from "./core/Receiver";
 import { EventArrowlet } from "./term/Event";
 import { Arrow } from "./core/Arrow";
 import { react, useReducerWithThunk } from "./react_arw"
-
+import { ReactAsyncAction } from "./react_arw/ReactAsyncAction";
 /** Returns Cycle from Continuation */
 
 /**Takes a resolver to use later that may return Cycle to be done in a scheduler once all inputs are known*/
@@ -70,14 +70,8 @@ export class Fletcher{
   static Next<Pi,Pii,Piii,Ri,Rii,Riii,E>(lhs:Arrow<Pi,Pii,Ri,Rii,E>,rhs:Arrow<Ri,Rii,Piii,Riii,E>){
     return lhs.next(rhs);
   }
-  static React<P,R,E>(self:ArrowletApi<P,R,E>,p:P){  
-    return react(self,p);
+  static React<P,R,E>(self:ArrowletApi<P,R,E>,p:P,r:R){  
+    react(self,p);
   }
 }
 export { useReducerWithThunk }
-
-// function then<A,B,C>(lhs: (a:A) => B, rhs : (b:B) => C) : (a:A) => C {
-//   return (a:A) => {
-
-//   }
-// }
