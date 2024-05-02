@@ -29,9 +29,9 @@ function useReducerWithThunk<S,A>(state:S, dispatch:Dispatch<A>):[S,ReactAsyncAc
 
   // Memoize so you can include it in the dependency array without causing infinite loops
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  const stableDispatch : (action: A | ((a: A) => void)) => void = useCallback(customDispatch, [dispatch]);
+  //const stableDispatch : (action: A | ((a: A) => void)) => void = useCallback(customDispatch, [dispatch]);
 
-  return [state, stableDispatch];
+  return [state, customDispatch];
 }
 
 export { useReducerWithThunk };
