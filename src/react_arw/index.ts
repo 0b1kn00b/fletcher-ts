@@ -13,9 +13,10 @@ export function react<P,R,E>(self:ArrowletApi<P,R,E>,p:P){
   }
 }
 
+//(reducer: Reducer<S, A>, initialState: S): [S, Dispatch<A>] 
 //<Reducer<S, A>>(reducer: Reducer<S, A>, initialState: S, initializer?: undefined): [S, Dispatch<A>] (+4 overloads) import useReducer
-function useReducerWithThunk<S,A>(reducer:Reducer<S,A>, initialState:S) : [S,ReactAsyncAction<A>] {
-  const [state, dispatch] : [S, Dispatch<A>]= useReducer(reducer, initialState);
+function useReducerWithThunk<S,A>(state:S, dispatch:Dispatch<A>):[S,ReactAsyncAction<A>] {
+  //const [state, dispatch] : [S, Dispatch<A>]= useReducer(reducer, initialState);
 
   function customDispatch(action:((a:A)=>void) | A):void{
     switch  (typeof action ) {
