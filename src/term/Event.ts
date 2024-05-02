@@ -2,7 +2,6 @@ import { ArrowletApi } from "../core/ArrowletApi";
 import { Terminal } from "../core/Terminal";
 import { Deferred } from "ts-deferred";
 import * as E from 'fp-ts/Either';
-import { Payload } from "../core/Payload";
 import { Result } from "../core/Result";
 export class EventArrowlet<T extends Event> implements ArrowletApi<string,T>{
   private _emiter : EventTarget;

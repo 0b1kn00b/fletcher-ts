@@ -1,5 +1,4 @@
 import { Deferred } from "ts-deferred";
-import { Payload } from "./Payload";
 import { Receiver } from "./Receiver";
 import { Settler } from "./Settler";
 import { Result } from "./Result";
@@ -18,7 +17,7 @@ export type TerminalSink<R> = Apply<TerminalInput<R>, Cycle>;
  */
 export declare class Terminal<R> extends Settler<TerminalInput<R>> {
     receive(receiver: Receiver<R>): Cycle;
-    static later<R>(payload: Payload<R>): Receiver<R>;
+    static later<R>(payload: Promise<Result<R>>): Receiver<R>;
     static issue<R>(self: Result<R>): Receiver<R>;
     static value<R>(self: R): Receiver<R>;
     static error<R>(self: Error): Receiver<R>;

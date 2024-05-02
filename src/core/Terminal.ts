@@ -1,6 +1,5 @@
 import { Deferred } from "ts-deferred";
 import * as E from "fp-ts/Either";
-import { Payload } from "./Payload";
 import { Receiver, ReceiverInput } from "./Receiver";
 import { Settler } from "./Settler";
 import { Result } from "./Result";
@@ -51,7 +50,7 @@ export class Terminal<R> extends Settler<TerminalInput<R>> {
       )
     )
   }
-  static later<R>(payload: Payload<R>): Receiver<R> {
+  static later<R>(payload: Promise<Result<R>>): Receiver<R> {
     return new Receiver(
       (fn: Apply<ReceiverInput<R>, Cycle>): Cycle => {
         return fn.apply(payload);
