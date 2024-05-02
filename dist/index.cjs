@@ -459,6 +459,12 @@ class Arrow {
     return Arrow.Compose(this, before);
   }
 }
+function react(dispatch) {
+  return new Anon((p, cont) => {
+    dispatch(p);
+    return Cycle.Unit();
+  });
+}
 function useReducerWithThunk(dispatch) {
   function customDispatch(action) {
     switch (typeof action) {
@@ -521,8 +527,8 @@ class Fletcher {
   static Next(lhs, rhs) {
     return lhs.next(rhs);
   }
-  static React(self, p) {
+  static React(dispatch) {
+    return react(useReducerWithThunk(dispatch));
   }
 }
 exports.Fletcher = Fletcher;
-exports.useReducerWithThunk = useReducerWithThunk;

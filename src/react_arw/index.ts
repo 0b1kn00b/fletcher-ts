@@ -5,17 +5,22 @@ import { Dispatch} from 'react';
 import { Result } from "../core/Result";
 import { ReactAsyncAction } from './ReactAsyncAction';
 import { resolve } from '../util';
+import { Terminal } from 'src/core/Terminal';
+import { Anon } from 'src/term/Anon';
+import { Cycle } from 'src/core/Cycle';
 
-export function react<P,R,E>(self:ArrowletApi<P,R,E>,p:P){
-  return async function(dispatch:Dispatch<Result<R,E>>) {
-    const result = await resolve(self,p);
-    dispatch(result);
-  }
+export function react<P,R,E>(dispatch:Dispatch<R>):ArrowletApi<R,void,E>{
+  return new Anon(
+    (p:R,cont:Terminal<void,E>) => {
+      dispatch(p);
+      return Cycle.Unit();
+    }
+  );
 }
 
 //(reducer: Reducer<S, A>, initialState: S): [S, Dispatch<A>] 
 //<Reducer<S, A>>(reducer: Reducer<S, A>, initialState: S, initializer?: undefined): [S, Dispatch<A>] (+4 overloads) import useReducer
-function useReducerWithThunk<S,A>(dispatch:Dispatch<A>):ReactAsyncAction<A> {
+function useReducerWithThunk<A>(dispatch:Dispatch<A>):Dispatch<A> {
   //const [state, dispatch] : [S, Dispatch<A>]= useReducer(reducer, initialState);
 
   function customDispatch(action:((a:A)=>void) | A):void{

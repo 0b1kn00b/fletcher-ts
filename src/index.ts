@@ -1,1 +1,1 @@
-export {Fletcher, useReducerWithThunk} from './Fletcher'
+export {Fletcher} from './Fletcher'

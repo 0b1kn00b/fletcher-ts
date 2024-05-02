@@ -5,7 +5,7 @@ import { ArrowletApi } from "./core/ArrowletApi";
 import { Result } from "./core/Result";
 import { Receiver } from "./core/Receiver";
 import { Arrow } from "./core/Arrow";
-import { useReducerWithThunk } from "./react_arw";
+import { Dispatch } from "react";
 /** Returns Cycle from Continuation */
 /**Takes a resolver to use later that may return Cycle to be done in a scheduler once all inputs are known*/
 export declare class Fletcher {
@@ -25,6 +25,5 @@ export declare class Fletcher {
     static Pinch<Pi, Ri, Rii, E>(that: ArrowletApi<Pi, Rii, E>): Arrow<Pi, unknown, Pi, [unknown, Rii], E>;
     static Joint<Pi, Ri, Rii, E>(that: ArrowletApi<Ri, Rii, E>): Arrow<Pi, Ri, Pi, [Ri, Rii], E>;
     static Next<Pi, Pii, Piii, Ri, Rii, Riii, E>(lhs: Arrow<Pi, Pii, Ri, Rii, E>, rhs: Arrow<Ri, Rii, Piii, Riii, E>): Arrow<Pi, Pii, Piii, Riii, E>;
-    static React<P, R, E>(self: ArrowletApi<P, R, E>, p: P): void;
+    static React<R, E>(dispatch: Dispatch<R>): ArrowletApi<R, void, E>;
 }
-export { useReducerWithThunk };
