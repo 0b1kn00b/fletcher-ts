@@ -1,2 +1,2 @@
 
-export type ReactAsyncAction<A> = (action: A | ((a: A) => void)) => void;
+export type ReactAsyncAction<A> = (action: ((a: A) => void)) => void;
