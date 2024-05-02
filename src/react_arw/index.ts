@@ -15,7 +15,7 @@ export function react<P,R,E>(self:ArrowletApi<P,R,E>,p:P){
 
 //(reducer: Reducer<S, A>, initialState: S): [S, Dispatch<A>] 
 //<Reducer<S, A>>(reducer: Reducer<S, A>, initialState: S, initializer?: undefined): [S, Dispatch<A>] (+4 overloads) import useReducer
-function useReducerWithThunk<S,A>(state:S, dispatch:Dispatch<A>):[S,ReactAsyncAction<A>] {
+function useReducerWithThunk<S,A>(dispatch:Dispatch<A>):ReactAsyncAction<A> {
   //const [state, dispatch] : [S, Dispatch<A>]= useReducer(reducer, initialState);
 
   function customDispatch(action:((a:A)=>void) | A):void{
@@ -31,7 +31,7 @@ function useReducerWithThunk<S,A>(state:S, dispatch:Dispatch<A>):[S,ReactAsyncAc
   // eslint-disable-next-line react-hooks/exhaustive-deps
   //const stableDispatch : (action: A | ((a: A) => void)) => void = useCallback(customDispatch, [dispatch]);
 
-  return [state, customDispatch];
+  return customDispatch;
 }
 
 export { useReducerWithThunk };

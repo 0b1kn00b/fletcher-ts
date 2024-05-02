@@ -322,16 +322,16 @@ class u {
     return u.Compose(this, e);
   }
 }
-function V(s, e) {
-  function t(r) {
-    switch (typeof r) {
+function V(s) {
+  function e(t) {
+    switch (typeof t) {
       case "function":
-        return r(t);
+        return t(e);
       default:
-        e(r);
+        s(t);
     }
   }
-  return [s, t];
+  return e;
 }
 class f {
   static Terminal() {
