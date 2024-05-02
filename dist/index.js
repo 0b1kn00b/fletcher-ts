@@ -55,15 +55,14 @@ class $ {
   }
   static Submit(r) {
     let o = new Re();
-    return setTimeout(() => {
-      if (r != null) {
-        const l = r.after;
-        l != null ? l.then((d) => {
-          d != null ? $.Submit(d).then((y) => o.resolve(y), (y) => o.reject(y)) : o.resolve(null);
-        }) : o.resolve(null);
-      } else
-        o.resolve(null);
-    }), o.promise;
+    if (r != null) {
+      const l = r.after;
+      l != null ? l.then((d) => {
+        d != null ? $.Submit(d).then((y) => o.resolve(y), (y) => o.reject(y)) : o.resolve(null);
+      }) : o.resolve(null);
+    } else
+      o.resolve(null);
+    return o.promise;
   }
   static Par(r, o) {
     let l = r.after ?? Promise.resolve($.Unit()), d = o.after ?? Promise.resolve($.Unit()), y = Promise.all([l, d]);

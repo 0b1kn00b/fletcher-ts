@@ -40,37 +40,33 @@ export class Cycle {
   static Submit(self:Cycle){
     //console.log('submit');
     let deferred = new Deferred();
-    setTimeout(
-      () => {
-        //console.log('timeout');
-        if(self!=null){
-          const after = self.after; 
-          if(after != null){
-            //console.log('after:')
-            after.then(
-              x => {
-                if(x!=null){
-                  //console.log('resubmit');
-                  Cycle.Submit(x).then(
-                    x => deferred.resolve(x),
-                    e => deferred.reject(e)
-                  );
-                }else{
-                  //console.log('end x');
-                  deferred.resolve(null);
-                }
-              }
-            );
-          }else{
-            //console.log('end after')
-            deferred.resolve(null);
+    //console.log('timeout');
+    if(self!=null){
+      const after = self.after; 
+      if(after != null){
+        //console.log('after:')
+        after.then(
+          x => {
+            if(x!=null){
+              //console.log('resubmit');
+              Cycle.Submit(x).then(
+                x => deferred.resolve(x),
+                e => deferred.reject(e)
+              );
+            }else{
+              //console.log('end x');
+              deferred.resolve(null);
+            }
           }
-        }else{
-          //console.log('end');
-          deferred.resolve(null);
-        }
+        );
+      }else{
+        //console.log('end after')
+        deferred.resolve(null);
       }
-    );
+    }else{
+      //console.log('end');
+      deferred.resolve(null);
+    }
     return deferred.promise;
   }
   static Par(self:Cycle,that:Cycle):Cycle{
