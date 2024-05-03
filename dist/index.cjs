@@ -532,7 +532,7 @@ class Fletcher {
   }
   static Dispatch(self) {
     return (r) => {
-      self.defer(null, Fletcher.Terminal()).submit();
+      self.defer(r, Fletcher.Terminal()).submit();
     };
   }
 }

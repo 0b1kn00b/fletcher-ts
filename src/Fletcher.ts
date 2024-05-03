@@ -76,7 +76,7 @@ export class Fletcher{
   }
   static Dispatch<R>(self:ArrowletApi<R,void>):(r:R) => void{
     return (r:R) =>{
-      self.defer(null,Fletcher.Terminal()).submit();
+      self.defer(r,Fletcher.Terminal()).submit();
     } 
   }
 }
