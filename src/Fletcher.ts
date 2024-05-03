@@ -16,6 +16,7 @@ import { Dispatch } from "react";
 import { Option as OptionArw } from "./term/Option";
 import { OptionM } from "./term/OptionM";
 import * as O from 'fp-ts/Option';
+import { Then } from "./term/Then";
 /** Returns Cycle from Continuation */
 
 /**Takes a resolver to use later that may return Cycle to be done in a scheduler once all inputs are known*/
@@ -50,8 +51,8 @@ export class Fletcher{
     return new EventArrowlet(self)
   }
 
-  static Then<Pi,Ri,Rii>(that:ArrowletApi<Ri,Rii>):Arrow<Pi,Ri,Pi,Rii>{
-    return Fletcher.Arrow().Then(that);
+  static Then<Pi,Ri,Rii>(self:ArrowletApi<Pi,Ri>,that:ArrowletApi<Ri,Rii>):ArrowletApi<Pi,Rii>{
+    return new Then(self,that);
   }
   static Pair<Pi,Pii,Ri,Rii>(that:ArrowletApi<Pii,Rii>){
     return Fletcher.Arrow().Pair(that);

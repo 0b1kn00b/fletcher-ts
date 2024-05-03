@@ -537,8 +537,8 @@ class Fletcher {
   static Event(self) {
     return new EventArrowlet(self);
   }
-  static Then(that) {
-    return Fletcher.Arrow().Then(that);
+  static Then(self, that) {
+    return new Then(self, that);
   }
   static Pair(that) {
     return Fletcher.Arrow().Pair(that);

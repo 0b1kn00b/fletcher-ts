@@ -18,7 +18,7 @@ export declare class Fletcher {
     static Resolve<P, R>(self: ArrowletApi<P, R>, input: P): Promise<Result<R>>;
     static Forward<P, R>(self: ArrowletApi<P, R>, input: P): Receiver<R>;
     static Event<R extends Event>(self: EventTarget): ArrowletApi<string, R>;
-    static Then<Pi, Ri, Rii>(that: ArrowletApi<Ri, Rii>): Arrow<Pi, Ri, Pi, Rii>;
+    static Then<Pi, Ri, Rii>(self: ArrowletApi<Pi, Ri>, that: ArrowletApi<Ri, Rii>): ArrowletApi<Pi, Rii>;
     static Pair<Pi, Pii, Ri, Rii>(that: ArrowletApi<Pii, Rii>): Arrow<unknown, unknown, [unknown, Pii], [unknown, Rii]>;
     static FlatMap<Pi, Ri, Rii>(fn: (p: Ri) => ArrowletApi<Pi, Rii>): Arrow<Pi, Ri, Pi, Rii>;
     static First<Pi, Ri, Pii>(): Arrow<unknown, unknown, [unknown, unknown], [unknown, unknown]>;
