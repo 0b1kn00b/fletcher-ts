@@ -1,9 +1,9 @@
-import { ArrowletApi } from "../core/ArrowletApi";
+import { Arrowlet } from "../core/Arrowlet";
 import { Terminal } from "../core/Terminal";
 import { Deferred } from "ts-deferred";
 import * as E from 'fp-ts/Either';
 import { Result } from "../core/Result";
-export class EventArrowlet<T extends Event> implements ArrowletApi<string,T>{
+export class EventArrowlet<T extends Event> implements Arrowlet<string,T>{
   private _emiter : EventTarget;
   constructor(_emiter:EventTarget){
     this._emiter = _emiter;

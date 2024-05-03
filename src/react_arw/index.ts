@@ -1,6 +1,6 @@
 // https://chwastek.eu/blog/async-actions-with-usereducer-in-react
 import { useReducer, useCallback, Reducer } from 'react';
-import { ArrowletApi } from "../core/ArrowletApi";
+import { Arrowlet } from "../core/Arrowlet";
 import { Dispatch} from 'react'; 
 import { Result } from "../core/Result";
 import { ReactAsyncAction } from './ReactAsyncAction';
@@ -9,7 +9,7 @@ import { Terminal } from '../core/Terminal';
 import { Anon } from '../term/Anon';
 import { Cycle } from '../core/Cycle';
 
-export function react<P,R>(dispatch:Dispatch<R>):ArrowletApi<R,void>{
+export function react<P,R>(dispatch:Dispatch<R>):Arrowlet<R,void>{
   return new Anon(
     (p:R,cont:Terminal<void>) => {
       dispatch(p);

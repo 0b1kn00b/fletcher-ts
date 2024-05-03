@@ -1,6 +1,6 @@
 import { Receiver } from "./core/Receiver";
 import { Deferred } from "ts-deferred";
-import { ArrowletApi } from "./core/ArrowletApi";
+import { Arrowlet } from "./core/Arrowlet";
 import { Cycle } from "./core/Cycle";
 import { ReceiverSink } from "./core/Receiver";
 import { TerminalInput } from "./core/Terminal";
@@ -9,7 +9,7 @@ import { Terminal } from "./core/Terminal";
 import { Result } from "./core/Result";
 import { Fun } from "./term/Fun";
 
-export function forward<P,R>(self:ArrowletApi<P,R>, p: P) : Receiver<R>{
+export function forward<P,R>(self:Arrowlet<P,R>, p: P) : Receiver<R>{
   return new Receiver(
     (k:ReceiverSink<R>): Cycle => {
       let deferred : TerminalInput<R> = new Deferred();
@@ -27,7 +27,7 @@ export function forward<P,R>(self:ArrowletApi<P,R>, p: P) : Receiver<R>{
     }
   );
 }
-export function resolve<P,R>(self:ArrowletApi<P,R>,input:P):Promise<Result<R>>{
+export function resolve<P,R>(self:Arrowlet<P,R>,input:P):Promise<Result<R>>{
   //console.log('resolve init');
   let deferred : Deferred<Result<R>> = new Deferred();
   let cycle = self.defer(
@@ -50,9 +50,9 @@ export function resolve<P,R>(self:ArrowletApi<P,R>,input:P):Promise<Result<R>>{
   );
 }
 /**
- * normallly as ArrowletApi<void,void> to drive Arrow
+ * normallly as Arrowlet<void,void> to drive Arrow
  * @returns 
  */
-export function unit<Pi,Ri>():ArrowletApi<Pi,Ri>{
+export function unit<Pi,Ri>():Arrowlet<Pi,Ri>{
   return new Fun((pi:Pi) => {return (null as Ri)});
 }

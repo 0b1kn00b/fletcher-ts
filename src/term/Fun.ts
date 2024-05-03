@@ -1,9 +1,9 @@
-import { ArrowletApi } from "../core/ArrowletApi";
+import { Arrowlet } from "../core/Arrowlet";
 import { Cycle } from "../core/Cycle";
 import { Terminal } from "../core/Terminal";
 
 
-export class Fun<P,R> implements ArrowletApi<P,R>{
+export class Fun<P,R> implements Arrowlet<P,R>{
   private _apply:(p:P) => R;
   constructor(_apply:(p:P) => R){
     this._apply = _apply;
