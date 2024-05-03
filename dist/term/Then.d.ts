@@ -14,5 +14,5 @@ export declare class Then<Pi, Pii, R> implements Arrowlet<Pi, R> {
     lhs: Arrowlet<Pi, Pii>;
     rhs: Arrowlet<Pii, R>;
     constructor(lhs: Arrowlet<Pi, Pii>, rhs: Arrowlet<Pii, R>);
-    defer(p: Pi, cont: Terminal<R>): import("../core/Cycle").Cycle;
+    defer(p: Pi, cont: Terminal<R>): import("../Core").Cycle;
 }

@@ -16,6 +16,8 @@ import { Dispatch } from "react";
 import { Option as OptionArw } from "./term/Option";
 import { OptionM } from "./term/OptionM";
 import * as O from 'fp-ts/Option';
+import * as E from 'fp-ts/Either';
+
 import { Then } from "./term/Then";
 /** Returns Cycle from Continuation */
 
@@ -83,6 +85,9 @@ export class Fletcher{
       self.defer(r,Fletcher.Terminal()).submit();
     } 
   }
+  // static Entrench<R>(self:Arrowlet<void,R>):Arrowlet<R,void>{
+
+  // }
   static Option<P,R>(self:Arrowlet<P,R>):Arrowlet<O.Option<P>,O.Option<R>>{
     return new OptionArw(self);
   }

@@ -569,6 +569,8 @@ class Fletcher {
       self.defer(r, Fletcher.Terminal()).submit();
     };
   }
+  // static Entrench<R>(self:Arrowlet<void,R>):Arrowlet<R,void>{
+  // }
   static Option(self) {
     return new Option(self);
   }
