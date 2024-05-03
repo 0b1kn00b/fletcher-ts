@@ -5,9 +5,9 @@ import { Dispatch} from 'react';
 import { Result } from "../core/Result";
 import { ReactAsyncAction } from './ReactAsyncAction';
 import { resolve } from '../util';
-import { Terminal } from 'src/core/Terminal';
-import { Anon } from 'src/term/Anon';
-import { Cycle } from 'src/core/Cycle';
+import { Terminal } from '../core/Terminal';
+import { Anon } from '../term/Anon';
+import { Cycle } from '../core/Cycle';
 
 export function react<P,R>(dispatch:Dispatch<R>):ArrowletApi<R,void>{
   return new Anon(

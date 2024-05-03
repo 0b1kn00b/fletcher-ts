@@ -13,6 +13,8 @@ import { Arrow } from "./core/Arrow";
 import { react, useReducerWithThunk } from "./react_arw"
 import { ReactAsyncAction } from "./react_arw/ReactAsyncAction";
 import { Dispatch } from "react";
+import { Option as OptionArw } from "./term/Option";
+import * as O from 'fp-ts/Option';
 /** Returns Cycle from Continuation */
 
 /**Takes a resolver to use later that may return Cycle to be done in a scheduler once all inputs are known*/
@@ -78,5 +80,8 @@ export class Fletcher{
     return (r:R) =>{
       self.defer(r,Fletcher.Terminal()).submit();
     } 
+  }
+  static Option<P,R>(self:ArrowletApi<P,R>):ArrowletApi<O.Option<P>,O.Option<R>>{
+    return new OptionArw(self);
   }
 }

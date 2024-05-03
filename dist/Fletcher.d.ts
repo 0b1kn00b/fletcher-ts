@@ -6,6 +6,7 @@ import { Result } from "./core/Result";
 import { Receiver } from "./core/Receiver";
 import { Arrow } from "./core/Arrow";
 import { Dispatch } from "react";
+import * as O from 'fp-ts/Option';
 /** Returns Cycle from Continuation */
 /**Takes a resolver to use later that may return Cycle to be done in a scheduler once all inputs are known*/
 export declare class Fletcher {
@@ -27,4 +28,5 @@ export declare class Fletcher {
     static Next<Pi, Pii, Piii, Ri, Rii, Riii>(lhs: Arrow<Pi, Pii, Ri, Rii>, rhs: Arrow<Ri, Rii, Piii, Riii>): Arrow<Pi, Pii, Piii, Riii>;
     static React<R>(dispatch: Dispatch<R>): ArrowletApi<R, void>;
     static Dispatch<R>(self: ArrowletApi<R, void>): (r: R) => void;
+    static Option<P, R>(self: ArrowletApi<P, R>): ArrowletApi<O.Option<P>, O.Option<R>>;
 }

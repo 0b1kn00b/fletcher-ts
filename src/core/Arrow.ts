@@ -6,6 +6,7 @@ import { forward, resolve, unit } from "../util";
 import { Fun } from "../term/Fun";
 import { Unit } from "../term/Unit";
 
+
 export class Arrow<Pi,Ri,Pii,Rii>{
   private _apply : (self:ArrowletApi<Pi,Ri>) => ArrowletApi<Pii,Rii>;
   constructor(_apply:(self:ArrowletApi<Pi,Ri>) => ArrowletApi<Pii,Rii>){

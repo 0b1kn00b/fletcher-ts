@@ -39,6 +39,10 @@ var Deferred_1 = Deferred;
     }
   return to.concat(ar || Array.prototype.slice.call(from));
 });
+var none$1 = { _tag: "None" };
+var some$1 = function(a) {
+  return { _tag: "Some", value: a };
+};
 var isLeft$1 = function(ma) {
   return ma._tag === "Left";
 };
@@ -51,13 +55,13 @@ var right$1 = function(a) {
 var left = left$1;
 var right = right$1;
 var isLeft = isLeft$1;
-var matchW = function(onLeft, onRight) {
+var matchW$1 = function(onLeft, onRight) {
   return function(ma) {
     return isLeft(ma) ? onLeft(ma.left) : onRight(ma.right);
   };
 };
-var match = matchW;
-var fold = match;
+var match$1 = matchW$1;
+var fold$1 = match$1;
 class Cycle {
   constructor(_after) {
     __publicField(this, "_after", null);
@@ -146,7 +150,7 @@ class Receiver extends Settler {
     return new Receiver((cont) => {
       return this.apply(new Apply((p) => {
         let a = p.then((outcome) => {
-          let a2 = match(ok, no)(outcome);
+          let a2 = match$1(ok, no)(outcome);
           return a2;
         });
         let b = a.then((x) => {
@@ -159,7 +163,7 @@ class Receiver extends Settler {
     });
   }
   handler(ok, no) {
-    return match((result) => ok(result), (error) => {
+    return match$1((result) => ok(result), (error) => {
       if (no) {
         no(error);
       } else {
@@ -189,8 +193,8 @@ class Receiver extends Settler {
           return { fst: okI, snd: okII };
         }));
         let nxt = ipt.then((p) => {
-          return fold((l) => {
-            return fold((lI) => {
+          return fold$1((l) => {
+            return fold$1((lI) => {
               let res2 = [l, lI];
               return left(res2);
             }, (r) => right(r))(p.snd);
@@ -474,6 +478,28 @@ function useReducerWithThunk(dispatch) {
   }
   return customDispatch;
 }
+var none = none$1;
+var some = some$1;
+var isNone = function(fa) {
+  return fa._tag === "None";
+};
+var matchW = function(onNone, onSome) {
+  return function(ma) {
+    return isNone(ma) ? onNone() : onSome(ma.value);
+  };
+};
+var match = matchW;
+var fold = match;
+class Option {
+  constructor(delegate) {
+    __publicField(this, "delegate");
+    this.delegate = delegate;
+  }
+  defer(p, cont) {
+    let result = fold(() => cont.receive(Terminal.value(none)), (p2) => new Then(this.delegate, new Fun((r) => some(r))).defer(p2, cont))(p);
+    return result;
+  }
+}
 class Fletcher {
   static Terminal() {
     return new Terminal((a) => {
@@ -532,6 +558,9 @@ class Fletcher {
     return (r) => {
       self.defer(r, Fletcher.Terminal()).submit();
     };
+  }
+  static Option(self) {
+    return new Option(self);
   }
 }
 export {
