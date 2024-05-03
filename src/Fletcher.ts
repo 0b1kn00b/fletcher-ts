@@ -14,6 +14,7 @@ import { react, useReducerWithThunk } from "./react_arw"
 import { ReactAsyncAction } from "./react_arw/ReactAsyncAction";
 import { Dispatch } from "react";
 import { Option as OptionArw } from "./term/Option";
+import { OptionM } from "./term/OptionM";
 import * as O from 'fp-ts/Option';
 /** Returns Cycle from Continuation */
 
@@ -83,5 +84,8 @@ export class Fletcher{
   }
   static Option<P,R>(self:ArrowletApi<P,R>):ArrowletApi<O.Option<P>,O.Option<R>>{
     return new OptionArw(self);
+  }
+  static OptionM<P,R>(self:ArrowletApi<P,O.Option<R>>):ArrowletApi<O.Option<P>,O.Option<R>>{
+    return new OptionM(self);
   }
 }

@@ -29,4 +29,5 @@ export declare class Fletcher {
     static React<R>(dispatch: Dispatch<R>): ArrowletApi<R, void>;
     static Dispatch<R>(self: ArrowletApi<R, void>): (r: R) => void;
     static Option<P, R>(self: ArrowletApi<P, R>): ArrowletApi<O.Option<P>, O.Option<R>>;
+    static OptionM<P, R>(self: ArrowletApi<P, O.Option<R>>): ArrowletApi<O.Option<P>, O.Option<R>>;
 }

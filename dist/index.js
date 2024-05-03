@@ -500,6 +500,16 @@ class Option {
     return result;
   }
 }
+class OptionM {
+  constructor(delegate) {
+    __publicField(this, "delegate");
+    this.delegate = delegate;
+  }
+  defer(p, cont) {
+    let result = fold(() => cont.receive(Terminal.value(none)), (p2) => this.delegate.defer(p2, cont))(p);
+    return result;
+  }
+}
 class Fletcher {
   static Terminal() {
     return new Terminal((a) => {
@@ -561,6 +571,9 @@ class Fletcher {
   }
   static Option(self) {
     return new Option(self);
+  }
+  static OptionM(self) {
+    return new OptionM(self);
   }
 }
 export {
