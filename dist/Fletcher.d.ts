@@ -1,7 +1,7 @@
 import { Terminal } from "./core/Terminal";
 import { Cycle } from "./core/Cycle";
 import { Anon } from "./term/Anon";
-import { Arrowlet } from "./core/Arrowlet";
+import { Arrowlet } from "./Core";
 import { Result } from "./core/Result";
 import { Receiver } from "./core/Receiver";
 import { Arrow } from "./core/Arrow";

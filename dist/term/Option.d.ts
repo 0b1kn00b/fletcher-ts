@@ -1,4 +1,4 @@
-import { Arrowlet } from "../core/Arrowlet";
+import { Arrowlet } from "../Core";
 import * as O from 'fp-ts/Option';
 import { Cycle } from "../core/Cycle";
 import { Terminal } from "../core/Terminal";

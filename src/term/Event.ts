@@ -1,4 +1,4 @@
-import { Arrowlet } from "../core/Arrowlet";
+import { Arrowlet } from "../Core";
 import { Terminal } from "../core/Terminal";
 import { Deferred } from "ts-deferred";
 import * as E from 'fp-ts/Either';

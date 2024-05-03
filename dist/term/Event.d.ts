@@ -1,4 +1,4 @@
-import { Arrowlet } from "../core/Arrowlet";
+import { Arrowlet } from "../Core";
 import { Terminal } from "../core/Terminal";
 export declare class EventArrowlet<T extends Event> implements Arrowlet<string, T> {
     private _emiter;

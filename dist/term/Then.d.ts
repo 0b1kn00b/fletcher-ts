@@ -1,4 +1,4 @@
-import { Arrowlet } from "../core/Arrowlet";
+import { Arrowlet } from "../Core";
 import { Terminal } from "../core/Terminal";
 /**
  * Creates an arrowlet that outputs the result of the first into the second and returns the result.

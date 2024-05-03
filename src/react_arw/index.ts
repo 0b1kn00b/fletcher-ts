@@ -1,6 +1,6 @@
 // https://chwastek.eu/blog/async-actions-with-usereducer-in-react
 import { useReducer, useCallback, Reducer } from 'react';
-import { Arrowlet } from "../core/Arrowlet";
+import { Arrowlet } from "../Core";
 import { Dispatch} from 'react'; 
 import { Result } from "../core/Result";
 import { ReactAsyncAction } from './ReactAsyncAction';

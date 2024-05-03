@@ -1,4 +1,4 @@
-import { Arrowlet } from "../core/Arrowlet";
+import { Arrowlet } from "../Core";
 import { Cycle } from "../core/Cycle";
 import { Terminal } from "../core/Terminal";
 export declare class Fun<P, R> implements Arrowlet<P, R> {

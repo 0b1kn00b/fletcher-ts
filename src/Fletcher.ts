@@ -4,7 +4,7 @@ import { Apply } from "./core/Apply";
 import { Cycle } from "./core/Cycle";
 import { Fun } from "./term/Fun";
 import { Anon } from "./term/Anon";
-import { Arrowlet } from "./core/Arrowlet";
+import { Arrowlet } from "./Core";
 import { Result } from "./core/Result";
 import { forward, resolve } from "./util";
 import { Receiver } from "./core/Receiver";
