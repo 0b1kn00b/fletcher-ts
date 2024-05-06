@@ -142,11 +142,11 @@ export class Arrow<Pi,Ri,Pii,Rii>{
   public joint<Riii>(that:Arrowlet<Rii,Riii>):Arrow<Pi,Ri,Pii,[Rii,Riii]>{
     return this.next(Arrow.Joint(that));
   }
-  static Bound<Pi,Ri,Rii>(that:Arrowlet<[Pi,Ri],Rii>){
+  static Bound<Pi,Ri,Rii>(that:Arrowlet<[Pi,Ri],Rii>):Arrow<Pi,Ri,Pi,Rii>{
     return new Arrow(
       (self:Arrowlet<Pi,Ri>) => {
         let u : Arrowlet<Pi,Pi>              = new Unit();
-        let l : Arrow<Pi, [Pi, Ri], Ri, Rii>   = Arrow.Then(that); 
+        let l : Arrow<Pi, [Pi, Ri], Pi, Rii>   = Arrow.Then(that); 
         let r                                     = Arrow.Joint(self).apply(u);
         let n = l.apply(r);
         return n;
@@ -156,7 +156,7 @@ export class Arrow<Pi,Ri,Pii,Rii>{
   public bound<Riii>(that:Arrowlet<[Pii,Rii],Riii>){
     return this.next(Arrow.Bound(that));
   }
-  static Broach<Pi,Ri>(){
+  static Broach<Pi,Ri>():Arrow<Pi,Ri,Pi,[Pi,Ri]>{
     return new Arrow(
       (self:Arrowlet<Pi,Ri>) => {
         let unit : Arrowlet<[Pi,Ri],[Pi,Ri]> = new Fun( (p:[Pi,Ri]) => p);

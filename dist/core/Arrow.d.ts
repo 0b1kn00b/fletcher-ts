@@ -28,10 +28,10 @@ export declare class Arrow<Pi, Ri, Pii, Rii> {
     pinch<Riii>(that: Arrowlet<Pii, Riii>): Arrow<Pi, Ri, Pii, [Rii, Riii]>;
     static Joint<Pi, Ri, Rii>(that: Arrowlet<Ri, Rii>): Arrow<Pi, Ri, Pi, [Ri, Rii]>;
     joint<Riii>(that: Arrowlet<Rii, Riii>): Arrow<Pi, Ri, Pii, [Rii, Riii]>;
-    static Bound<Pi, Ri, Rii>(that: Arrowlet<[Pi, Ri], Rii>): Arrow<Pi, Ri, Ri, Rii>;
-    bound<Riii>(that: Arrowlet<[Pii, Rii], Riii>): Arrow<Pi, Ri, Rii, Riii>;
-    static Broach<Pi, Ri>(): Arrow<Pi, Ri, Ri, [Pi, Ri]>;
-    broach(): Arrow<Pi, Ri, Rii, [Pii, Rii]>;
+    static Bound<Pi, Ri, Rii>(that: Arrowlet<[Pi, Ri], Rii>): Arrow<Pi, Ri, Pi, Rii>;
+    bound<Riii>(that: Arrowlet<[Pii, Rii], Riii>): Arrow<Pi, Ri, Pii, Riii>;
+    static Broach<Pi, Ri>(): Arrow<Pi, Ri, Pi, [Pi, Ri]>;
+    broach(): Arrow<Pi, Ri, Pii, [Pii, Rii]>;
     resolve(p: Pii): Promise<import("./Result").Result<Rii>>;
     static Compose<Pi, Pii, Piii, Ri, Rii, Riii>(lhs: Arrow<Ri, Rii, Piii, Riii>, rhs: Arrow<Pi, Pii, Ri, Rii>): Arrow<Pi, Pii, Piii, Riii>;
     compose<P, R>(before: Arrow<P, R, Pi, Ri>): Arrow<P, R, Pii, Rii>;

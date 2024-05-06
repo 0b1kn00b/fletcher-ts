@@ -54,23 +54,29 @@ export class Fletcher{
   static Then<Pi,Ri,Rii>(self:Arrowlet<Pi,Ri>,that:Arrowlet<Ri,Rii>):Arrowlet<Pi,Rii>{
     return new Then(self,that);
   }
-  static Pair<Pi,Pii,Ri,Rii>(self:Arrowlet<Pi,Ri>,that:Arrowlet<Pii,Rii>){
+  static Pair<Pi,Pii,Ri,Rii>(self:Arrowlet<Pi,Ri>,that:Arrowlet<Pii,Rii>):Arrowlet<[Pi,Pii],[Ri,Rii]>{
     return Fletcher.Arrow().Pair(that).apply(self);
   }
   static FlatMap<Pi,Ri,Rii>(self:Arrowlet<Pi,Ri>,fn:(p:Ri)=>Arrowlet<Pi,Rii>){
     return Fletcher.Arrow().FlatMap(fn).apply(self);
   }
-  static First<Pi,Ri,Pii>(self:Arrowlet<Pi,Ri>){
+  static First<Pi,Ri,Pii>(self:Arrowlet<Pi,Ri>):Arrowlet<[Pi,Ri],[Pi,Pi]>{
     return Fletcher.Arrow().First().apply(self);
   }
-  static Second<Pi,Ri,Pii>(self:Arrowlet<Pi,Ri>){
+  static Second<Pi,Ri,Pii>(self:Arrowlet<Pi,Ri>):Arrowlet<[Pi,Pi],[Pi,Ri]>{
     return Fletcher.Arrow().Second().apply(self);
   }
-  static Pinch<Pi,Ri,Rii>(self:Arrowlet<Pi,Ri>,that:Arrowlet<Pi,Rii>){
+  static Pinch<Pi,Ri,Rii>(self:Arrowlet<Pi,Ri>,that:Arrowlet<Pi,Rii>):Arrowlet<Pi,[Ri,Rii]>{
     return Fletcher.Arrow().Pinch(that).apply(self);
   }
-  static Joint<Pi,Ri,Rii>(self:Arrowlet<Pi,Ri>,that:Arrowlet<Ri,Rii>){
+  static Joint<Pi,Ri,Rii>(self:Arrowlet<Pi,Ri>,that:Arrowlet<Ri,Rii>):Arrowlet<Pi,[Ri,Rii]>{
     return Fletcher.Arrow().Joint(that).apply(self);
+  }
+  static Bound<Pi,Ri,Rii>(self:Arrowlet<Pi,Ri>,that:Arrowlet<[Pi,Ri],Rii>):Arrowlet<Pi,Rii>{
+    return Fletcher.Arrow().Bound(that).apply(self);
+  }
+  static Broach<Pi,Ri>(self:Arrowlet<Pi,Ri>):Arrowlet<Pi,[Pi,Ri]>{
+    return Fletcher.Arrow().Broach().apply(self);
   }
   static Next<Pi,Pii,Piii,Ri,Rii,Riii>(lhs:Arrow<Pi,Pii,Ri,Rii>,rhs:Arrow<Ri,Rii,Piii,Riii>){
     return lhs.next(rhs);
@@ -93,7 +99,7 @@ export class Fletcher{
     EventArrowlet : EventArrowlet,
     Anon          : Anon,
     Fun           : Fun,
-    Option        : Option,
+    Option        : OptionArw,
     OptionM       : OptionM,
     Then          : Then,
     Unit          : Unit

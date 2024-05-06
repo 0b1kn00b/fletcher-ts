@@ -490,7 +490,7 @@ var matchW = function(onNone, onSome) {
 };
 var match = matchW;
 var fold = match;
-let Option$1 = class Option2 {
+class Option {
   constructor(delegate) {
     __publicField(this, "delegate");
     this.delegate = delegate;
@@ -499,7 +499,7 @@ let Option$1 = class Option2 {
     let result = fold(() => cont.receive(Terminal.value(none)), (p2) => new Then(this.delegate, new Fun((r) => some(r))).defer(p2, cont))(p);
     return result;
   }
-};
+}
 class OptionM {
   constructor(delegate) {
     __publicField(this, "delegate");
@@ -558,6 +558,12 @@ const _Fletcher = class _Fletcher {
   static Joint(self, that) {
     return _Fletcher.Arrow().Joint(that).apply(self);
   }
+  static Bound(self, that) {
+    return _Fletcher.Arrow().Bound(that).apply(self);
+  }
+  static Broach(self) {
+    return _Fletcher.Arrow().Broach().apply(self);
+  }
   static Next(lhs, rhs) {
     return lhs.next(rhs);
   }
@@ -570,7 +576,7 @@ const _Fletcher = class _Fletcher {
     };
   }
   static Option(self) {
-    return new Option$1(self);
+    return new Option(self);
   }
   static OptionM(self) {
     return new OptionM(self);
