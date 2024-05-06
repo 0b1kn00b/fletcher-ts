@@ -594,4 +594,7 @@ __publicField(_Fletcher, "Core", {
   Cycle
 });
 let Fletcher = _Fletcher;
+exports.Apply = Apply;
+exports.Cycle = Cycle;
 exports.Fletcher = Fletcher;
+exports.Terminal = Terminal;

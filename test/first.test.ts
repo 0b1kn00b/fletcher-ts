@@ -1,7 +1,7 @@
 // sum.test.js
 import { expect, test, vi, beforeEach, describe, afterEach, it } from 'vitest'
 import { Fletcher as F} from '../src'
-import { ArrowletApi } from '../src/core/ArrowletApi';
+import { Arrowlet } from '../src/Core';
 import { Arrow } from '../src/core/Arrow';
 import * as O from 'fp-ts/Option';
 import * as E from 'fp-ts/Either';

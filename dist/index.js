@@ -593,5 +593,8 @@ __publicField(_Fletcher, "Core", {
 });
 let Fletcher = _Fletcher;
 export {
-  Fletcher
+  Apply,
+  Cycle,
+  Fletcher,
+  Terminal
 };
