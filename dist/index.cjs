@@ -30,40 +30,15 @@ var Deferred = function() {
   return Deferred2;
 }();
 var Deferred_1 = Deferred;
-(function(to, from, pack) {
-  if (pack || arguments.length === 2)
-    for (var i = 0, l = from.length, ar; i < l; i++) {
-      if (ar || !(i in from)) {
-        if (!ar)
-          ar = Array.prototype.slice.call(from, 0, i);
-        ar[i] = from[i];
-      }
-    }
-  return to.concat(ar || Array.prototype.slice.call(from));
-});
-var none$1 = { _tag: "None" };
-var some$1 = function(a) {
-  return { _tag: "Some", value: a };
-};
-var isLeft$1 = function(ma) {
-  return ma._tag === "Left";
-};
-var left$1 = function(e) {
-  return { _tag: "Left", left: e };
-};
-var right$1 = function(a) {
-  return { _tag: "Right", right: a };
-};
-var left = left$1;
-var right = right$1;
-var isLeft = isLeft$1;
-var matchW$1 = function(onLeft, onRight) {
-  return function(ma) {
-    return isLeft(ma) ? onLeft(ma.left) : onRight(ma.right);
-  };
-};
-var match$1 = matchW$1;
-var fold$1 = match$1;
+class Apply {
+  constructor(_apply) {
+    __publicField(this, "_apply");
+    this._apply = _apply;
+  }
+  apply(a) {
+    return this._apply(a);
+  }
+}
 class Cycle {
   constructor(_after) {
     __publicField(this, "_after", null);
@@ -134,15 +109,40 @@ class Cycle {
     return new Cycle(() => self);
   }
 }
-class Apply {
-  constructor(_apply) {
-    __publicField(this, "_apply");
-    this._apply = _apply;
-  }
-  apply(a) {
-    return this._apply(a);
-  }
-}
+(function(to, from, pack) {
+  if (pack || arguments.length === 2)
+    for (var i = 0, l = from.length, ar; i < l; i++) {
+      if (ar || !(i in from)) {
+        if (!ar)
+          ar = Array.prototype.slice.call(from, 0, i);
+        ar[i] = from[i];
+      }
+    }
+  return to.concat(ar || Array.prototype.slice.call(from));
+});
+var none$1 = { _tag: "None" };
+var some$1 = function(a) {
+  return { _tag: "Some", value: a };
+};
+var isLeft$1 = function(ma) {
+  return ma._tag === "Left";
+};
+var left$1 = function(e) {
+  return { _tag: "Left", left: e };
+};
+var right$1 = function(a) {
+  return { _tag: "Right", right: a };
+};
+var left = left$1;
+var right = right$1;
+var isLeft = isLeft$1;
+var matchW$1 = function(onLeft, onRight) {
+  return function(ma) {
+    return isLeft(ma) ? onLeft(ma.left) : onRight(ma.right);
+  };
+};
+var match$1 = matchW$1;
+var fold$1 = match$1;
 class Cont extends Apply {
 }
 class Settler extends Cont {
@@ -588,6 +588,10 @@ __publicField(_Fletcher, "Instances", {
   OptionM,
   Then,
   Unit
+});
+__publicField(_Fletcher, "Core", {
+  Terminal,
+  Cycle
 });
 let Fletcher = _Fletcher;
 exports.Fletcher = Fletcher;

@@ -1,10 +1,6 @@
 import {Deferred} from "ts-deferred";
-import { Terminal, TerminalInput } from "./core/Terminal";
-import { Apply } from "./core/Apply";
-import { Cycle } from "./core/Cycle";
 import { Fun } from "./term/Fun";
 import { Anon } from "./term/Anon";
-import { Arrowlet } from "./Core";
 import { Unit } from "./term/Unit";
 import { Result } from "./core/Result";
 import { forward, resolve } from "./util";
@@ -17,6 +13,7 @@ import { Dispatch } from "react";
 import { Option as OptionArw } from "./term/Option";
 import { OptionM } from "./term/OptionM";
 import * as O from 'fp-ts/Option';
+import { Arrowlet, Terminal, Cycle, TerminalInput, Apply } from "./Core";
 import * as E from 'fp-ts/Either';
 
 import { Then } from "./term/Then";
@@ -103,5 +100,9 @@ export class Fletcher{
     OptionM       : OptionM,
     Then          : Then,
     Unit          : Unit
+  }
+  static Core = {
+    Terminal  : Terminal,
+    Cycle     : Cycle 
   }
 }
