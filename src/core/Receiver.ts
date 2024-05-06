@@ -59,13 +59,15 @@ export class Receiver<R> extends Settler<ReceiverInput<R>>{
           let work_left  = self.apply(
             new Apply((ocI)   => {
               lhs = ocI;
-              return Cycle.Unit();
+              //console.log("zip: set left");
+              return Cycle.ZERO;
             })
           );
           var work_right = that.apply(
             new Apply((ocII)  => {
               rhs = ocII;
-              return Cycle.Unit();
+              //console.log("zip: set right");
+              return Cycle.ZERO;
             })
           );
           return work_left.par(work_right).seq(
@@ -77,6 +79,7 @@ export class Receiver<R> extends Settler<ReceiverInput<R>>{
                   lhs_.then(
                     (okI:Result<R>) => rhs_.then(
                       (okII:Result<Ri>) => { 
+                        //console.log("zip: set both");
                         return {fst : okI, snd : okII} 
                       }
                     )
@@ -84,11 +87,13 @@ export class Receiver<R> extends Settler<ReceiverInput<R>>{
 
                 let nxt = ipt.then(
                   (p:{ fst : Result<R>,snd : Result<Ri>}):Result<[R,Ri]> => {
+                    //console.log('zip:both results',p);
                     return Either.fold(
                       (l:R) => {
                         return Either.fold(
                           (lI:Ri) => {
-                            let res : [R,Ri] = [l,lI]; 
+                            let res : [R,Ri] = [l,lI];
+                            //console.log('zip:both success',res); 
                             return Either.left(res);
                           },
                           (r:Error)   => Either.right(r)
@@ -100,7 +105,10 @@ export class Receiver<R> extends Settler<ReceiverInput<R>>{
                 );
                 let res = f.apply(nxt);
                 return new Promise(
-                  resolve => resolve(res)
+                  resolve => {
+                    //console.log('zip:zippped', res);
+                    resolve(res)
+                  }
                 );
               }
             )

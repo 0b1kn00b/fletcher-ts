@@ -13,7 +13,7 @@ export function react<P,R>(dispatch:Dispatch<R>):Arrowlet<R,void>{
   return new Anon(
     (p:R,cont:Terminal<void>) => {
       dispatch(p);
-      return Cycle.Unit();
+      return Cycle.ZERO;
     }
   );
 }

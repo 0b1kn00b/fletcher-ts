@@ -39,7 +39,7 @@ export class Terminal<R> extends Settler<TerminalInput<R>> {
                   return result.then(
                     _ => {
                       //console.log('receiver unit');
-                      return Cycle.Unit();
+                      return Cycle.ZERO;
                     }
                   )
                 });

@@ -37,7 +37,7 @@ class Apply {
     return this._apply(a);
   }
 }
-class Cycle {
+const _Cycle = class _Cycle {
   constructor(_after) {
     __publicField(this, "_after", null);
     this._after = _after;
@@ -46,11 +46,11 @@ class Cycle {
     return this._after == null ? null : this._after();
   }
   static Seq(lhs, rhs) {
-    return new Cycle(() => {
+    return new _Cycle(() => {
       let a = lhs == null ? void 0 : lhs.after;
       if (a != null) {
         return new Promise((resolve2) => a.then((x) => {
-          return Cycle.Seq(x, rhs);
+          return _Cycle.Seq(x, rhs);
         }).then(resolve2));
       } else {
         return rhs == null ? void 0 : rhs.after;
@@ -58,13 +58,13 @@ class Cycle {
     });
   }
   seq(rhs) {
-    return Cycle.Par(this, rhs);
+    return _Cycle.Par(this, rhs);
   }
   par(rhs) {
-    return Cycle.Par(this, rhs);
+    return _Cycle.Par(this, rhs);
   }
   submit() {
-    return Cycle.Submit(this);
+    return _Cycle.Submit(this);
   }
   static Submit(self) {
     let deferred = new Deferred_1();
@@ -73,7 +73,7 @@ class Cycle {
       if (after != null) {
         after.then((x) => {
           if (x != null) {
-            Cycle.Submit(x).then((x2) => deferred.resolve(x2), (e) => deferred.reject(e));
+            _Cycle.Submit(x).then((x2) => deferred.resolve(x2), (e) => deferred.reject(e));
           } else {
             deferred.resolve(null);
           }
@@ -87,26 +87,36 @@ class Cycle {
     return deferred.promise;
   }
   static Par(self, that) {
-    let l = self.after ?? Promise.resolve(Cycle.Unit());
-    let r = that.after ?? Promise.resolve(Cycle.Unit());
+    let l = self.after ?? Promise.resolve(_Cycle.ZERO);
+    let r = that.after ?? Promise.resolve(_Cycle.ZERO);
     let a = Promise.all([l, r]);
-    return Cycle.Pure(a.then(([l2, r2]) => {
-      if (l2 != null && r2 != null) {
-        return Cycle.Par(l2, r2);
-      } else if (l2 != null) {
-        return l2;
-      } else {
-        return r2;
+    a.then((x) => {
+    });
+    return _Cycle.Pure(a.then(([l2, r2]) => {
+      const do_left = !(l2 === _Cycle.ZERO);
+      const do_right = !(r2 === _Cycle.ZERO);
+      var result = _Cycle.ZERO;
+      if (do_left) {
+        if (do_right) {
+          result = _Cycle.Par(l2, r2);
+        } else {
+          result = l2;
+        }
+      } else if (do_right) {
+        result = r2;
       }
+      return result;
     }));
   }
-  static Unit() {
-    return new Cycle(null);
-  }
+  // static Unit(){
+  //   return new Cycle(null);
+  // }
   static Pure(self) {
-    return new Cycle(() => self);
+    return new _Cycle(() => self);
   }
-}
+};
+__publicField(_Cycle, "ZERO", new _Cycle(null));
+let Cycle = _Cycle;
 (function(to, from, pack) {
   if (pack || arguments.length === 2)
     for (var i = 0, l = from.length, ar; i < l; i++) {
@@ -180,11 +190,11 @@ class Receiver extends Settler {
       var rhs = null;
       let work_left = self.apply(new Apply((ocI) => {
         lhs = ocI;
-        return Cycle.Unit();
+        return Cycle.ZERO;
       }));
       var work_right = that.apply(new Apply((ocII) => {
         rhs = ocII;
-        return Cycle.Unit();
+        return Cycle.ZERO;
       }));
       return work_left.par(work_right).seq(new Cycle(() => {
         let lhs_ = lhs;
@@ -201,7 +211,9 @@ class Receiver extends Settler {
           }, (r) => right(r))(p.fst);
         });
         let res = f.apply(nxt);
-        return new Promise((resolve2) => resolve2(res));
+        return new Promise((resolve2) => {
+          resolve2(res);
+        });
       }));
     });
   }
@@ -215,7 +227,7 @@ class Terminal extends Settler {
         });
         return new Cycle(() => {
           return result.then((_) => {
-            return Cycle.Unit();
+            return Cycle.ZERO;
           });
         });
       }));
@@ -464,7 +476,7 @@ class Arrow {
 function react(dispatch) {
   return new Anon((p, cont) => {
     dispatch(p);
-    return Cycle.Unit();
+    return Cycle.ZERO;
   });
 }
 function useReducerWithThunk(dispatch) {

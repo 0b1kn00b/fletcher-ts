@@ -8,6 +8,6 @@ export declare class Cycle {
     submit(): Promise<unknown>;
     static Submit(self: Cycle): Promise<unknown>;
     static Par(self: Cycle, that: Cycle): Cycle;
-    static Unit(): Cycle;
+    static ZERO: Cycle;
     static Pure(self: Promise<Cycle>): Cycle;
 }
