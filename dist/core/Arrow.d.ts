@@ -1,4 +1,4 @@
-import { Arrowlet } from "./Arrowlet";
+import { Arrowlet } from "../Core";
 export declare class Arrow<Pi, Ri, Pii, Rii> {
     private _apply;
     constructor(_apply: (self: Arrowlet<Pi, Ri>) => Arrowlet<Pii, Rii>);

@@ -1,12 +1,17 @@
 import { Terminal } from "./core/Terminal";
 import { Cycle } from "./core/Cycle";
+import { Fun } from "./term/Fun";
 import { Anon } from "./term/Anon";
 import { Arrowlet } from "./Core";
+import { Unit } from "./term/Unit";
 import { Result } from "./core/Result";
 import { Receiver } from "./core/Receiver";
+import { EventArrowlet } from "./term/Event";
 import { Arrow } from "./core/Arrow";
 import { Dispatch } from "react";
+import { OptionM } from "./term/OptionM";
 import * as O from 'fp-ts/Option';
+import { Then } from "./term/Then";
 /** Returns Cycle from Continuation */
 /**Takes a resolver to use later that may return Cycle to be done in a scheduler once all inputs are known*/
 export declare class Fletcher {
@@ -30,4 +35,13 @@ export declare class Fletcher {
     static Dispatch<R>(self: Arrowlet<R, void>): (r: R) => void;
     static Option<P, R>(self: Arrowlet<P, R>): Arrowlet<O.Option<P>, O.Option<R>>;
     static OptionM<P, R>(self: Arrowlet<P, O.Option<R>>): Arrowlet<O.Option<P>, O.Option<R>>;
+    static Instances: {
+        EventArrowlet: typeof EventArrowlet;
+        Anon: typeof Anon;
+        Fun: typeof Fun;
+        Option: new (text?: string, value?: string, defaultSelected?: boolean, selected?: boolean) => HTMLOptionElement;
+        OptionM: typeof OptionM;
+        Then: typeof Then;
+        Unit: typeof Unit;
+    };
 }

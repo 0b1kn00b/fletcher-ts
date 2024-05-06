@@ -5,6 +5,7 @@ import { Cycle } from "./core/Cycle";
 import { Fun } from "./term/Fun";
 import { Anon } from "./term/Anon";
 import { Arrowlet } from "./Core";
+import { Unit } from "./term/Unit";
 import { Result } from "./core/Result";
 import { forward, resolve } from "./util";
 import { Receiver } from "./core/Receiver";
@@ -93,5 +94,14 @@ export class Fletcher{
   }
   static OptionM<P,R>(self:Arrowlet<P,O.Option<R>>):Arrowlet<O.Option<P>,O.Option<R>>{
     return new OptionM(self);
+  }
+  static Instances = {
+    EventArrowlet : EventArrowlet,
+    Anon          : Anon,
+    Fun           : Fun,
+    Option        : Option,
+    OptionM       : OptionM,
+    Then          : Then,
+    Unit          : Unit
   }
 }

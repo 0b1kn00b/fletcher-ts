@@ -264,6 +264,11 @@ class Anon {
     return this._defer(p, cont);
   }
 }
+class Unit extends Fun {
+  constructor() {
+    super((p) => p);
+  }
+}
 function forward(self, p) {
   return new Receiver((k) => {
     let deferred = new Deferred_1();
@@ -318,11 +323,6 @@ class Then {
   defer(p, cont) {
     var a = forward(this.lhs, p);
     return cont.receive(a.flat_fold((ok) => forward(this.rhs, ok), (no) => Terminal.error(no)));
-  }
-}
-class Unit extends Fun {
-  constructor() {
-    super((p) => p);
   }
 }
 class Arrow {
@@ -490,7 +490,7 @@ var matchW = function(onNone, onSome) {
 };
 var match = matchW;
 var fold = match;
-class Option {
+let Option$1 = class Option2 {
   constructor(delegate) {
     __publicField(this, "delegate");
     this.delegate = delegate;
@@ -499,7 +499,7 @@ class Option {
     let result = fold(() => cont.receive(Terminal.value(none)), (p2) => new Then(this.delegate, new Fun((r) => some(r))).defer(p2, cont))(p);
     return result;
   }
-}
+};
 class OptionM {
   constructor(delegate) {
     __publicField(this, "delegate");
@@ -510,7 +510,7 @@ class OptionM {
     return result;
   }
 }
-class Fletcher {
+const _Fletcher = class _Fletcher {
   static Terminal() {
     return new Terminal((a) => {
       return a.apply(new Deferred_1());
@@ -523,7 +523,7 @@ class Fletcher {
     return new Fun(fn);
   }
   static Pure(r) {
-    return Fletcher.Fun1R((_) => r);
+    return _Fletcher.Fun1R((_) => r);
   }
   static Anon(fn) {
     return new Anon(fn);
@@ -541,22 +541,22 @@ class Fletcher {
     return new Then(self, that);
   }
   static Pair(that) {
-    return Fletcher.Arrow().Pair(that);
+    return _Fletcher.Arrow().Pair(that);
   }
   static FlatMap(fn) {
-    return Fletcher.Arrow().FlatMap(fn);
+    return _Fletcher.Arrow().FlatMap(fn);
   }
   static First() {
-    return Fletcher.Arrow().First();
+    return _Fletcher.Arrow().First();
   }
   static Second() {
-    return Fletcher.Arrow().Second();
+    return _Fletcher.Arrow().Second();
   }
   static Pinch(that) {
-    return Fletcher.Arrow().Pinch(that);
+    return _Fletcher.Arrow().Pinch(that);
   }
   static Joint(that) {
-    return Fletcher.Arrow().Joint(that);
+    return _Fletcher.Arrow().Joint(that);
   }
   static Next(lhs, rhs) {
     return lhs.next(rhs);
@@ -566,18 +566,28 @@ class Fletcher {
   }
   static Dispatch(self) {
     return (r) => {
-      self.defer(r, Fletcher.Terminal()).submit();
+      self.defer(r, _Fletcher.Terminal()).submit();
     };
   }
   // static Entrench<R>(self:Arrowlet<void,R>):Arrowlet<R,void>{
   // }
   static Option(self) {
-    return new Option(self);
+    return new Option$1(self);
   }
   static OptionM(self) {
     return new OptionM(self);
   }
-}
+};
+__publicField(_Fletcher, "Instances", {
+  EventArrowlet,
+  Anon,
+  Fun,
+  Option,
+  OptionM,
+  Then,
+  Unit
+});
+let Fletcher = _Fletcher;
 export {
   Fletcher
 };

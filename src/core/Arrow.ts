@@ -1,7 +1,6 @@
 import { Then } from "../term/Then";
-import { Arrowlet } from "./Arrowlet"
+import { Arrowlet, Terminal } from "../Core"
 import { Anon } from "../term/Anon";
-import { Terminal } from "./Terminal";
 import { forward, resolve, unit } from "../util";
 import { Fun } from "../term/Fun";
 import { Unit } from "../term/Unit";
