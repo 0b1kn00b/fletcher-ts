@@ -542,23 +542,23 @@ const _Fletcher = class _Fletcher {
   static Then(self, that) {
     return new Then(self, that);
   }
-  static Pair(that) {
-    return _Fletcher.Arrow().Pair(that);
+  static Pair(self, that) {
+    return _Fletcher.Arrow().Pair(that).apply(self);
   }
-  static FlatMap(fn) {
-    return _Fletcher.Arrow().FlatMap(fn);
+  static FlatMap(self, fn) {
+    return _Fletcher.Arrow().FlatMap(fn).apply(self);
   }
-  static First() {
-    return _Fletcher.Arrow().First();
+  static First(self) {
+    return _Fletcher.Arrow().First().apply(self);
   }
-  static Second() {
-    return _Fletcher.Arrow().Second();
+  static Second(self) {
+    return _Fletcher.Arrow().Second().apply(self);
   }
-  static Pinch(that) {
-    return _Fletcher.Arrow().Pinch(that);
+  static Pinch(self, that) {
+    return _Fletcher.Arrow().Pinch(that).apply(self);
   }
-  static Joint(that) {
-    return _Fletcher.Arrow().Joint(that);
+  static Joint(self, that) {
+    return _Fletcher.Arrow().Joint(that).apply(self);
   }
   static Next(lhs, rhs) {
     return lhs.next(rhs);
@@ -571,8 +571,6 @@ const _Fletcher = class _Fletcher {
       self.defer(r, _Fletcher.Terminal()).submit();
     };
   }
-  // static Entrench<R>(self:Arrowlet<void,R>):Arrowlet<R,void>{
-  // }
   static Option(self) {
     return new Option$1(self);
   }

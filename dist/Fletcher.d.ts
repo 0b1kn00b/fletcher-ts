@@ -22,12 +22,12 @@ export declare class Fletcher {
     static Forward<P, R>(self: Arrowlet<P, R>, input: P): Receiver<R>;
     static Event<R extends Event>(self: EventTarget): Arrowlet<string, R>;
     static Then<Pi, Ri, Rii>(self: Arrowlet<Pi, Ri>, that: Arrowlet<Ri, Rii>): Arrowlet<Pi, Rii>;
-    static Pair<Pi, Pii, Ri, Rii>(that: Arrowlet<Pii, Rii>): Arrow<unknown, unknown, [unknown, Pii], [unknown, Rii]>;
-    static FlatMap<Pi, Ri, Rii>(fn: (p: Ri) => Arrowlet<Pi, Rii>): Arrow<Pi, Ri, Pi, Rii>;
-    static First<Pi, Ri, Pii>(): Arrow<unknown, unknown, [unknown, unknown], [unknown, unknown]>;
-    static Second<Pi, Ri, Pii>(): Arrow<unknown, unknown, [unknown, unknown], [unknown, unknown]>;
-    static Pinch<Pi, Ri, Rii>(that: Arrowlet<Pi, Rii>): Arrow<Pi, unknown, Pi, [unknown, Rii]>;
-    static Joint<Pi, Ri, Rii>(that: Arrowlet<Ri, Rii>): Arrow<Pi, Ri, Pi, [Ri, Rii]>;
+    static Pair<Pi, Pii, Ri, Rii>(self: Arrowlet<Pi, Ri>, that: Arrowlet<Pii, Rii>): Arrowlet<[unknown, Pii], [unknown, Rii]>;
+    static FlatMap<Pi, Ri, Rii>(self: Arrowlet<Pi, Ri>, fn: (p: Ri) => Arrowlet<Pi, Rii>): Arrowlet<Pi, Rii>;
+    static First<Pi, Ri, Pii>(self: Arrowlet<Pi, Ri>): Arrowlet<[unknown, unknown], [unknown, unknown]>;
+    static Second<Pi, Ri, Pii>(self: Arrowlet<Pi, Ri>): Arrowlet<[unknown, unknown], [unknown, unknown]>;
+    static Pinch<Pi, Ri, Rii>(self: Arrowlet<Pi, Ri>, that: Arrowlet<Pi, Rii>): Arrowlet<Pi, [unknown, Rii]>;
+    static Joint<Pi, Ri, Rii>(self: Arrowlet<Pi, Ri>, that: Arrowlet<Ri, Rii>): Arrowlet<unknown, [Ri, Rii]>;
     static Next<Pi, Pii, Piii, Ri, Rii, Riii>(lhs: Arrow<Pi, Pii, Ri, Rii>, rhs: Arrow<Ri, Rii, Piii, Riii>): Arrow<Pi, Pii, Piii, Riii>;
     static React<R>(dispatch: Dispatch<R>): Arrowlet<R, void>;
     static Dispatch<R>(self: Arrowlet<R, void>): (r: R) => void;
