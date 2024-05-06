@@ -89,6 +89,23 @@ export class Fletcher{
       self.defer(r,Fletcher.Terminal()).submit();
     } 
   }
+  static Stage<P,R>(self:Arrowlet<P,R>,before:((p:P)=>void) | null, after:((r:R) => void) | null):Arrowlet<P,R>{
+    return Fletcher.Anon(
+      (p:P,cont:Terminal<R>) => {
+        if(before){
+          before(p)
+        }
+        return Fletcher.Then(self,Fletcher.Fun1R(
+          (r:R) => {
+            if(after){
+              after(r);
+            }
+            return r;
+          }
+        )).defer(p,cont);
+      }
+    );
+  }
   static Option<P,R>(self:Arrowlet<P,R>):Arrowlet<O.Option<P>,O.Option<R>>{
     return new OptionArw(self);
   }

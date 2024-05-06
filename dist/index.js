@@ -575,6 +575,19 @@ const _Fletcher = class _Fletcher {
       self.defer(r, _Fletcher.Terminal()).submit();
     };
   }
+  static Stage(self, before, after) {
+    return _Fletcher.Anon((p, cont) => {
+      if (before) {
+        before(p);
+      }
+      return _Fletcher.Then(self, _Fletcher.Fun1R((r) => {
+        if (after) {
+          after(r);
+        }
+        return r;
+      })).defer(p, cont);
+    });
+  }
   static Option(self) {
     return new Option(self);
   }
