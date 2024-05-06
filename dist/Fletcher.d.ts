@@ -37,6 +37,7 @@ export declare class Fletcher {
     static Stage<P, R>(self: Arrowlet<P, R>, before: ((p: P) => void) | null, after: ((r: R) => void) | null): Arrowlet<P, R>;
     static Option<P, R>(self: Arrowlet<P, R>): Arrowlet<O.Option<P>, O.Option<R>>;
     static OptionM<P, R>(self: Arrowlet<P, O.Option<R>>): Arrowlet<O.Option<P>, O.Option<R>>;
+    static OptionP<P>(fn: (p: P) => boolean): Arrowlet<P, O.Option<P>>;
     static Instances: {
         EventArrowlet: typeof EventArrowlet;
         Anon: typeof Anon;

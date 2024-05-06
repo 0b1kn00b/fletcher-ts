@@ -112,6 +112,17 @@ export class Fletcher{
   static OptionM<P,R>(self:Arrowlet<P,O.Option<R>>):Arrowlet<O.Option<P>,O.Option<R>>{
     return new OptionM(self);
   }
+  static OptionP<P>(fn:(p:P)=>boolean):Arrowlet<P,O.Option<P>>{
+    return Fletcher.Fun1R(
+      (p:P) => {
+        if(fn(p)){
+          return O.some(p);
+        }else{
+          return O.none;
+        }
+      }
+    );
+  }
   static Instances = {
     EventArrowlet : EventArrowlet,
     Anon          : Anon,

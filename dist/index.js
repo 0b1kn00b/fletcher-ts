@@ -594,6 +594,15 @@ const _Fletcher = class _Fletcher {
   static OptionM(self) {
     return new OptionM(self);
   }
+  static OptionP(fn) {
+    return _Fletcher.Fun1R((p) => {
+      if (fn(p)) {
+        return some(p);
+      } else {
+        return none;
+      }
+    });
+  }
 };
 __publicField(_Fletcher, "Instances", {
   EventArrowlet,
