@@ -47,7 +47,7 @@ export class Fletcher{
   static Forward<P,R>(self:Arrowlet<P,R>,input:P):Receiver<R>{
     return forward(self,input);
   }
-  static Event<R extends Event>(self:EventTarget):Arrowlet<string,R>{
+  static Event<R extends Event>(self:string):Arrowlet<EventTarget,R>{
     return new EventArrowlet(self)
   }
 

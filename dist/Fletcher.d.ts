@@ -21,7 +21,7 @@ export declare class Fletcher {
     static Anon<Pi, Ri>(fn: (p: Pi, cont: Terminal<Ri>) => Cycle): Anon<Pi, Ri>;
     static Resolve<P, R>(self: Arrowlet<P, R>, input: P): Promise<Result<R>>;
     static Forward<P, R>(self: Arrowlet<P, R>, input: P): Receiver<R>;
-    static Event<R extends Event>(self: EventTarget): Arrowlet<string, R>;
+    static Event<R extends Event>(self: string): Arrowlet<EventTarget, R>;
     static Then<Pi, Ri, Rii>(self: Arrowlet<Pi, Ri>, that: Arrowlet<Ri, Rii>): Arrowlet<Pi, Rii>;
     static Pair<Pi, Pii, Ri, Rii>(self: Arrowlet<Pi, Ri>, that: Arrowlet<Pii, Rii>): Arrowlet<[Pi, Pii], [Ri, Rii]>;
     static FlatMap<Pi, Ri, Rii>(self: Arrowlet<Pi, Ri>, fn: (p: Ri) => Arrowlet<Pi, Rii>): Arrowlet<Pi, Rii>;

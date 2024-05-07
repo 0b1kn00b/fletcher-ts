@@ -308,20 +308,19 @@ function unit() {
   });
 }
 class EventArrowlet {
-  constructor(_emiter) {
-    __publicField(this, "_emiter");
-    this._emiter = _emiter;
+  constructor(event_name) {
+    __publicField(this, "event_name");
+    this.event_name = event_name;
   }
-  defer(eventname, cont) {
+  defer(target, cont) {
     let deferred = new Deferred_1();
-    let self = this;
     let handler = {
       handleEvent: function(evt) {
         deferred.resolve(left(evt));
-        self._emiter.removeEventListener(eventname, handler);
+        target.removeEventListener(this.event_name, handler);
       }
     };
-    this._emiter.addEventListener(eventname, handler);
+    target.addEventListener(this.event_name, handler);
     return cont.receive(Terminal.later(deferred.promise));
   }
 }
