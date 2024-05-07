@@ -527,6 +527,9 @@ const _Fletcher = class _Fletcher {
       return a.apply(new Deferred_1());
     });
   }
+  static Unit() {
+    return new Unit();
+  }
   static Arrow() {
     return Arrow;
   }

@@ -15,6 +15,7 @@ import { Then } from "./term/Then";
 /**Takes a resolver to use later that may return Cycle to be done in a scheduler once all inputs are known*/
 export declare class Fletcher {
     static Terminal<P>(): Terminal<P>;
+    static Unit<P>(): Arrowlet<P, P>;
     static Arrow(): typeof Arrow;
     static Fun1R<Pi, Ri>(fn: (p: Pi) => Ri): Arrowlet<Pi, Ri>;
     static Pure<Pi, Ri>(r: Ri): Arrowlet<Pi, Ri>;

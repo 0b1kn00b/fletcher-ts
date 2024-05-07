@@ -29,6 +29,9 @@ export class Fletcher{
       }
     )
   }
+  static Unit<P>():Arrowlet<P,P>{
+    return new Unit();
+  }
   static Arrow(){
     return Arrow;
   }
