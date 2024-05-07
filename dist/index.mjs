@@ -1,11 +1,9 @@
-"use strict";
 var __defProp = Object.defineProperty;
 var __defNormalProp = (obj, key, value) => key in obj ? __defProp(obj, key, { enumerable: true, configurable: true, writable: true, value }) : obj[key] = value;
 var __publicField = (obj, key, value) => {
   __defNormalProp(obj, typeof key !== "symbol" ? key + "" : key, value);
   return value;
 };
-Object.defineProperty(exports, Symbol.toStringTag, { value: "Module" });
 var Deferred = function() {
   function Deferred2() {
     var _this = this;
@@ -318,6 +316,7 @@ class EventArrowlet {
     let deferred = new Deferred_1();
     let handler = {
       handleEvent: function(evt) {
+        console.log("loaded");
         deferred.resolve(left(evt));
         target.removeEventListener(this.event_name, handler);
       }
@@ -529,54 +528,224 @@ const _Fletcher = class _Fletcher {
       return a.apply(new Deferred_1());
     });
   }
+  /**
+   * Arrow that passed the input p to the output
+   *
+   * @static
+   * @typeParam P
+   * @return {*}  {Arrowlet<P,P>}
+   * @memberof Fletcher
+   */
   static Unit() {
     return new Unit();
   }
   static Arrow() {
     return Arrow;
   }
+  /**
+   * Arrow of function `fn`
+   * @static
+   * @typeParam Pi
+   * @typeParam Ri
+   * @param {(p:Pi)=>Ri} fn
+   * @return {*}  {Arrowlet<Pi,Ri>}
+   * @memberof Fletcher
+   */
   static Fun1R(fn) {
     return new Fun(fn);
   }
+  /**
+   * Arrow that produces result `r`, no matter the input
+   *
+   * @static
+   * @typeParam Pi
+   * @typeParam Ri
+   * @param {Ri} r
+   * @return {*}  {Arrowlet<Pi,Ri>}
+   * @memberof Fletcher
+   */
   static Pure(r) {
     return _Fletcher.Fun1R((_) => r);
   }
+  /**
+   * Arrow instance of lambda
+   *
+   * @static
+   * @typeParam Pi
+   * @typeParam Ri
+   * @param {(p:Pi,cont:Terminal<Ri>)=>Cycle} fn
+   * @return {*}
+   * @memberof Fletcher
+   */
   static Anon(fn) {
     return new Anon(fn);
   }
+  /**
+   * Runs Arrow and produces Promise result
+   *
+   * @static
+   * @typeParam P
+   * @typeParam R
+   * @param {Arrowlet<P,R>} self
+   * @param {P} input
+   * @return {*}  {Promise<Result<R>>}
+   * @memberof Fletcher
+   */
   static Resolve(self, input) {
     return resolve(self, input);
   }
+  /**
+   * Produces Receiver for Terminal to receive
+   *
+   * @static
+   * @typeParam P
+   * @typeParam R
+   * @param {Arrowlet<P,R>} self
+   * @param {P} input
+   * @return {*}  {Receiver<R>}
+   * @memberof Fletcher
+   */
   static Forward(self, input) {
     return forward(self, input);
   }
+  /**
+   * Produces Arrow that listend for named event
+   *
+   * @static
+   * @typeParam R
+   * @param {string} self
+   * @return {*}  {Arrowlet<EventTarget,R>}
+   * @memberof Fletcher
+   */
   static Event(self) {
     return new EventArrowlet(self);
   }
+  /**
+   * Arrow runs `self`, then runs `that` with it's output
+   * @static
+   * @typeParam Pi
+   * @typeParam Ri
+   * @typeParam Rii
+   * @param {Arrowlet<Pi,Ri>} self
+   * @param {Arrowlet<Ri,Rii>} that
+   * @return {*}  {Arrowlet<Pi,Rii>}
+   * @memberof Fletcher
+   */
   static Then(self, that) {
     return new Then(self, that);
   }
+  /**
+   * Arrow that takes a tuple [pi,pii] and produced [ri,rii]
+   *
+   * @static
+   * @typeParam Pi
+   * @typeParam Pii
+   * @typeParam Ri
+   * @typeParam Rii
+   * @param {Arrowlet<Pi,Ri>} self
+   * @param {Arrowlet<Pii,Rii>} that
+   * @return {*}  {Arrowlet<[Pi,Pii],[Ri,Rii]>}
+   * @memberof Fletcher
+   */
   static Pair(self, that) {
     return _Fletcher.Arrow().Pair(that).apply(self);
   }
+  /**
+   * Use the output of Arrow to produce another and run with input Pi
+   *
+   * @static
+   * @typeParam Pi
+   * @typeParam Ri
+   * @typeParam Rii
+   * @param {Arrowlet<Pi,Ri>} self
+   * @param {(p:Ri)=>Arrowlet<Pi,Rii>} fn
+   * @return {*}
+   * @memberof Fletcher
+   */
   static FlatMap(self, fn) {
     return _Fletcher.Arrow().FlatMap(fn).apply(self);
   }
+  /**
+  * Runs an Arrow over the left component of a tuple.
+  *
+  * @static
+  * @typeParam Pi
+  * @typeParam Ri
+  * @typeParam Pii
+  * @return {*}  {Arrow<Pi,Ri,[Pi,Pii],[Ri,Pii]>}
+  * @memberof Arrow
+  */
   static First(self) {
     return _Fletcher.Arrow().First().apply(self);
   }
+  /**
+   * Runs an Arrow over the rignt component of a tuple
+   *
+   * @static
+   * @typeParam Pi
+   * @typeParam Ri
+   * @typeParam Pii
+   * @return {*}  {Arrow<Pi,Ri,[Pii,Pi],[Pii,Ri]>}
+   * @memberof Arrow
+   */
   static Second(self) {
     return _Fletcher.Arrow().Second().apply(self);
   }
+  /**
+   * An Arrow which runs two Arrows with the same input
+   *
+   * @static
+   * @typeParam Pi
+   * @typeParam Ri
+   * @typeParam Rii
+   * @param {Arrowlet<Pi,Ri>} self
+   * @param {Arrowlet<Pi,Rii>} that
+   * @return {*}  {Arrowlet<Pi,[Ri,Rii]>}
+   * @memberof Fletcher
+   */
   static Pinch(self, that) {
     return _Fletcher.Arrow().Pinch(that).apply(self);
   }
+  /**
+   * An Arrow which produces the result of the left and the right arrow as a tuple
+   *
+   * @static
+   * @typeParam Pi
+   * @typeParam Ri
+   * @typeParam Rii
+   * @param {Arrowlet<Pi,Ri>} self
+   * @param {Arrowlet<Ri,Rii>} that
+   * @return {*}  {Arrowlet<Pi,[Ri,Rii]>}
+   * @memberof Fletcher
+   */
   static Joint(self, that) {
     return _Fletcher.Arrow().Joint(that).apply(self);
   }
+  /**
+   * An Arrow which places the input and output of the left arrow as a tuple into the right
+   *
+   * @static
+   * @typeParam Pi
+   * @typeParam Ri
+   * @typeParam Rii
+   * @param  self
+   * @param  that
+   * @return {*}  {Arrowlet<Pi,Rii>}
+   * @memberof Fletcher
+   */
   static Bound(self, that) {
     return _Fletcher.Arrow().Bound(that).apply(self);
   }
+  /**
+   * An Arrow which produces both it's result and it's input as a result.
+   *
+   * @static
+   * @typeParam Pi
+   * @typeParam Ri
+   * @param {Arrowlet<Pi,Ri>} self
+   * @return {*}  {Arrowlet<Pi,[Pi,Ri]>}
+   * @memberof Fletcher
+   */
   static Broach(self) {
     return _Fletcher.Arrow().Broach().apply(self);
   }
@@ -591,6 +760,44 @@ const _Fletcher = class _Fletcher {
       self.defer(r, _Fletcher.Terminal()).submit();
     };
   }
+  /**
+   * Produce the first result to arrive. Note it runs in left right order
+   *
+   * @static
+   * @typeParam P
+   * @typeParam R
+   * @param {Arrowlet<P,R>} self
+   * @param {Arrowlet<P,R>} that
+   * @return {*}  {Arrowlet<P,R>}
+   * @memberof Fletcher
+   */
+  static Race(self, that) {
+    return _Fletcher.Anon((p, cont) => {
+      const deferred = new Deferred_1();
+      var complete = false;
+      function handler(r) {
+        if (!complete) {
+          complete = true;
+          deferred.resolve(r);
+        }
+      }
+      const a = _Fletcher.Then(self, _Fletcher.Fun1R(handler));
+      const b = _Fletcher.Then(self, _Fletcher.Fun1R(handler));
+      return new Cycle(() => Promise.any([_Fletcher.Resolve(a, p), _Fletcher.Resolve(b, p)]).then((_) => deferred.promise.then((r) => cont.receive(Terminal.value(r)))));
+    });
+  }
+  /**
+   * An Arrow which calls handler `before` with it's input adn handler `after` with it's output
+   *
+   * @static
+   * @typeParam P
+   * @typeParam R
+   * @param {Arrowlet<P,R>} self
+   * @param {(((p:P)=>void) | null)} before
+   * @param {(((r:R) => void) | null)} after
+   * @return {*}  {Arrowlet<P,R>}
+   * @memberof Fletcher
+   */
   static Stage(self, before, after) {
     return _Fletcher.Anon((p, cont) => {
       if (before) {
@@ -604,12 +811,41 @@ const _Fletcher = class _Fletcher {
       })).defer(p, cont);
     });
   }
+  /**
+   * Wraps an Arrow in such a way as it takes an Option
+   *
+   * @static
+   * @typeParam P
+   * @typeParam R
+   * @param {Arrowlet<P,R>} self
+   * @return {*}  {Arrowlet<O.Option<P>,O.Option<R>>}
+   * @memberof Fletcher
+   */
   static Option(self) {
     return new Option(self);
   }
+  /**
+   * Turns the flatMap function of an Option into an Option Arrow.
+   *
+   * @static
+   * @typeParam P
+   * @typeParam R
+   * @param {Arrowlet<P,O.Option<R>>} self
+   * @return {*}  {Arrowlet<O.Option<P>,O.Option<R>>}
+   * @memberof Fletcher
+   */
   static OptionM(self) {
     return new OptionM(self);
   }
+  /**
+   * Produces Some(p) if the predicate returns true, None otherwise
+   *
+   * @static
+   * @typeParam P
+   * @param {(p:P)=>boolean} fn
+   * @return {*}  {Arrowlet<P,O.Option<P>>}
+   * @memberof Fletcher
+   */
   static OptionP(fn) {
     return _Fletcher.Fun1R((p) => {
       if (fn(p)) {
@@ -634,7 +870,9 @@ __publicField(_Fletcher, "Core", {
   Cycle
 });
 let Fletcher = _Fletcher;
-exports.Apply = Apply;
-exports.Cycle = Cycle;
-exports.Fletcher = Fletcher;
-exports.Terminal = Terminal;
+export {
+  Apply,
+  Cycle,
+  Fletcher,
+  Terminal
+};

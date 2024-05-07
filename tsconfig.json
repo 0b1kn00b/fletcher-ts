@@ -10,7 +10,7 @@
     "outDir": "./dist",
     "baseUrl" : "./",
     "paths" : {
-      "fletcher-ts/*": ["fletcher-ts/dist/*"],
+      "fletcher-ts/*": ["fletcher-ts/dist/*"]
     },
     "skipLibCheck": true,
     "types": ["vite/client","node"],
@@ -21,5 +21,6 @@
   ],
   "exclude": [
     "node_modules"
-  ]
+  ],
+  
 }

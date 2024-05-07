@@ -1,0 +1,17 @@
+{
+    "compilerOptions": {
+        "module": "NodeNext",
+        "lib": ["DOM","ES2023"],
+        "moduleResolution": "NodeNext",
+        "esModuleInterop": true,
+        "paths" : {
+            "@plugin/app/*": ["../node_modules/typedoc-plugin-markdown/dist/app/*"],
+            "@plugin/libs/*": ["../node_modules/typedoc-plugin-markdown/dist/libs/*"],
+            "@plugin/theme": ["../node_modules/typedoc-plugin-markdown/dist/theme/index.ts"],
+            "@plugin/theme/*": ["../node_modules/typedoc-plugin-markdown/dist/theme/*"],
+            "@plugin/options": ["../node_modules/typedoc-plugin-markdown/dist/options/index.ts"],
+            "@plugin/options/*": ["../node_modules/typedoc-plugin-markdown/dist/options/*"]
+        }
+    },
+    "include": ["**/*.ts","../node_modules/typedoc-plugin-markdown/**/*"]
+}

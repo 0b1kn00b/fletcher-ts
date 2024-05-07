@@ -1,6 +1,6 @@
 {
 	"name": "fletcher-ts",
-	"version": "0.10.2",
+	"version": "0.10.3",
 	"description": "arrowlet library for typescript",
 	"dependencies": {
 		"fp-ts": "^2.16.5",
@@ -12,7 +12,6 @@
 		"xstate": "^5.12.0",
 		"xstate-react": "^0.1.1"
 	},
-	"type": "module",
 	"main": "./dist/index.js",
 	"module": "./dist/index.js",
 	"types": "./dist/index.d.ts",
@@ -27,13 +26,16 @@
 		"rollup-plugin-typescript-paths": "^1.3.0",
 		"tslib": "^2.4.0",
 		"typedoc": "^0.25.13",
+		"typedoc-plugin-markdown": "^4.0.1",
 		"typescript": "^5.4.5",
 		"vite": "^5.2.10",
 		"vitest": "^1.5.2"
 	},
 	"scripts": {
 		"test": "vitest",
-		"build": "rm -rf dist && tsc && vite build"
+		"build": "rm -rf dist && tsc && vite build",
+		"docs": "typedoc",
+		"plugin:build" : "cd ./local_plugins && tsc -p tsconfig.json"
 	},
 	"exports": {
 		".": {

@@ -1,0 +1,11 @@
+{
+  "expandObjects": "true",
+  "expandParameters": "true",
+  "parametersFormat": "table",
+  //"plugin": ["typedoc-plugin-markdown" ],
+  "plugin": ["typedoc-plugin-markdown","./local_plugins/discrete_parameters.js"],
+  "theme" : "customTheme",
+  "out" : "./docs",
+  "entryPoints": ["src/index.ts"],
+  "tsconfig" : "./tsconfig.json"
+}

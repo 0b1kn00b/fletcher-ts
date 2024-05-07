@@ -94,19 +94,19 @@ export class Arrow<Pi,Ri,Pii,Rii>{
   public flat_map<Riii>(fn:(p:Rii)=>Arrowlet<Pii,Riii>){
     return this.next(Arrow.FlatMap(fn));
   }
-  static First<Pi,Ri,Pii>(){
+  static First<Pi,Ri,Pii>():Arrow<Pi,Ri,[Pi,Pii],[Ri,Pii]>{
     return new Arrow((self:Arrowlet<Pi,Ri>):Arrowlet<[Pi,Pii],[Ri,Pii]> => {
       let l : Arrow<Pi,Ri,Pii,Pii> = Arrow.Pure(new Fun((x:Pii) => x));
-      let r = Arrow.Pair(l.apply(self)).apply(self);
+      let r : Arrowlet<[Pi,Pii],[Ri,Pii]>= Arrow.Pair(l.apply(self)).apply(self);
       return r;
     });
   }
   public first(){
     return this.next(Arrow.First());
   }
-  static Second<Pi,Ri,Pii>(){
+  static Second<Pi,Ri,Pii>():Arrow<Pi,Ri,[Pii,Pi],[Pii,Ri]>{
     return new Arrow((self:Arrowlet<Pi,Ri>):Arrowlet<[Pii,Pi],[Pii,Ri]> => {
-      let l : Arrow<Pi,Ri,Pii,Pii> = Arrow.Pure(new Fun((x:Pii) => x));
+      let l : Arrow<Pi,Ri,Pi,Pi> = Arrow.Pure(new Fun((x:Pi) => x));
       let r : Arrowlet<[Pii,Pi],[Pii,Ri]> = Arrow.Pair(self).apply(l.apply(self));
       return r;
     });
@@ -114,6 +114,7 @@ export class Arrow<Pi,Ri,Pii,Rii>{
   public second(){
     return this.next(Arrow.Second());
   }
+
   static Pinch<Pi,Ri,Rii>(that:Arrowlet<Pi,Rii>){
     return new Arrow(
       (self:Arrowlet<Pi,Ri>) => {

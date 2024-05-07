@@ -11,8 +11,9 @@ export class EventArrowlet<T extends Event> implements Arrowlet<EventTarget,T>{
   public defer(target:EventTarget,cont:Terminal<T>){
     let deferred : Deferred<Result<T>>  = new Deferred();
     let self                            = this;
-    let handler : EventListenerObject = {
+    let handler = {
       handleEvent : function (evt:T):void{
+        console.log('loaded');
         deferred.resolve(E.left(evt));
         target.removeEventListener(this.event_name,handler);
       }
