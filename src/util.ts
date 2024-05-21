@@ -1,10 +1,7 @@
-import { Allocator } from "./core/Allocator";
+
 import { Deferred } from "ts-deferred";
-import { Arrowlet } from "./core/Arrowlet";
-import { Work } from "./core/Work";
-import { Apply } from "./core/Apply";
-import { Junction } from "./core/Junction";
-import { Fun } from "./term/Fun";
+import { type Arrowlet, Allocator, Work, Apply, Junction } from "src/Core";
+import { Fun } from "src/Term";
 
 export function forward<P,R>(self:Arrowlet<P,R>, p: P) : Allocator<R>{
   return new Allocator(

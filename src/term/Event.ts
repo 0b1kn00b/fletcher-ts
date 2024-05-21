@@ -1,8 +1,7 @@
-import { Arrowlet } from "../Core";
-import { Junction } from "../core/Junction";
-import { Work } from "../Core";
+import { type Arrowlet, Junction, Work } from "src/Core";
 import { Deferred } from "ts-deferred";
 import * as E from 'fp-ts/Either';
+
 export class EventArrowlet<T extends Event> implements Arrowlet<EventTarget,T>{
   private event_name : string;
   constructor(event_name:string){
@@ -14,7 +13,7 @@ export class EventArrowlet<T extends Event> implements Arrowlet<EventTarget,T>{
     let self                            = this;
     let handler = {
       handleEvent : function (evt:T):void{
-        console.log('loaded');
+        //console.log('loaded');
         deferred.resolve(evt);
         event_handler_removed = true;
         target.removeEventListener(this.event_name,handler);

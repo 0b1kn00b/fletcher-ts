@@ -1,19 +1,16 @@
 // https://chwastek.eu/blog/async-actions-with-usereducer-in-react
-import { useReducer, useCallback, Reducer } from 'react';
-import { Arrowlet } from "../Core";
-import { Dispatch } from 'react'; 
-import { ReactAsyncAction } from './ReactAsyncAction';
-import { resolve } from '../util';
-import { Junction } from '../core/Junction';
-import { Anon } from '../term/Anon';
-import { Work } from '../core/Work';
-import { Allocator } from '../Core';
+import { useReducer, useCallback, type Reducer } from 'react';
+import { type Arrowlet, Allocator, Junction, Work } from "src/Core";
+import { type Dispatch } from 'react'; 
+import { type ReactAsyncAction } from 'src/react_arw/ReactAsyncAction';
+import { resolve } from 'src/util';
+import { Anon } from 'src/term/Anon';
 
 export function react<P,R>(dispatch:Dispatch<R>):Arrowlet<R,void>{
   return new Anon(
-    (p:R,cont:Junction<void>) => {
+    (p:R,cont:Junction<void>):Work.Work => {
       dispatch(p);
-      return Work.ZERO;
+      return cont.receive(Junction.issue(null));
     }
   );
 }

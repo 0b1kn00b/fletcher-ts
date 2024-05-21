@@ -1,4 +1,4 @@
-import { Arrowlet, Work, Junction } from "../Core";
+import { type Arrowlet, Work, Junction } from "src/Core";
 
 export class Anon<Pi,R> implements Arrowlet<Pi,R>{
   private _defer :   ( (p:Pi,cont:Junction<R>) => Work.Work);

@@ -1,6 +1,6 @@
 {
 	"name": "fletcher-ts",
-	"version": "0.13.0",
+	"version": "0.14.0",
 	"description": "arrowlet library for typescript",
 	"dependencies": {
 		"effect": "^3.2.1",
@@ -11,15 +11,11 @@
 		"ts-deferred": "^1.0.4",
 		"ts-error": "^1.0.6",
 		"ts-pattern": "^5.1.1",
+		"vite-plugin-dts": "^3.9.1",
+		"vite-tsconfig-paths": "^4.3.2",
 		"xstate": "^5.12.0",
 		"xstate-react": "^0.1.1"
 	},
-	"main": "./dist/index.js",
-	"module": "./dist/index.js",
-	"types": "./dist/index.d.ts",
-	"files": [
-		"./dist/*"
-	],
 	"devDependencies": {
 		"@rollup/plugin-typescript": "^11.1.6",
 		"@types/node": "^20.12.7",
@@ -33,16 +29,13 @@
 		"vite": "^5.2.10",
 		"vitest": "^1.5.2"
 	},
+	"type": "module",
+	"main": "./dist/index.js",
+	"types": "./dist/index.dts",
 	"scripts": {
 		"test": "vitest",
-		"build": "rm -rf dist && tsc && vite build",
+		"build": "rm -rf dist && vite build",
 		"docs": "typedoc",
 		"plugin:build": "cd ./local_plugins && tsc -p tsconfig.json"
-	},
-	"exports": {
-		".": {
-			"import": "./dist/index.js",
-			"require": "./dist/index.cjs"
-		}
 	}
 }

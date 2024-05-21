@@ -1,23 +1,13 @@
+import type { Dispatch } from "react";
 import {Deferred} from "ts-deferred";
-import { Fun } from "./term/Fun";
-import { Anon as AnonCls} from "./term/Anon";
-import { Unit as UnitCls } from "./term/Unit";
-import { forward, resolve } from "./util";
-import { EventArrowlet } from "./term/Event";
-import { Arrow as ArrowCls} from "./core/Arrow";
-import { react, useReducerWithThunk } from "./react_arw"
-import { ReactAsyncAction } from "./react_arw/ReactAsyncAction";
-import { Option as OptionCls } from "./term/Option";
-import { OptionM as OptionMCls} from "./term/OptionM";
+import { Work, Junction as JunctionCls, Allocator, type Arrowlet } from "src/Core";
+import { OptionM as OptionMCls, Option as OptionCls, Receiver as ReceiverCls, Callback as CallbackCls, Then as ThenCls, Fun, Anon as AnonCls, Unit as UnitCls, Event as EventCls } from "src/Term";
+import { resolve, forward } from "src/util";
+import { useReducerWithThunk, react } from "src/react_arw";
+import { Arrow as ArrowCls } from "src/Arrow";
+import * as Either from 'effect/Either';
 import * as O from 'fp-ts/Option';
-import { Arrowlet, Junction as JunctionCls, Work, Apply } from "./Core";
-import * as E from 'fp-ts/Either';
-import { Then as ThenCls } from "./term/Then";
-import { Allocator } from "./core/Allocator";
-import { Effect as EffectNms, Either, pipe } from "effect";
-import { Callback as CallbackCls } from "./term/Callback";
-import { Receiver as ReceiverCls } from "./term/Receiver";
-import { Dispatch } from "react";
+import { Effect as EffectNms } from "effect";
 /** Returns Work from Continuation */
 
 
@@ -111,7 +101,7 @@ export function Forward<P,R>(self:Arrowlet<P,R>,input:P):Allocator<R>{
  * @memberof Fletcher
  */
 export function Event<R extends Event>(self:string):Arrowlet<EventTarget,R>{
-  return new EventArrowlet(self)
+  return new EventCls(self)
 }
 /**
  * Arrow runs `self`, then runs `that` with it's output
@@ -156,7 +146,8 @@ export function Pair<Pi,Pii,Ri,Rii>(self:Arrowlet<Pi,Ri>,that:Arrowlet<Pii,Rii>)
  * @memberof Fletcher
  */
 export function FlatMap<Pi,Ri,Rii>(fn:(p:Ri)=>Arrowlet<Pi,Rii>):ArrowCls<Pi,Ri,Pi,Rii>{
-  return Arrow().FlatMap(fn);
+  let next : ArrowCls<Pi,Ri,Pi,Rii> = ArrowCls.FlatMap(fn);
+  return next;
 }
 /**
  * Runs an Arrow over the left component of a tuple.
@@ -375,21 +366,21 @@ export function OptionP<P>(fn:(p:P)=>boolean):Arrowlet<P,O.Option<P>>{
  * @return {*}  {Arrowlet<P,E.Either<E,R>>}
  * @memberof Fletcher
  */
-export function Timeout<P,R,E>(self:Arrowlet<P,R>,ms:number,error:E):Arrowlet<P,E.Either<E,R>>{
+export function Timeout<P,R,E>(self:Arrowlet<P,R>,ms:number,error:E):Arrowlet<P,Either.Either<R,E>>{
   return Race(
     Anon(
-      (p:P,junc:JunctionCls<E.Either<E,R>>) => {
-        const deferred : Deferred<E.Either<E,R>> = new Deferred();
+      (p:P,junc:JunctionCls<Either.Either<R,E>>) => {
+        const deferred : Deferred<Either.Either<R,E>> = new Deferred();
         setTimeout(
           () => {
-            deferred.resolve(E.left(error));
+            deferred.resolve(Either.left(error));
           },
           ms
         );
         return junc.receive(JunctionCls.later(deferred.promise));
       }
     ),
-    Then(self,Fun1R(E.right))
+    Then(self,Fun1R(Either.right))
   );
 }
 /**
@@ -422,9 +413,9 @@ export function Worker<P>(work:Work.Work):Arrowlet<P,P>{
 * @return {*}  {Arrowlet<P,E.Either<E,R>>}
 * @memberof Fletcher
 */
-export function RaceWithTimeout<P,R,E>(l:Arrowlet<P,R>,r:Arrowlet<P,R>,ms,error:E):Arrowlet<P,E.Either<E,R>>{
-  const lhs : Arrowlet<P,E.Either<E,R>> = Timeout(l,ms,error);
-  const rhs : Arrowlet<P,E.Either<E,R>> = Timeout(r,ms,error);
+export function RaceWithTimeout<P,R,E>(l:Arrowlet<P,R>,r:Arrowlet<P,R>,ms,error:E):Arrowlet<P,Either.Either<R,E>>{
+  const lhs : Arrowlet<P,Either.Either<R,E>> = Timeout(l,ms,error);
+  const rhs : Arrowlet<P,Either.Either<R,E>> = Timeout(r,ms,error);
   return Race(lhs,rhs);
 }
 /**

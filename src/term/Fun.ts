@@ -1,4 +1,4 @@
-import { Arrowlet, Work, Junction } from "../Core";
+import { type Arrowlet, Work, Junction } from "src/Core";
 
 export class Fun<P,R> implements Arrowlet<P,R>{
   private _apply:(p:P) => R;

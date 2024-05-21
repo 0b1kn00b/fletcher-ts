@@ -1,11 +1,6 @@
-import { Then } from "../term/Then";
-import { Arrowlet, Junction } from "../Core"
-import { Anon } from "../term/Anon";
-import { forward, resolve, unit } from "../util";
-import { Fun } from "../term/Fun";
-import { Unit } from "../term/Unit";
-
-
+import  { type Arrowlet, Junction } from "src/Core";
+import { Anon, Callback, Event, Fun, Option, OptionM, Receiver, Then, Unit } from "src/Term";
+import { forward, resolve } from "src/util";
 export class Arrow<Pi,Ri,Pii,Rii>{
   private _apply : (self:Arrowlet<Pi,Ri>) => Arrowlet<Pii,Rii>;
   constructor(_apply:(self:Arrowlet<Pi,Ri>) => Arrowlet<Pii,Rii>){
@@ -167,9 +162,9 @@ export class Arrow<Pi,Ri,Pii,Rii>{
   public broach(){
     return this.next(Arrow.Broach());
   }
-  public resolve(p:Pii){
-    return resolve(this.apply(unit()),p);
-  }
+  // public resolve(p:Pii){
+  //   return resolve(this.apply(unit()),p);
+  // }
   static Compose<Pi,Pii,Piii,Ri,Rii,Riii>(lhs:Arrow<Ri,Rii,Piii,Riii>,rhs:Arrow<Pi,Pii,Ri,Rii>){
     return rhs.next(lhs);
   }

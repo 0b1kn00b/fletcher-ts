@@ -1,26 +1,43 @@
 {
   "compilerOptions": {
-    "lib": ["DOM", "DOM.Iterable", "ESNext"],
+    "allowImportingTsExtensions": true,
     "allowJs": false,
-    "moduleResolution": "Bundler", // or "nodenext"
-    "forceConsistentCasingInFileNames": true,
-    "module": "ESNext",
-    "target": "ESNext",
+    "allowSyntheticDefaultImports": true,
+    "baseUrl": ".",
     "declaration": true,
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "isolatedModules": true,
+    "lib": [
+      "DOM",
+      "DOM.Iterable",
+      "ESNext"
+    ],
+    "module": "ESNext",
+    "moduleDetection": "force",
+    "moduleResolution": "Bundler", // or "nodenext"
+    "noEmit": true,
+    "noUncheckedIndexedAccess": true,
     "outDir": "./dist",
-    "baseUrl" : ".",
-    "paths" : {
-      "fletcher-ts/*": ["fletcher-ts/dist/*"]
+    "paths": {
+      "src/*": [
+        "src/*"
+      ]
     },
     "skipLibCheck": true,
-    "types": ["vite/client","node"],
     "strict": false,
+    "target": "ESNext",
+    "types": [
+      "vite/client",
+      "node"
+    ],
+    "verbatimModuleSyntax" : true,
+    "useDefineForClassFields": true
   },
-  "include": [
-    "src/**/*"
-  ],
   "exclude": [
     "node_modules"
   ],
-  
+  "include": [
+    "src/**/*"
+  ]
 }

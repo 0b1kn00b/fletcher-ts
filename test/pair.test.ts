@@ -1,7 +1,5 @@
 import { expect, test, vi, beforeEach, describe, afterEach, it } from 'vitest'
-import { Fletcher as F} from '../src'
-import { Arrowlet } from '../src/Core';
-import { Arrow } from '../src/core/Arrow';
+
 import * as O from 'fp-ts/Option';
 import * as E from 'fp-ts/Either';
 

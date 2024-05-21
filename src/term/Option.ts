@@ -1,11 +1,7 @@
-import { Arrowlet } from "../Core";
+import { type Arrowlet, Work, Junction } from "src/Core";
+import { Fun, Then } from "src/Term";
 
 import * as O from 'fp-ts/Option';
-import { Work } from "../core/Work";
-import { Junction } from "../core/Junction";
-import { Then } from "./Then";
-import { Fun } from "./Fun";
-
 
 export class Option<P,R> implements Arrowlet<O.Option<P>,O.Option<R>>{
   delegate : Arrowlet<P,R>;

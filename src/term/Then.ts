@@ -1,6 +1,5 @@
-import { Arrowlet } from "../Core";
-import { Junction } from "../core/Junction";
-import { forward } from "../util"; 
+import { type Arrowlet, Junction } from "src/Core";
+import { forward } from "src/util"; 
 /**
  * Creates an arrowlet that outputs the result of the first into the second and returns the result.
  *

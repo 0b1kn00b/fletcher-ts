@@ -1,5 +1,5 @@
 import { Deferred } from "ts-deferred";
-import { Arrowlet, Junction, Work } from "src/Core";
+import { type Arrowlet, Junction, Work } from "src/Core";
 
 export class Callback<P,R> implements Arrowlet<P,R>{
   constructor(private deferred : (p:P,cb:(r:R) => void) => void){}

@@ -1,10 +1,9 @@
-import { Arrowlet } from "../Core";
-
 import * as O from 'fp-ts/Option';
-import { Work } from "../core/Work";
-import { Junction } from "../core/Junction";
-import { Then } from "./Then";
-import { Fun } from "./Fun";
+
+import { type Arrowlet, Work, Junction } from "src/Core";
+
+
+import { Then, Fun } from "src/Term";
 
 
 export class OptionM<P,R> implements Arrowlet<O.Option<P>,O.Option<R>>{

@@ -1,5 +1,4 @@
-import { Arrowlet, Junction, Work } from "src/Core";
-import { Allocator } from "src/core/Allocator";
+import { type Arrowlet, Allocator, Junction, Work } from "src/Core";
 
 export class Receiver<R> implements Arrowlet<void,R>{
   constructor( private deferred : Allocator<R> ){}

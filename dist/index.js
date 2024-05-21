@@ -1,213 +1,276 @@
-"use strict";
-var __defProp = Object.defineProperty;
-var __defNormalProp = (obj, key, value) => key in obj ? __defProp(obj, key, { enumerable: true, configurable: true, writable: true, value }) : obj[key] = value;
-var __publicField = (obj, key, value) => {
-  __defNormalProp(obj, typeof key !== "symbol" ? key + "" : key, value);
-  return value;
+var id = Object.defineProperty;
+var cd = (t, e, n) => e in t ? id(t, e, { enumerable: !0, configurable: !0, writable: !0, value: n }) : t[e] = n;
+var f = (t, e, n) => (cd(t, typeof e != "symbol" ? e + "" : e, n), n), Hc = (t, e, n) => {
+  if (!e.has(t))
+    throw TypeError("Cannot " + n);
 };
-var __accessCheck = (obj, member, msg) => {
-  if (!member.has(obj))
-    throw TypeError("Cannot " + msg);
-};
-var __privateGet = (obj, member, getter) => {
-  __accessCheck(obj, member, "read from private field");
-  return getter ? getter.call(obj) : member.get(obj);
-};
-var __privateAdd = (obj, member, value) => {
-  if (member.has(obj))
+var Jc = (t, e, n) => (Hc(t, e, "read from private field"), n ? n.call(t) : e.get(t)), Wc = (t, e, n) => {
+  if (e.has(t))
     throw TypeError("Cannot add the same private member more than once");
-  member instanceof WeakSet ? member.add(obj) : member.set(obj, value);
-};
-var __privateSet = (obj, member, value, setter) => {
-  __accessCheck(obj, member, "write to private field");
-  setter ? setter.call(obj, value) : member.set(obj, value);
-  return value;
-};
-var _value, _a, _b, _c, _d, _e, _f, _g, _h, _i, _j, _k, _l, _m, _n, _o, _p, _q, _r, _s, _t, _u, _v, _w, _x, _y, _z, _A, _B, _C, _D, _E, _F, _G, _H, _I, _J, _K, _L, _M, _N, _O, _P;
-Object.defineProperty(exports, Symbol.toStringTag, { value: "Module" });
-var Deferred = function() {
-  function Deferred2() {
-    var _this = this;
-    this.resolve = function(value) {
-      _this._resolve(value);
-    };
-    this.reject = function(reason) {
-      _this._reject(reason);
-    };
-    this._promise = new Promise(function(resolve2, reject) {
-      _this._resolve = resolve2;
-      _this._reject = reject;
+  e instanceof WeakSet ? e.add(t) : e.set(t, n);
+}, Gc = (t, e, n, r) => (Hc(t, e, "write to private field"), r ? r.call(t, n) : e.set(t, n), n);
+var ad = function() {
+  function t() {
+    var e = this;
+    this.resolve = function(n) {
+      e._resolve(n);
+    }, this.reject = function(n) {
+      e._reject(n);
+    }, this._promise = new Promise(function(n, r) {
+      e._resolve = n, e._reject = r;
     });
   }
-  Object.defineProperty(Deferred2.prototype, "promise", {
+  return Object.defineProperty(t.prototype, "promise", {
     get: function() {
       return this._promise;
     },
-    enumerable: true,
-    configurable: true
-  });
-  return Deferred2;
-}();
-var Deferred_1 = Deferred;
-const isFunction$1 = (input) => typeof input === "function";
-const dual = function(arity, body) {
-  if (typeof arity === "function") {
-    return function() {
-      if (arity(arguments)) {
-        return body.apply(this, arguments);
-      }
-      return (self) => body(self, ...arguments);
-    };
+    enumerable: !0,
+    configurable: !0
+  }), t;
+}(), Kt = ad;
+let en = class {
+  constructor(e) {
+    f(this, "_defer");
+    this._defer = e;
   }
-  switch (arity) {
+  defer(e, n) {
+    return this._defer(e, n);
+  }
+}, ud = class {
+  constructor(e) {
+    this.deferred = e;
+  }
+  defer(e, n) {
+    let r = new Kt();
+    return this.deferred(
+      e,
+      (s) => {
+        r.resolve(s);
+      }
+    ), _e.fromPromise(r.promise.then((s) => _e.ZERO));
+  }
+};
+var ld = { _tag: "None" }, fd = function(t) {
+  return { _tag: "Some", value: t };
+};
+class hd {
+  constructor(e) {
+    f(this, "event_name");
+    this.event_name = e;
+  }
+  defer(e, n) {
+    let r = !1, s = new Kt(), o = {
+      handleEvent: function(a) {
+        s.resolve(a), r = !0, e.removeEventListener(this.event_name, o);
+      }
+    };
+    e.addEventListener(
+      this.event_name,
+      o
+    );
+    let c = _e.fromThunk(
+      () => (r || e.removeEventListener(this.event_name, o), null)
+    );
+    return _e.Seq(n.receive(Pe.later(s.promise)), c);
+  }
+}
+class nn {
+  constructor(e) {
+    f(this, "_apply");
+    this._apply = e;
+  }
+  defer(e, n) {
+    return n.receive(Pe.issue(this._apply(e)));
+  }
+}
+var Xo = ld, Xa = fd, dd = function(t) {
+  return t._tag === "None";
+}, pd = function(t, e) {
+  return function(n) {
+    return dd(n) ? t() : e(n.value);
+  };
+}, gd = pd, Za = gd;
+let md = class {
+  constructor(e) {
+    f(this, "delegate");
+    this.delegate = e;
+  }
+  defer(e, n) {
+    return Za(
+      () => n.receive(Pe.issue(Xo)),
+      (s) => new Zo(this.delegate, new nn((o) => Xa(o))).defer(s, n)
+    )(e);
+  }
+}, _d = class {
+  constructor(e) {
+    f(this, "delegate");
+    this.delegate = e;
+  }
+  defer(e, n) {
+    return Za(
+      () => n.receive(Pe.issue(Xo)),
+      (s) => this.delegate.defer(s, n)
+    )(e);
+  }
+}, yd = class {
+  constructor(e) {
+    this.deferred = e;
+  }
+  defer(e, n) {
+    return n.receive(this.deferred);
+  }
+}, Zo = class {
+  constructor(e, n) {
+    f(this, "lhs");
+    f(this, "rhs");
+    this.lhs = e, this.rhs = n;
+  }
+  defer(e, n) {
+    var r = it(this.lhs, e);
+    return n.receive(
+      r.flat_fold(
+        (s) => it(this.rhs, s)
+      )
+    );
+  }
+}, Nr = class extends nn {
+  constructor() {
+    super((e) => e);
+  }
+};
+function it(t, e) {
+  return new Mt(
+    (n) => {
+      let r = new Kt(), s = t.defer(
+        e,
+        new Pe(
+          (c) => c.apply(r)
+        )
+      ), o = n.apply(r.promise);
+      return _e.Seq(s, o);
+    }
+  );
+}
+function bd(t, e) {
+  let n = new Kt(), r = t.defer(
+    e,
+    Pe.Pure(n)
+  );
+  return _e.Promise(r).then(
+    (o) => n.promise.then(
+      (c) => c
+    )
+  );
+}
+const vd = (t) => typeof t == "function", g = function(t, e) {
+  if (typeof t == "function")
+    return function() {
+      return t(arguments) ? e.apply(this, arguments) : (n) => e(n, ...arguments);
+    };
+  switch (t) {
     case 0:
     case 1:
-      throw new RangeError(`Invalid arity ${arity}`);
+      throw new RangeError(`Invalid arity ${t}`);
     case 2:
-      return function(a, b) {
-        if (arguments.length >= 2) {
-          return body(a, b);
-        }
-        return function(self) {
-          return body(self, a);
+      return function(n, r) {
+        return arguments.length >= 2 ? e(n, r) : function(s) {
+          return e(s, n);
         };
       };
     case 3:
-      return function(a, b, c) {
-        if (arguments.length >= 3) {
-          return body(a, b, c);
-        }
-        return function(self) {
-          return body(self, a, b);
+      return function(n, r, s) {
+        return arguments.length >= 3 ? e(n, r, s) : function(o) {
+          return e(o, n, r);
         };
       };
     case 4:
-      return function(a, b, c, d) {
-        if (arguments.length >= 4) {
-          return body(a, b, c, d);
-        }
-        return function(self) {
-          return body(self, a, b, c);
+      return function(n, r, s, o) {
+        return arguments.length >= 4 ? e(n, r, s, o) : function(c) {
+          return e(c, n, r, s);
         };
       };
     case 5:
-      return function(a, b, c, d, e) {
-        if (arguments.length >= 5) {
-          return body(a, b, c, d, e);
-        }
-        return function(self) {
-          return body(self, a, b, c, d);
+      return function(n, r, s, o, c) {
+        return arguments.length >= 5 ? e(n, r, s, o, c) : function(a) {
+          return e(a, n, r, s, o);
         };
       };
     default:
       return function() {
-        if (arguments.length >= arity) {
-          return body.apply(this, arguments);
-        }
-        const args = arguments;
-        return function(self) {
-          return body(self, ...args);
+        if (arguments.length >= t)
+          return e.apply(this, arguments);
+        const n = arguments;
+        return function(r) {
+          return e(r, ...n);
         };
       };
   }
-};
-const identity = (a) => a;
-const constant = (value) => () => value;
-const constTrue = /* @__PURE__ */ constant(true);
-const constFalse = /* @__PURE__ */ constant(false);
-const constUndefined = /* @__PURE__ */ constant(void 0);
-function pipe(a, ab, bc, cd, de, ef, fg, gh, hi) {
+}, Ve = (t) => t, ds = (t) => () => t, zc = /* @__PURE__ */ ds(!0), ho = /* @__PURE__ */ ds(!1), Sd = /* @__PURE__ */ ds(void 0);
+function m(t, e, n, r, s, o, c, a, u) {
   switch (arguments.length) {
     case 1:
-      return a;
+      return t;
     case 2:
-      return ab(a);
+      return e(t);
     case 3:
-      return bc(ab(a));
+      return n(e(t));
     case 4:
-      return cd(bc(ab(a)));
+      return r(n(e(t)));
     case 5:
-      return de(cd(bc(ab(a))));
+      return s(r(n(e(t))));
     case 6:
-      return ef(de(cd(bc(ab(a)))));
+      return o(s(r(n(e(t)))));
     case 7:
-      return fg(ef(de(cd(bc(ab(a))))));
+      return c(o(s(r(n(e(t))))));
     case 8:
-      return gh(fg(ef(de(cd(bc(ab(a)))))));
+      return a(c(o(s(r(n(e(t)))))));
     case 9:
-      return hi(gh(fg(ef(de(cd(bc(ab(a))))))));
+      return u(a(c(o(s(r(n(e(t))))))));
     default: {
-      let ret = arguments[0];
-      for (let i = 1; i < arguments.length; i++) {
-        ret = arguments[i](ret);
-      }
-      return ret;
+      let h = arguments[0];
+      for (let b = 1; b < arguments.length; b++)
+        h = arguments[b](h);
+      return h;
     }
   }
 }
-const make$o = (isEquivalent) => (self, that) => self === that || isEquivalent(self, that);
-const mapInput$1 = /* @__PURE__ */ dual(2, (self, f) => make$o((x, y) => self(f(x), f(y))));
-const array$1 = (item) => make$o((self, that) => {
-  if (self.length !== that.length) {
-    return false;
-  }
-  for (let i = 0; i < self.length; i++) {
-    const isEq = item(self[i], that[i]);
-    if (!isEq) {
-      return false;
-    }
-  }
-  return true;
+const ei = (t) => (e, n) => e === n || t(e, n), wd = /* @__PURE__ */ g(2, (t, e) => ei((n, r) => t(e(n), e(r)))), kd = (t) => ei((e, n) => {
+  if (e.length !== n.length)
+    return !1;
+  for (let r = 0; r < e.length; r++)
+    if (!t(e[r], n[r]))
+      return !1;
+  return !0;
 });
-let moduleVersion = "3.2.1";
-const getCurrentVersion = () => moduleVersion;
-const globalStoreId = /* @__PURE__ */ Symbol.for(`effect/GlobalValue/globalStoreId/${/* @__PURE__ */ getCurrentVersion()}`);
-if (!(globalStoreId in globalThis)) {
-  globalThis[globalStoreId] = /* @__PURE__ */ new Map();
-}
-const globalStore = globalThis[globalStoreId];
-const globalValue = (id, compute) => {
-  if (!globalStore.has(id)) {
-    globalStore.set(id, compute());
-  }
-  return globalStore.get(id);
-};
-const isString = (input) => typeof input === "string";
-const isNumber = (input) => typeof input === "number";
-const isBigInt = (input) => typeof input === "bigint";
-const isFunction = isFunction$1;
-const isRecordOrArray = (input) => typeof input === "object" && input !== null;
-const isObject = (input) => isRecordOrArray(input) || isFunction(input);
-const hasProperty = /* @__PURE__ */ dual(2, (self, property) => isObject(self) && property in self);
-const isTagged = /* @__PURE__ */ dual(2, (self, tag) => hasProperty(self, "_tag") && self["_tag"] === tag);
-const isNullable = (input) => input === null || input === void 0;
-const isPromiseLike = (input) => hasProperty(input, "then") && isFunction(input.then);
-const getBugErrorMessage = (message) => `BUG: ${message} - please report an issue at https://github.com/Effect-TS/effect/issues`;
-let SingleShotGen$1 = class SingleShotGen {
-  constructor(self) {
-    __publicField(this, "self");
-    __publicField(this, "called", false);
-    this.self = self;
+let Ed = "3.2.1";
+const Jr = () => Ed, po = /* @__PURE__ */ Symbol.for(`effect/GlobalValue/globalStoreId/${/* @__PURE__ */ Jr()}`);
+po in globalThis || (globalThis[po] = /* @__PURE__ */ new Map());
+const Gs = globalThis[po], Q = (t, e) => (Gs.has(t) || Gs.set(t, e()), Gs.get(t)), eu = (t) => typeof t == "string", xr = (t) => typeof t == "number", Od = (t) => typeof t == "bigint", ps = vd, Rd = (t) => typeof t == "object" && t !== null, ti = (t) => Rd(t) || ps(t), D = /* @__PURE__ */ g(2, (t, e) => ti(t) && e in t), tu = /* @__PURE__ */ g(2, (t, e) => D(t, "_tag") && t._tag === e), Yt = (t) => t == null, Id = (t) => D(t, "then") && ps(t.then), ni = (t) => `BUG: ${t} - please report an issue at https://github.com/Effect-TS/effect/issues`;
+let Cd = class nu {
+  constructor(e) {
+    f(this, "self");
+    f(this, "called", !1);
+    this.self = e;
   }
   /**
    * @since 2.0.0
    */
-  next(a) {
+  next(e) {
     return this.called ? {
-      value: a,
-      done: true
-    } : (this.called = true, {
+      value: e,
+      done: !0
+    } : (this.called = !0, {
       value: this.self,
-      done: false
+      done: !1
     });
   }
   /**
    * @since 2.0.0
    */
-  return(a) {
+  return(e) {
     return {
-      value: a,
-      done: true
+      value: e,
+      done: !0
     };
   }
   /**
@@ -220,37 +283,14 @@ let SingleShotGen$1 = class SingleShotGen {
    * @since 2.0.0
    */
   [Symbol.iterator]() {
-    return new SingleShotGen(this.self);
+    return new nu(this.self);
   }
 };
-const defaultIncHi = 335903614;
-const defaultIncLo = 4150755663;
-const MUL_HI = 1481765933 >>> 0;
-const MUL_LO = 1284865837 >>> 0;
-const BIT_53 = 9007199254740992;
-const BIT_27 = 134217728;
-class PCGRandom {
-  constructor(seedHi, seedLo, incHi, incLo) {
-    __publicField(this, "_state");
-    if (isNullable(seedLo) && isNullable(seedHi)) {
-      seedLo = Math.random() * 4294967295 >>> 0;
-      seedHi = 0;
-    } else if (isNullable(seedLo)) {
-      seedLo = seedHi;
-      seedHi = 0;
-    }
-    if (isNullable(incLo) && isNullable(incHi)) {
-      incLo = this._state ? this._state[3] : defaultIncLo;
-      incHi = this._state ? this._state[2] : defaultIncHi;
-    } else if (isNullable(incLo)) {
-      incLo = incHi;
-      incHi = 0;
-    }
-    this._state = new Int32Array([0, 0, incHi >>> 0, ((incLo || 0) | 1) >>> 0]);
-    this._next();
-    add64(this._state, this._state[0], this._state[1], seedHi >>> 0, seedLo >>> 0);
-    this._next();
-    return this;
+const Td = 335903614, $d = 4150755663, Fd = 1481765933, Ad = 1284865837, Md = 9007199254740992, Pd = 134217728;
+class ru {
+  constructor(e, n, r, s) {
+    f(this, "_state");
+    return Yt(n) && Yt(e) ? (n = Math.random() * 4294967295 >>> 0, e = 0) : Yt(n) && (n = e, e = 0), Yt(s) && Yt(r) ? (s = this._state ? this._state[3] : $d, r = this._state ? this._state[2] : Td) : Yt(s) && (s = r, r = 0), this._state = new Int32Array([0, 0, r >>> 0, ((s || 0) | 1) >>> 0]), this._next(), Yc(this._state, this._state[0], this._state[1], e >>> 0, n >>> 0), this._next(), this;
   }
   /**
    * Returns a copy of the internal state of this random number generator as a
@@ -267,11 +307,8 @@ class PCGRandom {
    *
    * @since 2.0.0
    */
-  setState(state) {
-    this._state[0] = state[0];
-    this._state[1] = state[1];
-    this._state[2] = state[2];
-    this._state[3] = state[3] | 1;
+  setState(e) {
+    this._state[0] = e[0], this._state[1] = e[1], this._state[2] = e[2], this._state[3] = e[3] | 1;
   }
   /**
    * Get a uniformly distributed 32 bit integer between [0, max).
@@ -279,19 +316,16 @@ class PCGRandom {
    * @category getter
    * @since 2.0.0
    */
-  integer(max) {
-    if (!max) {
+  integer(e) {
+    if (!e)
       return this._next();
-    }
-    max = max >>> 0;
-    if ((max & max - 1) === 0) {
-      return this._next() & max - 1;
-    }
-    let num = 0;
-    const skew = (-max >>> 0) % max >>> 0;
-    for (num = this._next(); num < skew; num = this._next()) {
-    }
-    return num % max;
+    if (e = e >>> 0, !(e & e - 1))
+      return this._next() & e - 1;
+    let n = 0;
+    const r = (-e >>> 0) % e >>> 0;
+    for (n = this._next(); n < r; n = this._next())
+      ;
+    return n % e;
   }
   /**
    * Get a uniformly distributed IEEE-754 double between 0.0 and 1.0, with
@@ -301,416 +335,284 @@ class PCGRandom {
    * @since 2.0.0
    */
   number() {
-    const hi = (this._next() & 67108863) * 1;
-    const lo = (this._next() & 134217727) * 1;
-    return (hi * BIT_27 + lo) / BIT_53;
+    const e = (this._next() & 67108863) * 1, n = (this._next() & 134217727) * 1;
+    return (e * Pd + n) / Md;
   }
   /** @internal */
   _next() {
-    const oldHi = this._state[0] >>> 0;
-    const oldLo = this._state[1] >>> 0;
-    mul64(this._state, oldHi, oldLo, MUL_HI, MUL_LO);
-    add64(this._state, this._state[0], this._state[1], this._state[2], this._state[3]);
-    let xsHi = oldHi >>> 18;
-    let xsLo = (oldLo >>> 18 | oldHi << 14) >>> 0;
-    xsHi = (xsHi ^ oldHi) >>> 0;
-    xsLo = (xsLo ^ oldLo) >>> 0;
-    const xorshifted = (xsLo >>> 27 | xsHi << 5) >>> 0;
-    const rot = oldHi >>> 27;
-    const rot2 = (-rot >>> 0 & 31) >>> 0;
-    return (xorshifted >>> rot | xorshifted << rot2) >>> 0;
+    const e = this._state[0] >>> 0, n = this._state[1] >>> 0;
+    Nd(this._state, e, n, Fd, Ad), Yc(this._state, this._state[0], this._state[1], this._state[2], this._state[3]);
+    let r = e >>> 18, s = (n >>> 18 | e << 14) >>> 0;
+    r = (r ^ e) >>> 0, s = (s ^ n) >>> 0;
+    const o = (s >>> 27 | r << 5) >>> 0, c = e >>> 27, a = (-c >>> 0 & 31) >>> 0;
+    return (o >>> c | o << a) >>> 0;
   }
 }
-function mul64(out, aHi, aLo, bHi, bLo) {
-  let c1 = (aLo >>> 16) * (bLo & 65535) >>> 0;
-  let c0 = (aLo & 65535) * (bLo >>> 16) >>> 0;
-  let lo = (aLo & 65535) * (bLo & 65535) >>> 0;
-  let hi = (aLo >>> 16) * (bLo >>> 16) + ((c0 >>> 16) + (c1 >>> 16)) >>> 0;
-  c0 = c0 << 16 >>> 0;
-  lo = lo + c0 >>> 0;
-  if (lo >>> 0 < c0 >>> 0) {
-    hi = hi + 1 >>> 0;
-  }
-  c1 = c1 << 16 >>> 0;
-  lo = lo + c1 >>> 0;
-  if (lo >>> 0 < c1 >>> 0) {
-    hi = hi + 1 >>> 0;
-  }
-  hi = hi + Math.imul(aLo, bHi) >>> 0;
-  hi = hi + Math.imul(aHi, bLo) >>> 0;
-  out[0] = hi;
-  out[1] = lo;
+function Nd(t, e, n, r, s) {
+  let o = (n >>> 16) * (s & 65535) >>> 0, c = (n & 65535) * (s >>> 16) >>> 0, a = (n & 65535) * (s & 65535) >>> 0, u = (n >>> 16) * (s >>> 16) + ((c >>> 16) + (o >>> 16)) >>> 0;
+  c = c << 16 >>> 0, a = a + c >>> 0, a >>> 0 < c >>> 0 && (u = u + 1 >>> 0), o = o << 16 >>> 0, a = a + o >>> 0, a >>> 0 < o >>> 0 && (u = u + 1 >>> 0), u = u + Math.imul(n, r) >>> 0, u = u + Math.imul(e, s) >>> 0, t[0] = u, t[1] = a;
 }
-function add64(out, aHi, aLo, bHi, bLo) {
-  let hi = aHi + bHi >>> 0;
-  const lo = aLo + bLo >>> 0;
-  if (lo >>> 0 < aLo >>> 0) {
-    hi = hi + 1 | 0;
-  }
-  out[0] = hi;
-  out[1] = lo;
+function Yc(t, e, n, r, s) {
+  let o = e + r >>> 0;
+  const c = n + s >>> 0;
+  c >>> 0 < n >>> 0 && (o = o + 1 | 0), t[0] = o, t[1] = c;
 }
-const YieldWrapTypeId = /* @__PURE__ */ Symbol.for("effect/Utils/YieldWrap");
-class YieldWrap {
-  constructor(value) {
+const xd = /* @__PURE__ */ Symbol.for("effect/Utils/YieldWrap");
+var rr;
+class gs {
+  constructor(e) {
     /**
      * @since 3.0.6
      */
-    __privateAdd(this, _value, void 0);
-    __privateSet(this, _value, value);
+    Wc(this, rr, void 0);
+    Gc(this, rr, e);
   }
   /**
    * @since 3.0.6
    */
-  [YieldWrapTypeId]() {
-    return __privateGet(this, _value);
+  [xd]() {
+    return Jc(this, rr);
   }
 }
-_value = new WeakMap();
-const structuralRegionState = /* @__PURE__ */ globalValue("effect/Utils/isStructuralRegion", () => ({
-  enabled: false,
+rr = new WeakMap();
+const Ge = /* @__PURE__ */ Q("effect/Utils/isStructuralRegion", () => ({
+  enabled: !1,
   tester: void 0
-}));
-const randomHashCache = /* @__PURE__ */ globalValue(/* @__PURE__ */ Symbol.for("effect/Hash/randomHashCache"), () => /* @__PURE__ */ new WeakMap());
-const pcgr = /* @__PURE__ */ globalValue(/* @__PURE__ */ Symbol.for("effect/Hash/pcgr"), () => new PCGRandom());
-const symbol$1 = /* @__PURE__ */ Symbol.for("effect/Hash");
-const hash = (self) => {
-  if (structuralRegionState.enabled === true) {
+})), zs = /* @__PURE__ */ Q(/* @__PURE__ */ Symbol.for("effect/Hash/randomHashCache"), () => /* @__PURE__ */ new WeakMap()), jd = /* @__PURE__ */ Q(/* @__PURE__ */ Symbol.for("effect/Hash/pcgr"), () => new ru()), j = /* @__PURE__ */ Symbol.for("effect/Hash"), I = (t) => {
+  if (Ge.enabled === !0)
     return 0;
-  }
-  switch (typeof self) {
+  switch (typeof t) {
     case "number":
-      return number$1(self);
+      return si(t);
     case "bigint":
-      return string(self.toString(10));
+      return me(t.toString(10));
     case "boolean":
-      return string(String(self));
+      return me(String(t));
     case "symbol":
-      return string(String(self));
+      return me(String(t));
     case "string":
-      return string(self);
+      return me(t);
     case "undefined":
-      return string("undefined");
+      return me("undefined");
     case "function":
-    case "object": {
-      if (self === null) {
-        return string("null");
-      }
-      if (isHash(self)) {
-        return self[symbol$1]();
-      } else {
-        return random(self);
-      }
-    }
+    case "object":
+      return t === null ? me("null") : Ld(t) ? t[j]() : ri(t);
     default:
-      throw new Error(`BUG: unhandled typeof ${typeof self} - please report an issue at https://github.com/Effect-TS/effect/issues`);
+      throw new Error(`BUG: unhandled typeof ${typeof t} - please report an issue at https://github.com/Effect-TS/effect/issues`);
   }
-};
-const random = (self) => {
-  if (!randomHashCache.has(self)) {
-    randomHashCache.set(self, number$1(pcgr.integer(Number.MAX_SAFE_INTEGER)));
-  }
-  return randomHashCache.get(self);
-};
-const combine$5 = (b) => (self) => self * 53 ^ b;
-const optimize = (n) => n & 3221225471 | n >>> 1 & 1073741824;
-const isHash = (u) => hasProperty(u, symbol$1);
-const number$1 = (n) => {
-  if (n !== n || n === Infinity) {
+}, ri = (t) => (zs.has(t) || zs.set(t, si(jd.integer(Number.MAX_SAFE_INTEGER))), zs.get(t)), K = (t) => (e) => e * 53 ^ t, ms = (t) => t & 3221225471 | t >>> 1 & 1073741824, Ld = (t) => D(t, j), si = (t) => {
+  if (t !== t || t === 1 / 0)
     return 0;
-  }
-  let h = n | 0;
-  if (h !== n) {
-    h ^= n * 4294967295;
-  }
-  while (n > 4294967295) {
-    h ^= n /= 4294967295;
-  }
-  return optimize(n);
-};
-const string = (str) => {
-  let h = 5381, i = str.length;
-  while (i) {
-    h = h * 33 ^ str.charCodeAt(--i);
-  }
-  return optimize(h);
-};
-const structureKeys = (o, keys2) => {
-  let h = 12289;
-  for (let i = 0; i < keys2.length; i++) {
-    h ^= pipe(string(keys2[i]), combine$5(hash(o[keys2[i]])));
-  }
-  return optimize(h);
-};
-const structure = (o) => structureKeys(o, Object.keys(o));
-const array = (arr) => {
-  let h = 6151;
-  for (let i = 0; i < arr.length; i++) {
-    h = pipe(h, combine$5(hash(arr[i])));
-  }
-  return optimize(h);
-};
-const cached = function() {
+  let e = t | 0;
+  for (e !== t && (e ^= t * 4294967295); t > 4294967295; )
+    e ^= t /= 4294967295;
+  return ms(t);
+}, me = (t) => {
+  let e = 5381, n = t.length;
+  for (; n; )
+    e = e * 33 ^ t.charCodeAt(--n);
+  return ms(e);
+}, Dd = (t, e) => {
+  let n = 12289;
+  for (let r = 0; r < e.length; r++)
+    n ^= m(me(e[r]), K(I(t[e[r]])));
+  return ms(n);
+}, su = (t) => Dd(t, Object.keys(t)), sr = (t) => {
+  let e = 6151;
+  for (let n = 0; n < t.length; n++)
+    e = m(e, K(I(t[n])));
+  return ms(e);
+}, ue = function() {
   if (arguments.length === 1) {
-    const self2 = arguments[0];
-    return function(hash3) {
-      Object.defineProperty(self2, symbol$1, {
+    const n = arguments[0];
+    return function(r) {
+      return Object.defineProperty(n, j, {
         value() {
-          return hash3;
+          return r;
         },
-        enumerable: false
-      });
-      return hash3;
+        enumerable: !1
+      }), r;
     };
   }
-  const self = arguments[0];
-  const hash2 = arguments[1];
-  Object.defineProperty(self, symbol$1, {
+  const t = arguments[0], e = arguments[1];
+  return Object.defineProperty(t, j, {
     value() {
-      return hash2;
+      return e;
     },
-    enumerable: false
-  });
-  return hash2;
-};
-const symbol = /* @__PURE__ */ Symbol.for("effect/Equal");
-function equals$1() {
-  if (arguments.length === 1) {
-    return (self) => compareBoth(self, arguments[0]);
-  }
-  return compareBoth(arguments[0], arguments[1]);
+    enumerable: !1
+  }), e;
+}, P = /* @__PURE__ */ Symbol.for("effect/Equal");
+function N() {
+  return arguments.length === 1 ? (t) => Wr(t, arguments[0]) : Wr(arguments[0], arguments[1]);
 }
-function compareBoth(self, that) {
-  if (self === that) {
-    return true;
-  }
-  const selfType = typeof self;
-  if (selfType !== typeof that) {
-    return false;
-  }
-  if (selfType === "object" || selfType === "function") {
-    if (self !== null && that !== null) {
-      if (isEqual(self) && isEqual(that)) {
-        if (hash(self) === hash(that) && self[symbol](that)) {
-          return true;
-        } else {
-          return structuralRegionState.enabled && structuralRegionState.tester ? structuralRegionState.tester(self, that) : false;
+function Wr(t, e) {
+  if (t === e)
+    return !0;
+  const n = typeof t;
+  if (n !== typeof e)
+    return !1;
+  if (n === "object" || n === "function") {
+    if (t !== null && e !== null && Gr(t) && Gr(e))
+      return I(t) === I(e) && t[P](e) ? !0 : Ge.enabled && Ge.tester ? Ge.tester(t, e) : !1;
+    if (Ge.enabled) {
+      if (Array.isArray(t) && Array.isArray(e))
+        return t.length === e.length && t.every((r, s) => Wr(r, e[s]));
+      if (Object.getPrototypeOf(t) === Object.prototype && Object.getPrototypeOf(t) === Object.prototype) {
+        const r = Object.keys(t), s = Object.keys(e);
+        if (r.length === s.length) {
+          for (const o of r)
+            if (!(o in e && Wr(t[o], e[o])))
+              return Ge.tester ? Ge.tester(t, e) : !1;
+          return !0;
         }
       }
-    }
-    if (structuralRegionState.enabled) {
-      if (Array.isArray(self) && Array.isArray(that)) {
-        return self.length === that.length && self.every((v, i) => compareBoth(v, that[i]));
-      }
-      if (Object.getPrototypeOf(self) === Object.prototype && Object.getPrototypeOf(self) === Object.prototype) {
-        const keysSelf = Object.keys(self);
-        const keysThat = Object.keys(that);
-        if (keysSelf.length === keysThat.length) {
-          for (const key of keysSelf) {
-            if (!(key in that && compareBoth(self[key], that[key]))) {
-              return structuralRegionState.tester ? structuralRegionState.tester(self, that) : false;
-            }
-          }
-          return true;
-        }
-      }
-      return structuralRegionState.tester ? structuralRegionState.tester(self, that) : false;
+      return Ge.tester ? Ge.tester(t, e) : !1;
     }
   }
-  return structuralRegionState.enabled && structuralRegionState.tester ? structuralRegionState.tester(self, that) : false;
+  return Ge.enabled && Ge.tester ? Ge.tester(t, e) : !1;
 }
-const isEqual = (u) => hasProperty(u, symbol);
-const equivalence = () => equals$1;
-const NodeInspectSymbol = /* @__PURE__ */ Symbol.for("nodejs.util.inspect.custom");
-const toJSON = (x) => {
-  if (hasProperty(x, "toJSON") && isFunction(x["toJSON"]) && x["toJSON"].length === 0) {
-    return x.toJSON();
-  } else if (Array.isArray(x)) {
-    return x.map(toJSON);
-  }
-  return x;
-};
-const format$1 = (x) => JSON.stringify(x, null, 2);
-const toStringUnknown = (u, whitespace = 2) => {
+const Gr = (t) => D(t, P), oi = () => N, he = /* @__PURE__ */ Symbol.for("nodejs.util.inspect.custom"), ye = (t) => D(t, "toJSON") && ps(t.toJSON) && t.toJSON.length === 0 ? t.toJSON() : Array.isArray(t) ? t.map(ye) : t, Ie = (t) => JSON.stringify(t, null, 2), qn = (t, e = 2) => {
   try {
-    return typeof u === "object" ? stringifyCircular(u, whitespace) : String(u);
-  } catch (_) {
-    return String(u);
+    return typeof t == "object" ? Ud(t, e) : String(t);
+  } catch {
+    return String(t);
   }
-};
-const stringifyCircular = (obj, whitespace) => {
-  let cache = [];
-  const retVal = JSON.stringify(obj, (_key, value) => typeof value === "object" && value !== null ? cache.includes(value) ? void 0 : cache.push(value) && value : value, whitespace);
-  cache = void 0;
-  return retVal;
-};
-const pipeArguments = (self, args) => {
-  switch (args.length) {
+}, Ud = (t, e) => {
+  let n = [];
+  const r = JSON.stringify(t, (s, o) => typeof o == "object" && o !== null ? n.includes(o) ? void 0 : n.push(o) && o : o, e);
+  return n = void 0, r;
+}, A = (t, e) => {
+  switch (e.length) {
     case 1:
-      return args[0](self);
+      return e[0](t);
     case 2:
-      return args[1](args[0](self));
+      return e[1](e[0](t));
     case 3:
-      return args[2](args[1](args[0](self)));
+      return e[2](e[1](e[0](t)));
     case 4:
-      return args[3](args[2](args[1](args[0](self))));
+      return e[3](e[2](e[1](e[0](t))));
     case 5:
-      return args[4](args[3](args[2](args[1](args[0](self)))));
+      return e[4](e[3](e[2](e[1](e[0](t)))));
     case 6:
-      return args[5](args[4](args[3](args[2](args[1](args[0](self))))));
+      return e[5](e[4](e[3](e[2](e[1](e[0](t))))));
     case 7:
-      return args[6](args[5](args[4](args[3](args[2](args[1](args[0](self)))))));
+      return e[6](e[5](e[4](e[3](e[2](e[1](e[0](t)))))));
     case 8:
-      return args[7](args[6](args[5](args[4](args[3](args[2](args[1](args[0](self))))))));
+      return e[7](e[6](e[5](e[4](e[3](e[2](e[1](e[0](t))))))));
     case 9:
-      return args[8](args[7](args[6](args[5](args[4](args[3](args[2](args[1](args[0](self)))))))));
+      return e[8](e[7](e[6](e[5](e[4](e[3](e[2](e[1](e[0](t)))))))));
     default: {
-      let ret = self;
-      for (let i = 0, len = args.length; i < len; i++) {
-        ret = args[i](ret);
-      }
-      return ret;
+      let n = t;
+      for (let r = 0, s = e.length; r < s; r++)
+        n = e[r](n);
+      return n;
     }
   }
-};
-const OP_ASYNC = "Async";
-const OP_COMMIT = "Commit";
-const OP_FAILURE = "Failure";
-const OP_ON_FAILURE = "OnFailure";
-const OP_ON_SUCCESS = "OnSuccess";
-const OP_ON_SUCCESS_AND_FAILURE = "OnSuccessAndFailure";
-const OP_SUCCESS = "Success";
-const OP_SYNC = "Sync";
-const OP_TAG = "Tag";
-const OP_UPDATE_RUNTIME_FLAGS = "UpdateRuntimeFlags";
-const OP_WHILE = "While";
-const OP_WITH_RUNTIME = "WithRuntime";
-const OP_YIELD = "Yield";
-const OP_REVERT_FLAGS = "RevertFlags";
-const EffectTypeId$2 = /* @__PURE__ */ Symbol.for("effect/Effect");
-const StreamTypeId = /* @__PURE__ */ Symbol.for("effect/Stream");
-const SinkTypeId = /* @__PURE__ */ Symbol.for("effect/Sink");
-const ChannelTypeId = /* @__PURE__ */ Symbol.for("effect/Channel");
-const effectVariance = {
+}, jr = "Async", ii = "Commit", je = "Failure", Ys = "OnFailure", zr = "OnSuccess", Yr = "OnSuccessAndFailure", Le = "Success", ou = "Sync", qd = "Tag", or = "UpdateRuntimeFlags", Qr = "While", iu = "WithRuntime", Lr = "Yield", ci = "RevertFlags", cu = /* @__PURE__ */ Symbol.for("effect/Effect"), Bd = /* @__PURE__ */ Symbol.for("effect/Stream"), Vd = /* @__PURE__ */ Symbol.for("effect/Sink"), Kd = /* @__PURE__ */ Symbol.for("effect/Channel"), an = {
   /* c8 ignore next */
-  _R: (_) => _,
+  _R: (t) => t,
   /* c8 ignore next */
-  _E: (_) => _,
+  _E: (t) => t,
   /* c8 ignore next */
-  _A: (_) => _,
-  _V: /* @__PURE__ */ getCurrentVersion()
-};
-const sinkVariance = {
+  _A: (t) => t,
+  _V: /* @__PURE__ */ Jr()
+}, Hd = {
   /* c8 ignore next */
-  _A: (_) => _,
+  _A: (t) => t,
   /* c8 ignore next */
-  _In: (_) => _,
+  _In: (t) => t,
   /* c8 ignore next */
-  _L: (_) => _,
+  _L: (t) => t,
   /* c8 ignore next */
-  _E: (_) => _,
+  _E: (t) => t,
   /* c8 ignore next */
-  _R: (_) => _
-};
-const channelVariance = {
+  _R: (t) => t
+}, Jd = {
   /* c8 ignore next */
-  _Env: (_) => _,
+  _Env: (t) => t,
   /* c8 ignore next */
-  _InErr: (_) => _,
+  _InErr: (t) => t,
   /* c8 ignore next */
-  _InElem: (_) => _,
+  _InElem: (t) => t,
   /* c8 ignore next */
-  _InDone: (_) => _,
+  _InDone: (t) => t,
   /* c8 ignore next */
-  _OutErr: (_) => _,
+  _OutErr: (t) => t,
   /* c8 ignore next */
-  _OutElem: (_) => _,
+  _OutElem: (t) => t,
   /* c8 ignore next */
-  _OutDone: (_) => _
-};
-const EffectPrototype = {
-  [EffectTypeId$2]: effectVariance,
-  [StreamTypeId]: effectVariance,
-  [SinkTypeId]: sinkVariance,
-  [ChannelTypeId]: channelVariance,
-  [symbol](that) {
-    return this === that;
+  _OutDone: (t) => t
+}, _s = {
+  [cu]: an,
+  [Bd]: an,
+  [Vd]: Hd,
+  [Kd]: Jd,
+  [P](t) {
+    return this === t;
   },
-  [symbol$1]() {
-    return cached(this, random(this));
+  [j]() {
+    return ue(this, ri(this));
   },
   [Symbol.iterator]() {
-    return new SingleShotGen$1(new YieldWrap(this));
+    return new Cd(new gs(this));
   },
   pipe() {
-    return pipeArguments(this, arguments);
+    return A(this, arguments);
   }
-};
-const StructuralPrototype = {
-  [symbol$1]() {
-    return cached(this, structure(this));
+}, ai = {
+  [j]() {
+    return ue(this, su(this));
   },
-  [symbol](that) {
-    const selfKeys = Object.keys(this);
-    const thatKeys = Object.keys(that);
-    if (selfKeys.length !== thatKeys.length) {
-      return false;
-    }
-    for (const key of selfKeys) {
-      if (!(key in that && equals$1(this[key], that[key]))) {
-        return false;
-      }
-    }
-    return true;
+  [P](t) {
+    const e = Object.keys(this), n = Object.keys(t);
+    if (e.length !== n.length)
+      return !1;
+    for (const r of e)
+      if (!(r in t && N(this[r], t[r])))
+        return !1;
+    return !0;
   }
-};
-const CommitPrototype = {
-  ...EffectPrototype,
-  _op: OP_COMMIT
-};
-const StructuralCommitPrototype = {
-  ...CommitPrototype,
-  ...StructuralPrototype
-};
-const TypeId$9 = /* @__PURE__ */ Symbol.for("effect/Option");
-const CommonProto$1 = {
-  ...EffectPrototype,
-  [TypeId$9]: {
-    _A: (_) => _
+}, Wd = {
+  ..._s,
+  _op: ii
+}, Gd = {
+  ...Wd,
+  ...ai
+}, au = /* @__PURE__ */ Symbol.for("effect/Option"), uu = {
+  ..._s,
+  [au]: {
+    _A: (t) => t
   },
-  [NodeInspectSymbol]() {
+  [he]() {
     return this.toJSON();
   },
   toString() {
-    return format$1(this.toJSON());
+    return Ie(this.toJSON());
   }
-};
-const SomeProto = /* @__PURE__ */ Object.assign(/* @__PURE__ */ Object.create(CommonProto$1), {
+}, zd = /* @__PURE__ */ Object.assign(/* @__PURE__ */ Object.create(uu), {
   _tag: "Some",
   _op: "Some",
-  [symbol](that) {
-    return isOption(that) && isSome$1(that) && equals$1(this.value, that.value);
+  [P](t) {
+    return lu(t) && hu(t) && N(this.value, t.value);
   },
-  [symbol$1]() {
-    return cached(this, combine$5(hash(this._tag))(hash(this.value)));
+  [j]() {
+    return ue(this, K(I(this._tag))(I(this.value)));
   },
   toJSON() {
     return {
       _id: "Option",
       _tag: this._tag,
-      value: toJSON(this.value)
+      value: ye(this.value)
     };
   }
-});
-const NoneHash = /* @__PURE__ */ hash("None");
-const NoneProto = /* @__PURE__ */ Object.assign(/* @__PURE__ */ Object.create(CommonProto$1), {
+}), Yd = /* @__PURE__ */ I("None"), Qd = /* @__PURE__ */ Object.assign(/* @__PURE__ */ Object.create(uu), {
   _tag: "None",
   _op: "None",
-  [symbol](that) {
-    return isOption(that) && isNone$2(that);
+  [P](t) {
+    return lu(t) && fu(t);
   },
-  [symbol$1]() {
-    return NoneHash;
+  [j]() {
+    return Yd;
   },
   toJSON() {
     return {
@@ -718,278 +620,154 @@ const NoneProto = /* @__PURE__ */ Object.assign(/* @__PURE__ */ Object.create(Co
       _tag: this._tag
     };
   }
-});
-const isOption = (input) => hasProperty(input, TypeId$9);
-const isNone$2 = (fa) => fa._tag === "None";
-const isSome$1 = (fa) => fa._tag === "Some";
-const none$7 = /* @__PURE__ */ Object.create(NoneProto);
-const some$3 = (value) => {
-  const a = Object.create(SomeProto);
-  a.value = value;
-  return a;
-};
-const TypeId$8 = /* @__PURE__ */ Symbol.for("effect/Either");
-const CommonProto = {
-  ...EffectPrototype,
-  [TypeId$8]: {
-    _R: (_) => _
+}), lu = (t) => D(t, au), fu = (t) => t._tag === "None", hu = (t) => t._tag === "Some", du = /* @__PURE__ */ Object.create(Qd), pu = (t) => {
+  const e = Object.create(zd);
+  return e.value = t, e;
+}, gu = /* @__PURE__ */ Symbol.for("effect/Either"), mu = {
+  ..._s,
+  [gu]: {
+    _R: (t) => t
   },
-  [NodeInspectSymbol]() {
+  [he]() {
     return this.toJSON();
   },
   toString() {
-    return format$1(this.toJSON());
+    return Ie(this.toJSON());
   }
-};
-const RightProto = /* @__PURE__ */ Object.assign(/* @__PURE__ */ Object.create(CommonProto), {
+}, Xd = /* @__PURE__ */ Object.assign(/* @__PURE__ */ Object.create(mu), {
   _tag: "Right",
   _op: "Right",
-  [symbol](that) {
-    return isEither(that) && isRight$1(that) && equals$1(this.right, that.right);
+  [P](t) {
+    return _u(t) && bu(t) && N(this.right, t.right);
   },
-  [symbol$1]() {
-    return combine$5(hash(this._tag))(hash(this.right));
+  [j]() {
+    return K(I(this._tag))(I(this.right));
   },
   toJSON() {
     return {
       _id: "Either",
       _tag: this._tag,
-      right: toJSON(this.right)
+      right: ye(this.right)
     };
   }
-});
-const LeftProto = /* @__PURE__ */ Object.assign(/* @__PURE__ */ Object.create(CommonProto), {
+}), Zd = /* @__PURE__ */ Object.assign(/* @__PURE__ */ Object.create(mu), {
   _tag: "Left",
   _op: "Left",
-  [symbol](that) {
-    return isEither(that) && isLeft$1(that) && equals$1(this.left, that.left);
+  [P](t) {
+    return _u(t) && yu(t) && N(this.left, t.left);
   },
-  [symbol$1]() {
-    return combine$5(hash(this._tag))(hash(this.left));
+  [j]() {
+    return K(I(this._tag))(I(this.left));
   },
   toJSON() {
     return {
       _id: "Either",
       _tag: this._tag,
-      left: toJSON(this.left)
+      left: ye(this.left)
     };
   }
-});
-const isEither = (input) => hasProperty(input, TypeId$8);
-const isLeft$1 = (ma) => ma._tag === "Left";
-const isRight$1 = (ma) => ma._tag === "Right";
-const left$3 = (left2) => {
-  const a = Object.create(LeftProto);
-  a.left = left2;
-  return a;
-};
-const right$3 = (right2) => {
-  const a = Object.create(RightProto);
-  a.right = right2;
-  return a;
-};
-const right$2 = right$3;
-const left$2 = left$3;
-const isLeft = isLeft$1;
-const isRight = isRight$1;
-const match$3 = /* @__PURE__ */ dual(2, (self, {
-  onLeft,
-  onRight
-}) => isLeft(self) ? onLeft(self.left) : onRight(self.right));
-const merge$1 = /* @__PURE__ */ match$3({
-  onLeft: identity,
-  onRight: identity
-});
-const isNonEmptyArray$1 = (self) => self.length > 0;
-const make$n = (compare) => (self, that) => self === that ? 0 : compare(self, that);
-const number = /* @__PURE__ */ make$n((self, that) => self < that ? -1 : 1);
-const mapInput = /* @__PURE__ */ dual(2, (self, f) => make$n((b1, b2) => self(f(b1), f(b2))));
-const greaterThan$1 = (O) => dual(2, (self, that) => O(self, that) === 1);
-const none$6 = () => none$7;
-const some$2 = some$3;
-const isNone$1 = isNone$2;
-const isSome = isSome$1;
-const match$2 = /* @__PURE__ */ dual(2, (self, {
-  onNone,
-  onSome
-}) => isNone$1(self) ? onNone() : onSome(self.value));
-const getOrElse = /* @__PURE__ */ dual(2, (self, onNone) => isNone$1(self) ? onNone() : self.value);
-const orElseSome = /* @__PURE__ */ dual(2, (self, onNone) => isNone$1(self) ? some$2(onNone()) : self);
-const fromNullable = (nullableValue) => nullableValue == null ? none$6() : some$2(nullableValue);
-const getOrUndefined = /* @__PURE__ */ getOrElse(constUndefined);
-const getOrThrowWith = /* @__PURE__ */ dual(2, (self, onNone) => {
-  if (isSome(self)) {
-    return self.value;
-  }
-  throw onNone();
-});
-const getOrThrow = /* @__PURE__ */ getOrThrowWith(() => new Error("getOrThrow called on a None"));
-const map$4 = /* @__PURE__ */ dual(2, (self, f) => isNone$1(self) ? none$6() : some$2(f(self.value)));
-const flatMap$3 = /* @__PURE__ */ dual(2, (self, f) => isNone$1(self) ? none$6() : f(self.value));
-const containsWith = (isEquivalent) => dual(2, (self, a) => isNone$1(self) ? false : isEquivalent(self.value, a));
-const _equivalence$3 = /* @__PURE__ */ equivalence();
-const contains = /* @__PURE__ */ containsWith(_equivalence$3);
-const make$m = (...elements) => elements;
-const allocate = (n) => new Array(n);
-const makeBy = (n, f) => {
-  const max = Math.max(1, Math.floor(n));
-  const out = new Array(max);
-  for (let i = 0; i < max; i++) {
-    out[i] = f(i);
-  }
-  return out;
-};
-const fromIterable$6 = (collection) => Array.isArray(collection) ? collection : Array.from(collection);
-const prepend$2 = /* @__PURE__ */ dual(2, (self, head2) => [head2, ...self]);
-const append$1 = /* @__PURE__ */ dual(2, (self, last2) => [...self, last2]);
-const appendAll$2 = /* @__PURE__ */ dual(2, (self, that) => fromIterable$6(self).concat(fromIterable$6(that)));
-const isEmptyArray = (self) => self.length === 0;
-const isEmptyReadonlyArray = isEmptyArray;
-const isNonEmptyArray = isNonEmptyArray$1;
-const isNonEmptyReadonlyArray = isNonEmptyArray$1;
-const isOutOfBound = (i, as2) => i < 0 || i >= as2.length;
-const clamp = (i, as2) => Math.floor(Math.min(Math.max(0, i), as2.length));
-const get$7 = /* @__PURE__ */ dual(2, (self, index) => {
-  const i = Math.floor(index);
-  return isOutOfBound(i, self) ? none$6() : some$2(self[i]);
-});
-const unsafeGet$3 = /* @__PURE__ */ dual(2, (self, index) => {
-  const i = Math.floor(index);
-  if (isOutOfBound(i, self)) {
-    throw new Error(`Index ${i} out of bounds`);
-  }
-  return self[i];
-});
-const head = /* @__PURE__ */ get$7(0);
-const headNonEmpty$1 = /* @__PURE__ */ unsafeGet$3(0);
-const last = (self) => isNonEmptyReadonlyArray(self) ? some$2(lastNonEmpty(self)) : none$6();
-const lastNonEmpty = (self) => self[self.length - 1];
-const tailNonEmpty$1 = (self) => self.slice(1);
-const spanIndex = (self, predicate) => {
-  let i = 0;
-  for (const a of self) {
-    if (!predicate(a, i)) {
+}), _u = (t) => D(t, gu), yu = (t) => t._tag === "Left", bu = (t) => t._tag === "Right", ep = (t) => {
+  const e = Object.create(Zd);
+  return e.left = t, e;
+}, tp = (t) => {
+  const e = Object.create(Xd);
+  return e.right = t, e;
+}, at = tp, Pt = ep, Dn = yu, $r = bu, vu = /* @__PURE__ */ g(2, (t, {
+  onLeft: e,
+  onRight: n
+}) => Dn(t) ? e(t.left) : n(t.right)), np = /* @__PURE__ */ vu({
+  onLeft: Ve,
+  onRight: Ve
+}), Su = (t) => t.length > 0, wu = (t) => (e, n) => e === n ? 0 : t(e, n), rp = /* @__PURE__ */ wu((t, e) => t < e ? -1 : 1), sp = /* @__PURE__ */ g(2, (t, e) => wu((n, r) => t(e(n), e(r)))), op = (t) => g(2, (e, n) => t(e, n) === 1), M = () => du, H = pu, De = fu, nt = hu, ui = /* @__PURE__ */ g(2, (t, {
+  onNone: e,
+  onSome: n
+}) => De(t) ? e() : n(t.value)), Nt = /* @__PURE__ */ g(2, (t, e) => De(t) ? e() : t.value), ip = /* @__PURE__ */ g(2, (t, e) => De(t) ? H(e()) : t), li = (t) => t == null ? M() : H(t), Rt = /* @__PURE__ */ Nt(Sd), cp = /* @__PURE__ */ g(2, (t, e) => {
+  if (nt(t))
+    return t.value;
+  throw e();
+}), ap = /* @__PURE__ */ cp(() => new Error("getOrThrow called on a None")), ku = /* @__PURE__ */ g(2, (t, e) => De(t) ? M() : H(e(t.value))), Eu = /* @__PURE__ */ g(2, (t, e) => De(t) ? M() : e(t.value)), up = (t) => g(2, (e, n) => De(e) ? !1 : t(e.value, n)), lp = /* @__PURE__ */ oi(), fp = /* @__PURE__ */ up(lp), hp = (...t) => t, fi = (t) => new Array(t), dp = (t, e) => {
+  const n = Math.max(1, Math.floor(t)), r = new Array(n);
+  for (let s = 0; s < n; s++)
+    r[s] = e(s);
+  return r;
+}, Se = (t) => Array.isArray(t) ? t : Array.from(t), Xr = /* @__PURE__ */ g(2, (t, e) => [e, ...t]), pp = /* @__PURE__ */ g(2, (t, e) => [...t, e]), Ou = /* @__PURE__ */ g(2, (t, e) => Se(t).concat(Se(e))), gp = (t) => t.length === 0, mp = gp, _p = Su, He = Su, Ru = (t, e) => t < 0 || t >= e.length, yp = (t, e) => Math.floor(Math.min(Math.max(0, t), e.length)), bp = /* @__PURE__ */ g(2, (t, e) => {
+  const n = Math.floor(e);
+  return Ru(n, t) ? M() : H(t[n]);
+}), Iu = /* @__PURE__ */ g(2, (t, e) => {
+  const n = Math.floor(e);
+  if (Ru(n, t))
+    throw new Error(`Index ${n} out of bounds`);
+  return t[n];
+}), Bn = /* @__PURE__ */ bp(0), Ke = /* @__PURE__ */ Iu(0), vp = (t) => He(t) ? H(Cu(t)) : M(), Cu = (t) => t[t.length - 1], un = (t) => t.slice(1), Sp = (t, e) => {
+  let n = 0;
+  for (const r of t) {
+    if (!e(r, n))
       break;
-    }
-    i++;
+    n++;
   }
-  return i;
-};
-const span = /* @__PURE__ */ dual(2, (self, predicate) => splitAt(self, spanIndex(self, predicate)));
-const drop$1 = /* @__PURE__ */ dual(2, (self, n) => {
-  const input = fromIterable$6(self);
-  return input.slice(clamp(n, input), input.length);
-});
-const reverse$2 = (self) => Array.from(self).reverse();
-const sort = /* @__PURE__ */ dual(2, (self, O) => {
-  const out = Array.from(self);
-  out.sort(O);
-  return out;
-});
-const zip$1 = /* @__PURE__ */ dual(2, (self, that) => zipWith(self, that, make$m));
-const zipWith = /* @__PURE__ */ dual(3, (self, that, f) => {
-  const as2 = fromIterable$6(self);
-  const bs = fromIterable$6(that);
-  if (isNonEmptyReadonlyArray(as2) && isNonEmptyReadonlyArray(bs)) {
-    const out = [f(headNonEmpty$1(as2), headNonEmpty$1(bs))];
-    const len = Math.min(as2.length, bs.length);
-    for (let i = 1; i < len; i++) {
-      out[i] = f(as2[i], bs[i]);
-    }
-    return out;
+  return n;
+}, wp = /* @__PURE__ */ g(2, (t, e) => Rp(t, Sp(t, e))), kp = /* @__PURE__ */ g(2, (t, e) => {
+  const n = Se(t);
+  return n.slice(yp(e, n), n.length);
+}), Qc = (t) => Array.from(t).reverse(), Zr = /* @__PURE__ */ g(2, (t, e) => {
+  const n = Array.from(t);
+  return n.sort(e), n;
+}), Xc = /* @__PURE__ */ g(2, (t, e) => Ep(t, e, hp)), Ep = /* @__PURE__ */ g(3, (t, e, n) => {
+  const r = Se(t), s = Se(e);
+  if (He(r) && He(s)) {
+    const o = [n(Ke(r), Ke(s))], c = Math.min(r.length, s.length);
+    for (let a = 1; a < c; a++)
+      o[a] = n(r[a], s[a]);
+    return o;
   }
   return [];
-});
-const _equivalence$2 = /* @__PURE__ */ equivalence();
-const splitAt = /* @__PURE__ */ dual(2, (self, n) => {
-  const input = Array.from(self);
-  const _n2 = Math.floor(n);
-  if (isNonEmptyReadonlyArray(input)) {
-    if (_n2 >= 1) {
-      return splitNonEmptyAt(input, _n2);
-    }
-    return [[], input];
-  }
-  return [input, []];
-});
-const splitNonEmptyAt = /* @__PURE__ */ dual(2, (self, n) => {
-  const _n2 = Math.max(1, Math.floor(n));
-  return _n2 >= self.length ? [copy$1(self), []] : [prepend$2(self.slice(1, _n2), headNonEmpty$1(self)), self.slice(_n2)];
-});
-const copy$1 = (self) => self.slice();
-const unionWith = /* @__PURE__ */ dual(3, (self, that, isEquivalent) => {
-  const a = fromIterable$6(self);
-  const b = fromIterable$6(that);
-  if (isNonEmptyReadonlyArray(a)) {
-    if (isNonEmptyReadonlyArray(b)) {
-      const dedupe2 = dedupeWith(isEquivalent);
-      return dedupe2(appendAll$2(a, b));
-    }
-    return a;
-  }
-  return b;
-});
-const union$2 = /* @__PURE__ */ dual(2, (self, that) => unionWith(self, that, _equivalence$2));
-const empty$j = () => [];
-const of$2 = (a) => [a];
-const map$3 = /* @__PURE__ */ dual(2, (self, f) => self.map(f));
-const flatMap$2 = /* @__PURE__ */ dual(2, (self, f) => {
-  if (isEmptyReadonlyArray(self)) {
+}), Op = /* @__PURE__ */ oi(), Rp = /* @__PURE__ */ g(2, (t, e) => {
+  const n = Array.from(t), r = Math.floor(e);
+  return He(n) ? r >= 1 ? Ip(n, r) : [[], n] : [n, []];
+}), Ip = /* @__PURE__ */ g(2, (t, e) => {
+  const n = Math.max(1, Math.floor(e));
+  return n >= t.length ? [Cp(t), []] : [Xr(t.slice(1, n), Ke(t)), t.slice(n)];
+}), Cp = (t) => t.slice(), Tp = /* @__PURE__ */ g(3, (t, e, n) => {
+  const r = Se(t), s = Se(e);
+  return He(r) ? He(s) ? Tu(n)(Ou(r, s)) : r : s;
+}), go = /* @__PURE__ */ g(2, (t, e) => Tp(t, e, Op)), ln = () => [], Xe = (t) => [t], rn = /* @__PURE__ */ g(2, (t, e) => t.map(e)), $p = /* @__PURE__ */ g(2, (t, e) => {
+  if (mp(t))
     return [];
+  const n = [];
+  for (let r = 0; r < t.length; r++) {
+    const s = e(t[r], r);
+    for (let o = 0; o < s.length; o++)
+      n.push(s[o]);
   }
-  const out = [];
-  for (let i = 0; i < self.length; i++) {
-    const inner = f(self[i], i);
-    for (let j = 0; j < inner.length; j++) {
-      out.push(inner[j]);
-    }
+  return n;
+}), Fp = /* @__PURE__ */ $p(Ve), Wn = /* @__PURE__ */ g(3, (t, e, n) => Se(t).reduce((r, s, o) => n(r, s, o), e)), Zc = (t, e) => {
+  const n = [];
+  let r = t, s;
+  for (; nt(s = e(r)); ) {
+    const [o, c] = s.value;
+    n.push(o), r = c;
   }
-  return out;
-});
-const flatten$3 = /* @__PURE__ */ flatMap$2(identity);
-const reduce$6 = /* @__PURE__ */ dual(3, (self, b, f) => fromIterable$6(self).reduce((b2, a, i) => f(b2, a, i), b));
-const unfold = (b, f) => {
-  const out = [];
-  let next = b;
-  let o;
-  while (isSome(o = f(next))) {
-    const [a, b2] = o.value;
-    out.push(a);
-    next = b2;
-  }
-  return out;
-};
-const getEquivalence$2 = array$1;
-const dedupeWith = /* @__PURE__ */ dual(2, (self, isEquivalent) => {
-  const input = fromIterable$6(self);
-  if (isNonEmptyReadonlyArray(input)) {
-    const out = [headNonEmpty$1(input)];
-    const rest = tailNonEmpty$1(input);
-    for (const r of rest) {
-      if (out.every((a) => !isEquivalent(r, a))) {
-        out.push(r);
-      }
-    }
-    return out;
+  return n;
+}, hi = kd, Tu = /* @__PURE__ */ g(2, (t, e) => {
+  const n = Se(t);
+  if (He(n)) {
+    const r = [Ke(n)], s = un(n);
+    for (const o of s)
+      r.every((c) => !e(o, c)) && r.push(o);
+    return r;
   }
   return [];
-});
-const dedupe = (self) => dedupeWith(self, equivalence());
-const join$1 = /* @__PURE__ */ dual(2, (self, sep) => fromIterable$6(self).join(sep));
-const TagTypeId = /* @__PURE__ */ Symbol.for("effect/Context/Tag");
-const STMSymbolKey = "effect/STM";
-const STMTypeId = /* @__PURE__ */ Symbol.for(STMSymbolKey);
-const TagProto = {
-  ...EffectPrototype,
+}), Ap = (t) => Tu(t, oi()), Sn = /* @__PURE__ */ g(2, (t, e) => Se(t).join(e)), Mp = /* @__PURE__ */ Symbol.for("effect/Context/Tag"), Pp = "effect/STM", Np = /* @__PURE__ */ Symbol.for(Pp), xp = {
+  ..._s,
   _tag: "Tag",
   _op: "Tag",
-  [STMTypeId]: effectVariance,
-  [TagTypeId]: {
-    _Service: (_) => _,
-    _Identifier: (_) => _
+  [Np]: an,
+  [Mp]: {
+    _Service: (t) => t,
+    _Identifier: (t) => t
   },
   toString() {
-    return format$1(this.toJSON());
+    return Ie(this.toJSON());
   },
   toJSON() {
     return {
@@ -998,1140 +776,793 @@ const TagProto = {
       stack: this.stack
     };
   },
-  [NodeInspectSymbol]() {
+  [he]() {
     return this.toJSON();
   },
-  of(self) {
-    return self;
+  of(t) {
+    return t;
   },
-  context(self) {
-    return make$l(this, self);
+  context(t) {
+    return Vp(this, t);
   }
-};
-const makeGenericTag = (key) => {
-  const limit = Error.stackTraceLimit;
+}, jp = (t) => {
+  const e = Error.stackTraceLimit;
   Error.stackTraceLimit = 2;
-  const creationError = new Error();
-  Error.stackTraceLimit = limit;
-  const tag = Object.create(TagProto);
-  Object.defineProperty(tag, "stack", {
+  const n = new Error();
+  Error.stackTraceLimit = e;
+  const r = Object.create(xp);
+  return Object.defineProperty(r, "stack", {
     get() {
-      return creationError.stack;
+      return n.stack;
     }
-  });
-  tag.key = key;
-  return tag;
-};
-const TypeId$7 = /* @__PURE__ */ Symbol.for("effect/Context");
-const ContextProto = {
-  [TypeId$7]: {
-    _Services: (_) => _
+  }), r.key = t, r;
+}, $u = /* @__PURE__ */ Symbol.for("effect/Context"), Lp = {
+  [$u]: {
+    _Services: (t) => t
   },
-  [symbol](that) {
-    if (isContext(that)) {
-      if (this.unsafeMap.size === that.unsafeMap.size) {
-        for (const k of this.unsafeMap.keys()) {
-          if (!that.unsafeMap.has(k) || !equals$1(this.unsafeMap.get(k), that.unsafeMap.get(k))) {
-            return false;
-          }
-        }
-        return true;
-      }
+  [P](t) {
+    if (Up(t) && this.unsafeMap.size === t.unsafeMap.size) {
+      for (const e of this.unsafeMap.keys())
+        if (!t.unsafeMap.has(e) || !N(this.unsafeMap.get(e), t.unsafeMap.get(e)))
+          return !1;
+      return !0;
     }
-    return false;
+    return !1;
   },
-  [symbol$1]() {
-    return cached(this, number$1(this.unsafeMap.size));
+  [j]() {
+    return ue(this, si(this.unsafeMap.size));
   },
   pipe() {
-    return pipeArguments(this, arguments);
+    return A(this, arguments);
   },
   toString() {
-    return format$1(this.toJSON());
+    return Ie(this.toJSON());
   },
   toJSON() {
     return {
       _id: "Context",
-      services: Array.from(this.unsafeMap).map(toJSON)
+      services: Array.from(this.unsafeMap).map(ye)
     };
   },
-  [NodeInspectSymbol]() {
+  [he]() {
     return this.toJSON();
   }
-};
-const makeContext = (unsafeMap) => {
-  const context = Object.create(ContextProto);
-  context.unsafeMap = unsafeMap;
-  return context;
-};
-const serviceNotFoundError = (tag) => {
-  const error = new Error(`Service not found${tag.key ? `: ${String(tag.key)}` : ""}`);
-  if (tag.stack) {
-    const lines = tag.stack.split("\n");
-    if (lines.length > 2) {
-      const afterAt = lines[2].match(/at (.*)/);
-      if (afterAt) {
-        error.message = error.message + ` (defined at ${afterAt[1]})`;
-      }
+}, Gn = (t) => {
+  const e = Object.create(Lp);
+  return e.unsafeMap = t, e;
+}, Dp = (t) => {
+  const e = new Error(`Service not found${t.key ? `: ${String(t.key)}` : ""}`);
+  if (t.stack) {
+    const n = t.stack.split(`
+`);
+    if (n.length > 2) {
+      const r = n[2].match(/at (.*)/);
+      r && (e.message = e.message + ` (defined at ${r[1]})`);
     }
   }
-  if (error.stack) {
-    const lines = error.stack.split("\n");
-    lines.splice(1, 3);
-    error.stack = lines.join("\n");
+  if (e.stack) {
+    const n = e.stack.split(`
+`);
+    n.splice(1, 3), e.stack = n.join(`
+`);
   }
-  return error;
-};
-const isContext = (u) => hasProperty(u, TypeId$7);
-const _empty$6 = /* @__PURE__ */ makeContext(/* @__PURE__ */ new Map());
-const empty$i = () => _empty$6;
-const make$l = (tag, service) => makeContext(/* @__PURE__ */ new Map([[tag.key, service]]));
-const add$3 = /* @__PURE__ */ dual(3, (self, tag, service) => {
-  const map2 = new Map(self.unsafeMap);
-  map2.set(tag.key, service);
-  return makeContext(map2);
-});
-const unsafeGet$2 = /* @__PURE__ */ dual(2, (self, tag) => {
-  if (!self.unsafeMap.has(tag.key)) {
-    throw serviceNotFoundError(tag);
-  }
-  return self.unsafeMap.get(tag.key);
-});
-const get$6 = unsafeGet$2;
-const getOption$1 = /* @__PURE__ */ dual(2, (self, tag) => {
-  if (!self.unsafeMap.has(tag.key)) {
-    return none$7;
-  }
-  return some$3(self.unsafeMap.get(tag.key));
-});
-const GenericTag = makeGenericTag;
-const empty$h = empty$i;
-const add$2 = add$3;
-const get$5 = get$6;
-const unsafeGet$1 = unsafeGet$2;
-const getOption = getOption$1;
-const TypeId$6 = /* @__PURE__ */ Symbol.for("effect/Chunk");
-function copy(src, srcPos, dest, destPos, len) {
-  for (let i = srcPos; i < Math.min(src.length, srcPos + len); i++) {
-    dest[destPos + i - srcPos] = src[i];
-  }
-  return dest;
+  return e;
+}, Up = (t) => D(t, $u), qp = /* @__PURE__ */ Gn(/* @__PURE__ */ new Map()), Bp = () => qp, Vp = (t, e) => Gn(/* @__PURE__ */ new Map([[t.key, e]])), Kp = /* @__PURE__ */ g(3, (t, e, n) => {
+  const r = new Map(t.unsafeMap);
+  return r.set(e.key, n), Gn(r);
+}), Fu = /* @__PURE__ */ g(2, (t, e) => {
+  if (!t.unsafeMap.has(e.key))
+    throw Dp(e);
+  return t.unsafeMap.get(e.key);
+}), Hp = Fu, Jp = /* @__PURE__ */ g(2, (t, e) => t.unsafeMap.has(e.key) ? pu(t.unsafeMap.get(e.key)) : du), wn = jp, di = Bp, Pn = Kp, Vn = Hp, Wp = Fu, Gp = Jp, Au = /* @__PURE__ */ Symbol.for("effect/Chunk");
+function zp(t, e, n, r, s) {
+  for (let o = e; o < Math.min(t.length, e + s); o++)
+    n[r + o - e] = t[o];
+  return n;
 }
-const emptyArray = [];
-const getEquivalence$1 = (isEquivalent) => make$o((self, that) => self.length === that.length && toReadonlyArray(self).every((value, i) => isEquivalent(value, unsafeGet(that, i))));
-const _equivalence$1 = /* @__PURE__ */ getEquivalence$1(equals$1);
-const ChunkProto = {
-  [TypeId$6]: {
-    _A: (_) => _
+const Mu = [], Yp = (t) => ei((e, n) => e.length === n.length && Ft(e).every((r, s) => t(r, sn(n, s)))), Qp = /* @__PURE__ */ Yp(N), Xp = {
+  [Au]: {
+    _A: (t) => t
   },
   toString() {
-    return format$1(this.toJSON());
+    return Ie(this.toJSON());
   },
   toJSON() {
     return {
       _id: "Chunk",
-      values: toReadonlyArray(this).map(toJSON)
+      values: Ft(this).map(ye)
     };
   },
-  [NodeInspectSymbol]() {
+  [he]() {
     return this.toJSON();
   },
-  [symbol](that) {
-    return isChunk(that) && _equivalence$1(this, that);
+  [P](t) {
+    return Pu(t) && Qp(this, t);
   },
-  [symbol$1]() {
-    return cached(this, array(toReadonlyArray(this)));
+  [j]() {
+    return ue(this, sr(Ft(this)));
   },
   [Symbol.iterator]() {
     switch (this.backing._tag) {
-      case "IArray": {
+      case "IArray":
         return this.backing.array[Symbol.iterator]();
-      }
-      case "IEmpty": {
-        return emptyArray[Symbol.iterator]();
-      }
-      default: {
-        return toReadonlyArray(this)[Symbol.iterator]();
-      }
+      case "IEmpty":
+        return Mu[Symbol.iterator]();
+      default:
+        return Ft(this)[Symbol.iterator]();
     }
   },
   pipe() {
-    return pipeArguments(this, arguments);
+    return A(this, arguments);
   }
-};
-const makeChunk = (backing) => {
-  const chunk = Object.create(ChunkProto);
-  chunk.backing = backing;
-  switch (backing._tag) {
+}, fe = (t) => {
+  const e = Object.create(Xp);
+  switch (e.backing = t, t._tag) {
     case "IEmpty": {
-      chunk.length = 0;
-      chunk.depth = 0;
-      chunk.left = chunk;
-      chunk.right = chunk;
+      e.length = 0, e.depth = 0, e.left = e, e.right = e;
       break;
     }
     case "IConcat": {
-      chunk.length = backing.left.length + backing.right.length;
-      chunk.depth = 1 + Math.max(backing.left.depth, backing.right.depth);
-      chunk.left = backing.left;
-      chunk.right = backing.right;
+      e.length = t.left.length + t.right.length, e.depth = 1 + Math.max(t.left.depth, t.right.depth), e.left = t.left, e.right = t.right;
       break;
     }
     case "IArray": {
-      chunk.length = backing.array.length;
-      chunk.depth = 0;
-      chunk.left = _empty$5;
-      chunk.right = _empty$5;
+      e.length = t.array.length, e.depth = 0, e.left = ct, e.right = ct;
       break;
     }
     case "ISingleton": {
-      chunk.length = 1;
-      chunk.depth = 0;
-      chunk.left = _empty$5;
-      chunk.right = _empty$5;
+      e.length = 1, e.depth = 0, e.left = ct, e.right = ct;
       break;
     }
     case "ISlice": {
-      chunk.length = backing.length;
-      chunk.depth = backing.chunk.depth + 1;
-      chunk.left = _empty$5;
-      chunk.right = _empty$5;
+      e.length = t.length, e.depth = t.chunk.depth + 1, e.left = ct, e.right = ct;
       break;
     }
   }
-  return chunk;
-};
-const isChunk = (u) => hasProperty(u, TypeId$6);
-const _empty$5 = /* @__PURE__ */ makeChunk({
+  return e;
+}, Pu = (t) => D(t, Au), ct = /* @__PURE__ */ fe({
   _tag: "IEmpty"
-});
-const empty$g = () => _empty$5;
-const make$k = (...as2) => as2.length === 1 ? of$1(as2[0]) : unsafeFromNonEmptyArray(as2);
-const of$1 = (a) => makeChunk({
+}), vt = () => ct, Qs = (...t) => t.length === 1 ? Je(t[0]) : Zp(t), Je = (t) => fe({
   _tag: "ISingleton",
-  a
-});
-const fromIterable$5 = (self) => isChunk(self) ? self : makeChunk({
+  a: t
+}), ys = (t) => Pu(t) ? t : fe({
   _tag: "IArray",
-  array: fromIterable$6(self)
-});
-const copyToArray = (self, array2, initial) => {
-  switch (self.backing._tag) {
+  array: Se(t)
+}), mo = (t, e, n) => {
+  switch (t.backing._tag) {
     case "IArray": {
-      copy(self.backing.array, 0, array2, initial, self.length);
+      zp(t.backing.array, 0, e, n, t.length);
       break;
     }
     case "IConcat": {
-      copyToArray(self.left, array2, initial);
-      copyToArray(self.right, array2, initial + self.left.length);
+      mo(t.left, e, n), mo(t.right, e, n + t.left.length);
       break;
     }
     case "ISingleton": {
-      array2[initial] = self.backing.a;
+      e[n] = t.backing.a;
       break;
     }
     case "ISlice": {
-      let i = 0;
-      let j = initial;
-      while (i < self.length) {
-        array2[j] = unsafeGet(self, i);
-        i += 1;
-        j += 1;
-      }
+      let r = 0, s = n;
+      for (; r < t.length; )
+        e[s] = sn(t, r), r += 1, s += 1;
       break;
     }
   }
-};
-const toReadonlyArray = (self) => {
-  switch (self.backing._tag) {
-    case "IEmpty": {
-      return emptyArray;
-    }
-    case "IArray": {
-      return self.backing.array;
-    }
+}, Ft = (t) => {
+  switch (t.backing._tag) {
+    case "IEmpty":
+      return Mu;
+    case "IArray":
+      return t.backing.array;
     default: {
-      const arr = new Array(self.length);
-      copyToArray(self, arr, 0);
-      self.backing = {
+      const e = new Array(t.length);
+      return mo(t, e, 0), t.backing = {
         _tag: "IArray",
-        array: arr
-      };
-      self.left = _empty$5;
-      self.right = _empty$5;
-      self.depth = 0;
-      return arr;
+        array: e
+      }, t.left = ct, t.right = ct, t.depth = 0, e;
     }
   }
-};
-const reverse$1 = (self) => {
-  switch (self.backing._tag) {
+}, fn = (t) => {
+  switch (t.backing._tag) {
     case "IEmpty":
     case "ISingleton":
-      return self;
-    case "IArray": {
-      return makeChunk({
+      return t;
+    case "IArray":
+      return fe({
         _tag: "IArray",
-        array: reverse$2(self.backing.array)
+        array: Qc(t.backing.array)
       });
-    }
-    case "IConcat": {
-      return makeChunk({
+    case "IConcat":
+      return fe({
         _tag: "IConcat",
-        left: reverse$1(self.backing.right),
-        right: reverse$1(self.backing.left)
+        left: fn(t.backing.right),
+        right: fn(t.backing.left)
       });
-    }
     case "ISlice":
-      return unsafeFromArray(reverse$2(toReadonlyArray(self)));
+      return bs(Qc(Ft(t)));
   }
-};
-const unsafeFromArray = (self) => makeChunk({
+}, bs = (t) => fe({
   _tag: "IArray",
-  array: self
-});
-const unsafeFromNonEmptyArray = (self) => unsafeFromArray(self);
-const unsafeGet = /* @__PURE__ */ dual(2, (self, index) => {
-  switch (self.backing._tag) {
-    case "IEmpty": {
-      throw new Error(`Index out of bounds`);
-    }
+  array: t
+}), Zp = (t) => bs(t), sn = /* @__PURE__ */ g(2, (t, e) => {
+  switch (t.backing._tag) {
+    case "IEmpty":
+      throw new Error("Index out of bounds");
     case "ISingleton": {
-      if (index !== 0) {
-        throw new Error(`Index out of bounds`);
-      }
-      return self.backing.a;
+      if (e !== 0)
+        throw new Error("Index out of bounds");
+      return t.backing.a;
     }
     case "IArray": {
-      if (index >= self.length || index < 0) {
-        throw new Error(`Index out of bounds`);
-      }
-      return self.backing.array[index];
+      if (e >= t.length || e < 0)
+        throw new Error("Index out of bounds");
+      return t.backing.array[e];
     }
-    case "IConcat": {
-      return index < self.left.length ? unsafeGet(self.left, index) : unsafeGet(self.right, index - self.left.length);
-    }
-    case "ISlice": {
-      return unsafeGet(self.backing.chunk, index + self.backing.offset);
-    }
+    case "IConcat":
+      return e < t.left.length ? sn(t.left, e) : sn(t.right, e - t.left.length);
+    case "ISlice":
+      return sn(t.backing.chunk, e + t.backing.offset);
   }
-});
-const append = /* @__PURE__ */ dual(2, (self, a) => appendAll$1(self, of$1(a)));
-const prepend$1 = /* @__PURE__ */ dual(2, (self, elem) => appendAll$1(of$1(elem), self));
-const drop = /* @__PURE__ */ dual(2, (self, n) => {
-  if (n <= 0) {
-    return self;
-  } else if (n >= self.length) {
-    return _empty$5;
-  } else {
-    switch (self.backing._tag) {
-      case "ISlice": {
-        return makeChunk({
-          _tag: "ISlice",
-          chunk: self.backing.chunk,
-          offset: self.backing.offset + n,
-          length: self.backing.length - n
-        });
-      }
-      case "IConcat": {
-        if (n > self.left.length) {
-          return drop(self.right, n - self.left.length);
-        }
-        return makeChunk({
-          _tag: "IConcat",
-          left: drop(self.left, n),
-          right: self.right
-        });
-      }
-      default: {
-        return makeChunk({
-          _tag: "ISlice",
-          chunk: self,
-          offset: n,
-          length: self.length - n
-        });
-      }
-    }
+}), eg = /* @__PURE__ */ g(2, (t, e) => Ze(t, Je(e))), Ye = /* @__PURE__ */ g(2, (t, e) => Ze(Je(e), t)), _o = /* @__PURE__ */ g(2, (t, e) => {
+  if (e <= 0)
+    return t;
+  if (e >= t.length)
+    return ct;
+  switch (t.backing._tag) {
+    case "ISlice":
+      return fe({
+        _tag: "ISlice",
+        chunk: t.backing.chunk,
+        offset: t.backing.offset + e,
+        length: t.backing.length - e
+      });
+    case "IConcat":
+      return e > t.left.length ? _o(t.right, e - t.left.length) : fe({
+        _tag: "IConcat",
+        left: _o(t.left, e),
+        right: t.right
+      });
+    default:
+      return fe({
+        _tag: "ISlice",
+        chunk: t,
+        offset: e,
+        length: t.length - e
+      });
   }
-});
-const appendAll$1 = /* @__PURE__ */ dual(2, (self, that) => {
-  if (self.backing._tag === "IEmpty") {
-    return that;
-  }
-  if (that.backing._tag === "IEmpty") {
-    return self;
-  }
-  const diff2 = that.depth - self.depth;
-  if (Math.abs(diff2) <= 1) {
-    return makeChunk({
+}), Ze = /* @__PURE__ */ g(2, (t, e) => {
+  if (t.backing._tag === "IEmpty")
+    return e;
+  if (e.backing._tag === "IEmpty")
+    return t;
+  const n = e.depth - t.depth;
+  if (Math.abs(n) <= 1)
+    return fe({
       _tag: "IConcat",
-      left: self,
-      right: that
+      left: t,
+      right: e
     });
-  } else if (diff2 < -1) {
-    if (self.left.depth >= self.right.depth) {
-      const nr = appendAll$1(self.right, that);
-      return makeChunk({
+  if (n < -1)
+    if (t.left.depth >= t.right.depth) {
+      const r = Ze(t.right, e);
+      return fe({
         _tag: "IConcat",
-        left: self.left,
-        right: nr
+        left: t.left,
+        right: r
       });
     } else {
-      const nrr = appendAll$1(self.right.right, that);
-      if (nrr.depth === self.depth - 3) {
-        const nr = makeChunk({
+      const r = Ze(t.right.right, e);
+      if (r.depth === t.depth - 3) {
+        const s = fe({
           _tag: "IConcat",
-          left: self.right.left,
-          right: nrr
+          left: t.right.left,
+          right: r
         });
-        return makeChunk({
+        return fe({
           _tag: "IConcat",
-          left: self.left,
-          right: nr
+          left: t.left,
+          right: s
         });
       } else {
-        const nl = makeChunk({
+        const s = fe({
           _tag: "IConcat",
-          left: self.left,
-          right: self.right.left
+          left: t.left,
+          right: t.right.left
         });
-        return makeChunk({
+        return fe({
           _tag: "IConcat",
-          left: nl,
-          right: nrr
+          left: s,
+          right: r
         });
       }
     }
+  else if (e.right.depth >= e.left.depth) {
+    const r = Ze(t, e.left);
+    return fe({
+      _tag: "IConcat",
+      left: r,
+      right: e.right
+    });
   } else {
-    if (that.right.depth >= that.left.depth) {
-      const nl = appendAll$1(self, that.left);
-      return makeChunk({
+    const r = Ze(t, e.left.left);
+    if (r.depth === e.depth - 3) {
+      const s = fe({
         _tag: "IConcat",
-        left: nl,
-        right: that.right
+        left: r,
+        right: e.left.right
+      });
+      return fe({
+        _tag: "IConcat",
+        left: s,
+        right: e.right
       });
     } else {
-      const nll = appendAll$1(self, that.left.left);
-      if (nll.depth === that.depth - 3) {
-        const nl = makeChunk({
-          _tag: "IConcat",
-          left: nll,
-          right: that.left.right
-        });
-        return makeChunk({
-          _tag: "IConcat",
-          left: nl,
-          right: that.right
-        });
-      } else {
-        const nr = makeChunk({
-          _tag: "IConcat",
-          left: that.left.right,
-          right: that.right
-        });
-        return makeChunk({
-          _tag: "IConcat",
-          left: nll,
-          right: nr
-        });
-      }
+      const s = fe({
+        _tag: "IConcat",
+        left: e.left.right,
+        right: e.right
+      });
+      return fe({
+        _tag: "IConcat",
+        left: r,
+        right: s
+      });
     }
   }
+}), tg = (t) => t.length === 0, xt = (t) => t.length > 0, Nu = (t) => sn(t, 0), jt = Nu, yt = (t) => _o(t, 1), Lt = 5, pi = /* @__PURE__ */ Math.pow(2, Lt), ng = pi - 1, rg = pi / 2, sg = pi / 4;
+function og(t) {
+  return t -= t >> 1 & 1431655765, t = (t & 858993459) + (t >> 2 & 858993459), t = t + (t >> 4) & 252645135, t += t >> 8, t += t >> 16, t & 127;
+}
+function hn(t, e) {
+  return e >>> t & ng;
+}
+function tn(t) {
+  return 1 << t;
+}
+function xu(t, e) {
+  return og(t & e - 1);
+}
+const ig = (t, e) => ({
+  value: t,
+  previous: e
 });
-const isEmpty$3 = (self) => self.length === 0;
-const isNonEmpty = (self) => self.length > 0;
-const unsafeHead = (self) => unsafeGet(self, 0);
-const headNonEmpty = unsafeHead;
-const tailNonEmpty = (self) => drop(self, 1);
-const SIZE = 5;
-const BUCKET_SIZE = /* @__PURE__ */ Math.pow(2, SIZE);
-const MASK = BUCKET_SIZE - 1;
-const MAX_INDEX_NODE = BUCKET_SIZE / 2;
-const MIN_ARRAY_NODE = BUCKET_SIZE / 4;
-function popcount(x) {
-  x -= x >> 1 & 1431655765;
-  x = (x & 858993459) + (x >> 2 & 858993459);
-  x = x + (x >> 4) & 252645135;
-  x += x >> 8;
-  x += x >> 16;
-  return x & 127;
-}
-function hashFragment(shift, h) {
-  return h >>> shift & MASK;
-}
-function toBitmap(x) {
-  return 1 << x;
-}
-function fromBitmap(bitmap, bit) {
-  return popcount(bitmap & bit - 1);
-}
-const make$j = (value, previous) => ({
-  value,
-  previous
-});
-function arrayUpdate(mutate2, at, v, arr) {
-  let out = arr;
-  if (!mutate2) {
-    const len = arr.length;
-    out = new Array(len);
-    for (let i = 0; i < len; ++i)
-      out[i] = arr[i];
+function on(t, e, n, r) {
+  let s = r;
+  if (!t) {
+    const o = r.length;
+    s = new Array(o);
+    for (let c = 0; c < o; ++c)
+      s[c] = r[c];
   }
-  out[at] = v;
-  return out;
+  return s[e] = n, s;
 }
-function arraySpliceOut(mutate2, at, arr) {
-  const newLen = arr.length - 1;
-  let i = 0;
-  let g = 0;
-  let out = arr;
-  if (mutate2) {
-    i = g = at;
-  } else {
-    out = new Array(newLen);
-    while (i < at)
-      out[g++] = arr[i++];
-  }
-  ++i;
-  while (i <= newLen)
-    out[g++] = arr[i++];
-  if (mutate2) {
-    out.length = newLen;
-  }
-  return out;
+function ju(t, e, n) {
+  const r = n.length - 1;
+  let s = 0, o = 0, c = n;
+  if (t)
+    s = o = e;
+  else
+    for (c = new Array(r); s < e; )
+      c[o++] = n[s++];
+  for (++s; s <= r; )
+    c[o++] = n[s++];
+  return t && (c.length = r), c;
 }
-function arraySpliceIn(mutate2, at, v, arr) {
-  const len = arr.length;
-  if (mutate2) {
-    let i2 = len;
-    while (i2 >= at)
-      arr[i2--] = arr[i2];
-    arr[at] = v;
-    return arr;
+function cg(t, e, n, r) {
+  const s = r.length;
+  if (t) {
+    let u = s;
+    for (; u >= e; )
+      r[u--] = r[u];
+    return r[e] = n, r;
   }
-  let i = 0, g = 0;
-  const out = new Array(len + 1);
-  while (i < at)
-    out[g++] = arr[i++];
-  out[at] = v;
-  while (i < len)
-    out[++g] = arr[i++];
-  return out;
+  let o = 0, c = 0;
+  const a = new Array(s + 1);
+  for (; o < e; )
+    a[c++] = r[o++];
+  for (a[e] = n; o < s; )
+    a[++c] = r[o++];
+  return a;
 }
-class EmptyNode {
+class St {
   constructor() {
-    __publicField(this, "_tag", "EmptyNode");
+    f(this, "_tag", "EmptyNode");
   }
-  modify(edit, _shift, f, hash2, key, size2) {
-    const v = f(none$6());
-    if (isNone$1(v))
-      return new EmptyNode();
-    ++size2.value;
-    return new LeafNode(edit, hash2, key, v);
+  modify(e, n, r, s, o, c) {
+    const a = r(M());
+    return De(a) ? new St() : (++c.value, new At(e, s, o, a));
   }
 }
-function isEmptyNode(a) {
-  return isTagged(a, "EmptyNode");
+function et(t) {
+  return tu(t, "EmptyNode");
 }
-function isLeafNode(node) {
-  return isEmptyNode(node) || node._tag === "LeafNode" || node._tag === "CollisionNode";
+function ag(t) {
+  return et(t) || t._tag === "LeafNode" || t._tag === "CollisionNode";
 }
-function canEditNode(node, edit) {
-  return isEmptyNode(node) ? false : edit === node.edit;
+function vs(t, e) {
+  return et(t) ? !1 : e === t.edit;
 }
-class LeafNode {
-  constructor(edit, hash2, key, value) {
-    __publicField(this, "edit");
-    __publicField(this, "hash");
-    __publicField(this, "key");
-    __publicField(this, "value");
-    __publicField(this, "_tag", "LeafNode");
-    this.edit = edit;
-    this.hash = hash2;
-    this.key = key;
-    this.value = value;
+class At {
+  constructor(e, n, r, s) {
+    f(this, "edit");
+    f(this, "hash");
+    f(this, "key");
+    f(this, "value");
+    f(this, "_tag", "LeafNode");
+    this.edit = e, this.hash = n, this.key = r, this.value = s;
   }
-  modify(edit, shift, f, hash2, key, size2) {
-    if (equals$1(key, this.key)) {
-      const v2 = f(this.value);
-      if (v2 === this.value)
-        return this;
-      else if (isNone$1(v2)) {
-        --size2.value;
-        return new EmptyNode();
-      }
-      if (canEditNode(this, edit)) {
-        this.value = v2;
-        return this;
-      }
-      return new LeafNode(edit, hash2, key, v2);
+  modify(e, n, r, s, o, c) {
+    if (N(o, this.key)) {
+      const u = r(this.value);
+      return u === this.value ? this : De(u) ? (--c.value, new St()) : vs(this, e) ? (this.value = u, this) : new At(e, s, o, u);
     }
-    const v = f(none$6());
-    if (isNone$1(v))
+    const a = r(M());
+    return De(a) ? this : (++c.value, Lu(e, n, this.hash, this, s, new At(e, s, o, a)));
+  }
+}
+class gi {
+  constructor(e, n, r) {
+    f(this, "edit");
+    f(this, "hash");
+    f(this, "children");
+    f(this, "_tag", "CollisionNode");
+    this.edit = e, this.hash = n, this.children = r;
+  }
+  modify(e, n, r, s, o, c) {
+    if (s === this.hash) {
+      const u = vs(this, e), h = this.updateCollisionList(u, e, this.hash, this.children, r, o, c);
+      return h === this.children ? this : h.length > 1 ? new gi(e, this.hash, h) : h[0];
+    }
+    const a = r(M());
+    return De(a) ? this : (++c.value, Lu(e, n, this.hash, this, s, new At(e, s, o, a)));
+  }
+  updateCollisionList(e, n, r, s, o, c, a) {
+    const u = s.length;
+    for (let b = 0; b < u; ++b) {
+      const y = s[b];
+      if ("key" in y && N(c, y.key)) {
+        const k = y.value, w = o(k);
+        return w === k ? s : De(w) ? (--a.value, ju(e, b, s)) : on(e, b, new At(n, r, c, w), s);
+      }
+    }
+    const h = o(M());
+    return De(h) ? s : (++a.value, on(e, u, new At(n, r, c, h), s));
+  }
+}
+class dn {
+  constructor(e, n, r) {
+    f(this, "edit");
+    f(this, "mask");
+    f(this, "children");
+    f(this, "_tag", "IndexedNode");
+    this.edit = e, this.mask = n, this.children = r;
+  }
+  modify(e, n, r, s, o, c) {
+    const a = this.mask, u = this.children, h = hn(n, s), b = tn(h), y = xu(a, b), k = a & b, w = vs(this, e);
+    if (!k) {
+      const Y = new St().modify(e, n + Lt, r, s, o, c);
+      return Y ? u.length >= rg ? lg(e, h, Y, a, u) : new dn(e, a | b, cg(w, y, Y, u)) : this;
+    }
+    const R = u[y], J = R.modify(e, n + Lt, r, s, o, c);
+    if (R === J)
       return this;
-    ++size2.value;
-    return mergeLeaves(edit, shift, this.hash, this, hash2, new LeafNode(edit, hash2, key, v));
+    let B = a, ce;
+    if (et(J)) {
+      if (B &= ~b, !B)
+        return new St();
+      if (u.length <= 2 && ag(u[y ^ 1]))
+        return u[y ^ 1];
+      ce = ju(w, y, u);
+    } else
+      ce = on(w, y, J, u);
+    return w ? (this.mask = B, this.children = ce, this) : new dn(e, B, ce);
   }
 }
-class CollisionNode {
-  constructor(edit, hash2, children) {
-    __publicField(this, "edit");
-    __publicField(this, "hash");
-    __publicField(this, "children");
-    __publicField(this, "_tag", "CollisionNode");
-    this.edit = edit;
-    this.hash = hash2;
-    this.children = children;
+class mi {
+  constructor(e, n, r) {
+    f(this, "edit");
+    f(this, "size");
+    f(this, "children");
+    f(this, "_tag", "ArrayNode");
+    this.edit = e, this.size = n, this.children = r;
   }
-  modify(edit, shift, f, hash2, key, size2) {
-    if (hash2 === this.hash) {
-      const canEdit = canEditNode(this, edit);
-      const list = this.updateCollisionList(canEdit, edit, this.hash, this.children, f, key, size2);
-      if (list === this.children)
-        return this;
-      return list.length > 1 ? new CollisionNode(edit, this.hash, list) : list[0];
-    }
-    const v = f(none$6());
-    if (isNone$1(v))
+  modify(e, n, r, s, o, c) {
+    let a = this.size;
+    const u = this.children, h = hn(n, s), b = u[h], y = (b || new St()).modify(e, n + Lt, r, s, o, c);
+    if (b === y)
       return this;
-    ++size2.value;
-    return mergeLeaves(edit, shift, this.hash, this, hash2, new LeafNode(edit, hash2, key, v));
-  }
-  updateCollisionList(mutate2, edit, hash2, list, f, key, size2) {
-    const len = list.length;
-    for (let i = 0; i < len; ++i) {
-      const child = list[i];
-      if ("key" in child && equals$1(key, child.key)) {
-        const value = child.value;
-        const newValue2 = f(value);
-        if (newValue2 === value)
-          return list;
-        if (isNone$1(newValue2)) {
-          --size2.value;
-          return arraySpliceOut(mutate2, i, list);
-        }
-        return arrayUpdate(mutate2, i, new LeafNode(edit, hash2, key, newValue2), list);
-      }
-    }
-    const newValue = f(none$6());
-    if (isNone$1(newValue))
-      return list;
-    ++size2.value;
-    return arrayUpdate(mutate2, len, new LeafNode(edit, hash2, key, newValue), list);
+    const k = vs(this, e);
+    let w;
+    if (et(b) && !et(y))
+      ++a, w = on(k, h, y, u);
+    else if (!et(b) && et(y)) {
+      if (--a, a <= sg)
+        return ug(e, a, h, u);
+      w = on(k, h, new St(), u);
+    } else
+      w = on(k, h, y, u);
+    return k ? (this.size = a, this.children = w, this) : new mi(e, a, w);
   }
 }
-class IndexedNode {
-  constructor(edit, mask, children) {
-    __publicField(this, "edit");
-    __publicField(this, "mask");
-    __publicField(this, "children");
-    __publicField(this, "_tag", "IndexedNode");
-    this.edit = edit;
-    this.mask = mask;
-    this.children = children;
-  }
-  modify(edit, shift, f, hash2, key, size2) {
-    const mask = this.mask;
-    const children = this.children;
-    const frag = hashFragment(shift, hash2);
-    const bit = toBitmap(frag);
-    const indx = fromBitmap(mask, bit);
-    const exists = mask & bit;
-    const canEdit = canEditNode(this, edit);
-    if (!exists) {
-      const _newChild = new EmptyNode().modify(edit, shift + SIZE, f, hash2, key, size2);
-      if (!_newChild)
-        return this;
-      return children.length >= MAX_INDEX_NODE ? expand(edit, frag, _newChild, mask, children) : new IndexedNode(edit, mask | bit, arraySpliceIn(canEdit, indx, _newChild, children));
+function ug(t, e, n, r) {
+  const s = new Array(e - 1);
+  let o = 0, c = 0;
+  for (let a = 0, u = r.length; a < u; ++a)
+    if (a !== n) {
+      const h = r[a];
+      h && !et(h) && (s[o++] = h, c |= 1 << a);
     }
-    const current = children[indx];
-    const child = current.modify(edit, shift + SIZE, f, hash2, key, size2);
-    if (current === child)
-      return this;
-    let bitmap = mask;
-    let newChildren;
-    if (isEmptyNode(child)) {
-      bitmap &= ~bit;
-      if (!bitmap)
-        return new EmptyNode();
-      if (children.length <= 2 && isLeafNode(children[indx ^ 1])) {
-        return children[indx ^ 1];
-      }
-      newChildren = arraySpliceOut(canEdit, indx, children);
-    } else {
-      newChildren = arrayUpdate(canEdit, indx, child, children);
-    }
-    if (canEdit) {
-      this.mask = bitmap;
-      this.children = newChildren;
-      return this;
-    }
-    return new IndexedNode(edit, bitmap, newChildren);
+  return new dn(t, c, s);
+}
+function lg(t, e, n, r, s) {
+  const o = [];
+  let c = r, a = 0;
+  for (let u = 0; c; ++u)
+    c & 1 && (o[u] = s[a++]), c >>>= 1;
+  return o[e] = n, new mi(t, a + 1, o);
+}
+function fg(t, e, n, r, s, o) {
+  if (n === s)
+    return new gi(t, n, [o, r]);
+  const c = hn(e, n), a = hn(e, s);
+  if (c === a)
+    return (u) => new dn(t, tn(c) | tn(a), [u]);
+  {
+    const u = c < a ? [r, o] : [o, r];
+    return new dn(t, tn(c) | tn(a), u);
   }
 }
-class ArrayNode {
-  constructor(edit, size2, children) {
-    __publicField(this, "edit");
-    __publicField(this, "size");
-    __publicField(this, "children");
-    __publicField(this, "_tag", "ArrayNode");
-    this.edit = edit;
-    this.size = size2;
-    this.children = children;
-  }
-  modify(edit, shift, f, hash2, key, size2) {
-    let count = this.size;
-    const children = this.children;
-    const frag = hashFragment(shift, hash2);
-    const child = children[frag];
-    const newChild = (child || new EmptyNode()).modify(edit, shift + SIZE, f, hash2, key, size2);
-    if (child === newChild)
-      return this;
-    const canEdit = canEditNode(this, edit);
-    let newChildren;
-    if (isEmptyNode(child) && !isEmptyNode(newChild)) {
-      ++count;
-      newChildren = arrayUpdate(canEdit, frag, newChild, children);
-    } else if (!isEmptyNode(child) && isEmptyNode(newChild)) {
-      --count;
-      if (count <= MIN_ARRAY_NODE) {
-        return pack(edit, count, frag, children);
-      }
-      newChildren = arrayUpdate(canEdit, frag, new EmptyNode(), children);
-    } else {
-      newChildren = arrayUpdate(canEdit, frag, newChild, children);
-    }
-    if (canEdit) {
-      this.size = count;
-      this.children = newChildren;
-      return this;
-    }
-    return new ArrayNode(edit, count, newChildren);
-  }
-}
-function pack(edit, count, removed, elements) {
-  const children = new Array(count - 1);
-  let g = 0;
-  let bitmap = 0;
-  for (let i = 0, len = elements.length; i < len; ++i) {
-    if (i !== removed) {
-      const elem = elements[i];
-      if (elem && !isEmptyNode(elem)) {
-        children[g++] = elem;
-        bitmap |= 1 << i;
-      }
-    }
-  }
-  return new IndexedNode(edit, bitmap, children);
-}
-function expand(edit, frag, child, bitmap, subNodes) {
-  const arr = [];
-  let bit = bitmap;
-  let count = 0;
-  for (let i = 0; bit; ++i) {
-    if (bit & 1)
-      arr[i] = subNodes[count++];
-    bit >>>= 1;
-  }
-  arr[frag] = child;
-  return new ArrayNode(edit, count + 1, arr);
-}
-function mergeLeavesInner(edit, shift, h1, n1, h2, n2) {
-  if (h1 === h2)
-    return new CollisionNode(edit, h1, [n2, n1]);
-  const subH1 = hashFragment(shift, h1);
-  const subH2 = hashFragment(shift, h2);
-  if (subH1 === subH2) {
-    return (child) => new IndexedNode(edit, toBitmap(subH1) | toBitmap(subH2), [child]);
-  } else {
-    const children = subH1 < subH2 ? [n1, n2] : [n2, n1];
-    return new IndexedNode(edit, toBitmap(subH1) | toBitmap(subH2), children);
-  }
-}
-function mergeLeaves(edit, shift, h1, n1, h2, n2) {
-  let stack = void 0;
-  let currentShift = shift;
-  while (true) {
-    const res = mergeLeavesInner(edit, currentShift, h1, n1, h2, n2);
-    if (typeof res === "function") {
-      stack = make$j(res, stack);
-      currentShift = currentShift + SIZE;
-    } else {
-      let final = res;
-      while (stack != null) {
-        final = stack.value(final);
-        stack = stack.previous;
-      }
-      return final;
+function Lu(t, e, n, r, s, o) {
+  let c, a = e;
+  for (; ; ) {
+    const u = fg(t, a, n, r, s, o);
+    if (typeof u == "function")
+      c = ig(u, c), a = a + Lt;
+    else {
+      let h = u;
+      for (; c != null; )
+        h = c.value(h), c = c.previous;
+      return h;
     }
   }
 }
-const HashMapSymbolKey = "effect/HashMap";
-const HashMapTypeId = /* @__PURE__ */ Symbol.for(HashMapSymbolKey);
-const HashMapProto = {
-  [HashMapTypeId]: HashMapTypeId,
+const Du = "effect/HashMap", yo = /* @__PURE__ */ Symbol.for(Du), hg = {
+  [yo]: yo,
   [Symbol.iterator]() {
-    return new HashMapIterator(this, (k, v) => [k, v]);
+    return new Ss(this, (t, e) => [t, e]);
   },
-  [symbol$1]() {
-    let hash$1 = hash(HashMapSymbolKey);
-    for (const item of this) {
-      hash$1 ^= pipe(hash(item[0]), combine$5(hash(item[1])));
-    }
-    return cached(this, hash$1);
+  [j]() {
+    let t = I(Du);
+    for (const e of this)
+      t ^= m(I(e[0]), K(I(e[1])));
+    return ue(this, t);
   },
-  [symbol](that) {
-    if (isHashMap(that)) {
-      if (that._size !== this._size) {
-        return false;
+  [P](t) {
+    if (gg(t)) {
+      if (t._size !== this._size)
+        return !1;
+      for (const e of this) {
+        const n = m(t, yi(e[0], I(e[0])));
+        if (De(n))
+          return !1;
+        if (!N(e[1], n.value))
+          return !1;
       }
-      for (const item of this) {
-        const elem = pipe(that, getHash(item[0], hash(item[0])));
-        if (isNone$1(elem)) {
-          return false;
-        } else {
-          if (!equals$1(item[1], elem.value)) {
-            return false;
-          }
-        }
-      }
-      return true;
+      return !0;
     }
-    return false;
+    return !1;
   },
   toString() {
-    return format$1(this.toJSON());
+    return Ie(this.toJSON());
   },
   toJSON() {
     return {
       _id: "HashMap",
-      values: Array.from(this).map(toJSON)
+      values: Array.from(this).map(ye)
     };
   },
-  [NodeInspectSymbol]() {
+  [he]() {
     return this.toJSON();
   },
   pipe() {
-    return pipeArguments(this, arguments);
+    return A(this, arguments);
   }
+}, _i = (t, e, n, r) => {
+  const s = Object.create(hg);
+  return s._editable = t, s._edit = e, s._root = n, s._size = r, s;
 };
-const makeImpl$1 = (editable, edit, root, size2) => {
-  const map2 = Object.create(HashMapProto);
-  map2._editable = editable;
-  map2._edit = edit;
-  map2._root = root;
-  map2._size = size2;
-  return map2;
-};
-class HashMapIterator {
-  constructor(map2, f) {
-    __publicField(this, "map");
-    __publicField(this, "f");
-    __publicField(this, "v");
-    this.map = map2;
-    this.f = f;
-    this.v = visitLazy(this.map._root, this.f, void 0);
+class Ss {
+  constructor(e, n) {
+    f(this, "map");
+    f(this, "f");
+    f(this, "v");
+    this.map = e, this.f = n, this.v = Uu(this.map._root, this.f, void 0);
   }
   next() {
-    if (isNone$1(this.v)) {
+    if (De(this.v))
       return {
-        done: true,
+        done: !0,
         value: void 0
       };
-    }
-    const v0 = this.v.value;
-    this.v = applyCont(v0.cont);
-    return {
-      done: false,
-      value: v0.value
+    const e = this.v.value;
+    return this.v = es(e.cont), {
+      done: !1,
+      value: e.value
     };
   }
   [Symbol.iterator]() {
-    return new HashMapIterator(this.map, this.f);
+    return new Ss(this.map, this.f);
   }
 }
-const applyCont = (cont) => cont ? visitLazyChildren(cont[0], cont[1], cont[2], cont[3], cont[4]) : none$6();
-const visitLazy = (node, f, cont = void 0) => {
-  switch (node._tag) {
-    case "LeafNode": {
-      if (isSome(node.value)) {
-        return some$2({
-          value: f(node.key, node.value.value),
-          cont
-        });
-      }
-      return applyCont(cont);
-    }
+const es = (t) => t ? qu(t[0], t[1], t[2], t[3], t[4]) : M(), Uu = (t, e, n = void 0) => {
+  switch (t._tag) {
+    case "LeafNode":
+      return nt(t.value) ? H({
+        value: e(t.key, t.value.value),
+        cont: n
+      }) : es(n);
     case "CollisionNode":
     case "ArrayNode":
     case "IndexedNode": {
-      const children = node.children;
-      return visitLazyChildren(children.length, children, 0, f, cont);
+      const r = t.children;
+      return qu(r.length, r, 0, e, n);
     }
-    default: {
-      return applyCont(cont);
-    }
+    default:
+      return es(n);
   }
-};
-const visitLazyChildren = (len, children, i, f, cont) => {
-  while (i < len) {
-    const child = children[i++];
-    if (child && !isEmptyNode(child)) {
-      return visitLazy(child, f, [len, children, i, f, cont]);
-    }
+}, qu = (t, e, n, r, s) => {
+  for (; n < t; ) {
+    const o = e[n++];
+    if (o && !et(o))
+      return Uu(o, r, [t, e, n, r, s]);
   }
-  return applyCont(cont);
-};
-const _empty$4 = /* @__PURE__ */ makeImpl$1(false, 0, /* @__PURE__ */ new EmptyNode(), 0);
-const empty$f = () => _empty$4;
-const fromIterable$4 = (entries) => {
-  const map2 = beginMutation$1(empty$f());
-  for (const entry of entries) {
-    set$3(map2, entry[0], entry[1]);
-  }
-  return endMutation$1(map2);
-};
-const isHashMap = (u) => hasProperty(u, HashMapTypeId);
-const isEmpty$2 = (self) => self && isEmptyNode(self._root);
-const get$4 = /* @__PURE__ */ dual(2, (self, key) => getHash(self, key, hash(key)));
-const getHash = /* @__PURE__ */ dual(3, (self, key, hash2) => {
-  let node = self._root;
-  let shift = 0;
-  while (true) {
-    switch (node._tag) {
-      case "LeafNode": {
-        return equals$1(key, node.key) ? node.value : none$6();
-      }
+  return es(s);
+}, dg = /* @__PURE__ */ _i(!1, 0, /* @__PURE__ */ new St(), 0), ws = () => dg, pg = (t) => {
+  const e = Vu(ws());
+  for (const n of t)
+    zn(e, n[0], n[1]);
+  return vg(e);
+}, gg = (t) => D(t, yo), mg = (t) => t && et(t._root), _g = /* @__PURE__ */ g(2, (t, e) => yi(t, e, I(e))), yi = /* @__PURE__ */ g(3, (t, e, n) => {
+  let r = t._root, s = 0;
+  for (; ; )
+    switch (r._tag) {
+      case "LeafNode":
+        return N(e, r.key) ? r.value : M();
       case "CollisionNode": {
-        if (hash2 === node.hash) {
-          const children = node.children;
-          for (let i = 0, len = children.length; i < len; ++i) {
-            const child = children[i];
-            if ("key" in child && equals$1(key, child.key)) {
-              return child.value;
-            }
+        if (n === r.hash) {
+          const o = r.children;
+          for (let c = 0, a = o.length; c < a; ++c) {
+            const u = o[c];
+            if ("key" in u && N(e, u.key))
+              return u.value;
           }
         }
-        return none$6();
+        return M();
       }
       case "IndexedNode": {
-        const frag = hashFragment(shift, hash2);
-        const bit = toBitmap(frag);
-        if (node.mask & bit) {
-          node = node.children[fromBitmap(node.mask, bit)];
-          shift += SIZE;
+        const o = hn(s, n), c = tn(o);
+        if (r.mask & c) {
+          r = r.children[xu(r.mask, c)], s += Lt;
           break;
         }
-        return none$6();
+        return M();
       }
       case "ArrayNode": {
-        node = node.children[hashFragment(shift, hash2)];
-        if (node) {
-          shift += SIZE;
+        if (r = r.children[hn(s, n)], r) {
+          s += Lt;
           break;
         }
-        return none$6();
+        return M();
       }
       default:
-        return none$6();
+        return M();
     }
-  }
-});
-const has$3 = /* @__PURE__ */ dual(2, (self, key) => isSome(getHash(self, key, hash(key))));
-const set$3 = /* @__PURE__ */ dual(3, (self, key, value) => modifyAt$1(self, key, () => some$2(value)));
-const setTree = /* @__PURE__ */ dual(3, (self, newRoot, newSize) => {
-  if (self._editable) {
-    self._root = newRoot;
-    self._size = newSize;
-    return self;
-  }
-  return newRoot === self._root ? self : makeImpl$1(self._editable, self._edit, newRoot, newSize);
-});
-const keys$1 = (self) => new HashMapIterator(self, (key) => key);
-const size$3 = (self) => self._size;
-const beginMutation$1 = (self) => makeImpl$1(true, self._edit + 1, self._root, self._size);
-const endMutation$1 = (self) => {
-  self._editable = false;
-  return self;
-};
-const modifyAt$1 = /* @__PURE__ */ dual(3, (self, key, f) => modifyHash(self, key, hash(key), f));
-const modifyHash = /* @__PURE__ */ dual(4, (self, key, hash2, f) => {
-  const size2 = {
-    value: self._size
-  };
-  const newRoot = self._root.modify(self._editable ? self._edit : NaN, 0, f, hash2, key, size2);
-  return pipe(self, setTree(newRoot, size2.value));
-});
-const remove$2 = /* @__PURE__ */ dual(2, (self, key) => modifyAt$1(self, key, none$6));
-const map$2 = /* @__PURE__ */ dual(2, (self, f) => reduce$5(self, empty$f(), (map2, value, key) => set$3(map2, key, f(value, key))));
-const forEach$1 = /* @__PURE__ */ dual(2, (self, f) => reduce$5(self, void 0, (_, value, key) => f(value, key)));
-const reduce$5 = /* @__PURE__ */ dual(3, (self, zero2, f) => {
-  const root = self._root;
-  if (root._tag === "LeafNode") {
-    return isSome(root.value) ? f(zero2, root.value.value, root.key) : zero2;
-  }
-  if (root._tag === "EmptyNode") {
-    return zero2;
-  }
-  const toVisit = [root.children];
-  let children;
-  while (children = toVisit.pop()) {
-    for (let i = 0, len = children.length; i < len; ) {
-      const child = children[i++];
-      if (child && !isEmptyNode(child)) {
-        if (child._tag === "LeafNode") {
-          if (isSome(child.value)) {
-            zero2 = f(zero2, child.value.value, child.key);
-          }
-        } else {
-          toVisit.push(child.children);
-        }
-      }
+}), yg = /* @__PURE__ */ g(2, (t, e) => nt(yi(t, e, I(e)))), zn = /* @__PURE__ */ g(3, (t, e, n) => bi(t, e, () => H(n))), bg = /* @__PURE__ */ g(3, (t, e, n) => t._editable ? (t._root = e, t._size = n, t) : e === t._root ? t : _i(t._editable, t._edit, e, n)), Bu = (t) => new Ss(t, (e) => e), ts = (t) => t._size, Vu = (t) => _i(!0, t._edit + 1, t._root, t._size), vg = (t) => (t._editable = !1, t), bi = /* @__PURE__ */ g(3, (t, e, n) => Sg(t, e, I(e), n)), Sg = /* @__PURE__ */ g(4, (t, e, n, r) => {
+  const s = {
+    value: t._size
+  }, o = t._root.modify(t._editable ? t._edit : NaN, 0, r, n, e, s);
+  return m(t, bg(o, s.value));
+}), ea = /* @__PURE__ */ g(2, (t, e) => bi(t, e, M)), wg = /* @__PURE__ */ g(2, (t, e) => ks(t, ws(), (n, r, s) => zn(n, s, e(r, s)))), kg = /* @__PURE__ */ g(2, (t, e) => ks(t, void 0, (n, r, s) => e(r, s))), ks = /* @__PURE__ */ g(3, (t, e, n) => {
+  const r = t._root;
+  if (r._tag === "LeafNode")
+    return nt(r.value) ? n(e, r.value.value, r.key) : e;
+  if (r._tag === "EmptyNode")
+    return e;
+  const s = [r.children];
+  let o;
+  for (; o = s.pop(); )
+    for (let c = 0, a = o.length; c < a; ) {
+      const u = o[c++];
+      u && !et(u) && (u._tag === "LeafNode" ? nt(u.value) && (e = n(e, u.value.value, u.key)) : s.push(u.children));
     }
-  }
-  return zero2;
-});
-const HashSetSymbolKey = "effect/HashSet";
-const HashSetTypeId = /* @__PURE__ */ Symbol.for(HashSetSymbolKey);
-const HashSetProto = {
-  [HashSetTypeId]: HashSetTypeId,
+  return e;
+}), Ku = "effect/HashSet", bo = /* @__PURE__ */ Symbol.for(Ku), Eg = {
+  [bo]: bo,
   [Symbol.iterator]() {
-    return keys$1(this._keyMap);
+    return Bu(this._keyMap);
   },
-  [symbol$1]() {
-    return cached(this, combine$5(hash(this._keyMap))(hash(HashSetSymbolKey)));
+  [j]() {
+    return ue(this, K(I(this._keyMap))(I(Ku)));
   },
-  [symbol](that) {
-    if (isHashSet(that)) {
-      return size$3(this._keyMap) === size$3(that._keyMap) && equals$1(this._keyMap, that._keyMap);
-    }
-    return false;
+  [P](t) {
+    return Og(t) ? ts(this._keyMap) === ts(t._keyMap) && N(this._keyMap, t._keyMap) : !1;
   },
   toString() {
-    return format$1(this.toJSON());
+    return Ie(this.toJSON());
   },
   toJSON() {
     return {
       _id: "HashSet",
-      values: Array.from(this).map(toJSON)
+      values: Array.from(this).map(ye)
     };
   },
-  [NodeInspectSymbol]() {
+  [he]() {
     return this.toJSON();
   },
   pipe() {
-    return pipeArguments(this, arguments);
+    return A(this, arguments);
   }
-};
-const makeImpl = (keyMap) => {
-  const set2 = Object.create(HashSetProto);
-  set2._keyMap = keyMap;
-  return set2;
-};
-const isHashSet = (u) => hasProperty(u, HashSetTypeId);
-const _empty$3 = /* @__PURE__ */ makeImpl(/* @__PURE__ */ empty$f());
-const empty$e = () => _empty$3;
-const fromIterable$3 = (elements) => {
-  const set2 = beginMutation(empty$e());
-  for (const value of elements) {
-    add$1(set2, value);
-  }
-  return endMutation(set2);
-};
-const make$i = (...elements) => {
-  const set2 = beginMutation(empty$e());
-  for (const value of elements) {
-    add$1(set2, value);
-  }
-  return endMutation(set2);
-};
-const has$2 = /* @__PURE__ */ dual(2, (self, value) => has$3(self._keyMap, value));
-const size$2 = (self) => size$3(self._keyMap);
-const beginMutation = (self) => makeImpl(beginMutation$1(self._keyMap));
-const endMutation = (self) => {
-  self._keyMap._editable = false;
-  return self;
-};
-const mutate = /* @__PURE__ */ dual(2, (self, f) => {
-  const transient = beginMutation(self);
-  f(transient);
-  return endMutation(transient);
-});
-const add$1 = /* @__PURE__ */ dual(2, (self, value) => self._keyMap._editable ? (set$3(value, true)(self._keyMap), self) : makeImpl(set$3(value, true)(self._keyMap)));
-const remove$1 = /* @__PURE__ */ dual(2, (self, value) => self._keyMap._editable ? (remove$2(value)(self._keyMap), self) : makeImpl(remove$2(value)(self._keyMap)));
-const difference$1 = /* @__PURE__ */ dual(2, (self, that) => mutate(self, (set2) => {
-  for (const value of that) {
-    remove$1(set2, value);
-  }
-}));
-const union$1 = /* @__PURE__ */ dual(2, (self, that) => mutate(empty$e(), (set2) => {
-  forEach(self, (value) => add$1(set2, value));
-  for (const value of that) {
-    add$1(set2, value);
-  }
-}));
-const forEach = /* @__PURE__ */ dual(2, (self, f) => forEach$1(self._keyMap, (_, k) => f(k)));
-const reduce$4 = /* @__PURE__ */ dual(3, (self, zero2, f) => reduce$5(self._keyMap, zero2, (z, _, a) => f(z, a)));
-const empty$d = empty$e;
-const fromIterable$2 = fromIterable$3;
-const make$h = make$i;
-const has$1 = has$2;
-const size$1 = size$2;
-const add = add$1;
-const remove = remove$1;
-const difference = difference$1;
-const union = union$1;
-const reduce$3 = reduce$4;
-const TypeId$5 = /* @__PURE__ */ Symbol.for("effect/MutableRef");
-const MutableRefProto = {
-  [TypeId$5]: TypeId$5,
+}, Es = (t) => {
+  const e = Object.create(Eg);
+  return e._keyMap = t, e;
+}, Og = (t) => D(t, bo), Rg = /* @__PURE__ */ Es(/* @__PURE__ */ ws()), Os = () => Rg, Ig = (t) => {
+  const e = vi(Os());
+  for (const n of t)
+    Yn(e, n);
+  return Si(e);
+}, Cg = (...t) => {
+  const e = vi(Os());
+  for (const n of t)
+    Yn(e, n);
+  return Si(e);
+}, Tg = /* @__PURE__ */ g(2, (t, e) => yg(t._keyMap, e)), $g = (t) => ts(t._keyMap), vi = (t) => Es(Vu(t._keyMap)), Si = (t) => (t._keyMap._editable = !1, t), Hu = /* @__PURE__ */ g(2, (t, e) => {
+  const n = vi(t);
+  return e(n), Si(n);
+}), Yn = /* @__PURE__ */ g(2, (t, e) => t._keyMap._editable ? (zn(e, !0)(t._keyMap), t) : Es(zn(e, !0)(t._keyMap))), Ju = /* @__PURE__ */ g(2, (t, e) => t._keyMap._editable ? (ea(e)(t._keyMap), t) : Es(ea(e)(t._keyMap))), Fg = /* @__PURE__ */ g(2, (t, e) => Hu(t, (n) => {
+  for (const r of e)
+    Ju(n, r);
+})), Ag = /* @__PURE__ */ g(2, (t, e) => Hu(Os(), (n) => {
+  Mg(t, (r) => Yn(n, r));
+  for (const r of e)
+    Yn(n, r);
+})), Mg = /* @__PURE__ */ g(2, (t, e) => kg(t._keyMap, (n, r) => e(r))), Pg = /* @__PURE__ */ g(3, (t, e, n) => ks(t._keyMap, e, (r, s, o) => n(r, o))), Dt = Os, Ng = Ig, wi = Cg, xg = Tg, Wu = $g, Kn = Yn, Gu = Ju, ta = Fg, Qn = Ag, ns = Pg, na = /* @__PURE__ */ Symbol.for("effect/MutableRef"), jg = {
+  [na]: na,
   toString() {
-    return format$1(this.toJSON());
+    return Ie(this.toJSON());
   },
   toJSON() {
     return {
       _id: "MutableRef",
-      current: toJSON(this.current)
+      current: ye(this.current)
     };
   },
-  [NodeInspectSymbol]() {
+  [he]() {
     return this.toJSON();
   },
   pipe() {
-    return pipeArguments(this, arguments);
+    return A(this, arguments);
   }
-};
-const make$g = (value) => {
-  const ref = Object.create(MutableRefProto);
-  ref.current = value;
-  return ref;
-};
-const get$3 = (self) => self.current;
-const set$2 = /* @__PURE__ */ dual(2, (self, value) => {
-  self.current = value;
-  return self;
-});
-const FiberIdSymbolKey = "effect/FiberId";
-const FiberIdTypeId = /* @__PURE__ */ Symbol.for(FiberIdSymbolKey);
-const OP_NONE = "None";
-const OP_RUNTIME = "Runtime";
-const OP_COMPOSITE = "Composite";
-const emptyHash = /* @__PURE__ */ string(`${FiberIdSymbolKey}-${OP_NONE}`);
-let None$2 = class None {
+}, ki = (t) => {
+  const e = Object.create(jg);
+  return e.current = t, e;
+}, Ut = (t) => t.current, Rs = /* @__PURE__ */ g(2, (t, e) => (t.current = e, t)), Ei = "effect/FiberId", Xn = /* @__PURE__ */ Symbol.for(Ei), rs = "None", vo = "Runtime", Lg = "Composite", Dg = /* @__PURE__ */ me(`${Ei}-${rs}`);
+var Dw;
+let Ug = class {
   constructor() {
-    __publicField(this, _a, FiberIdTypeId);
-    __publicField(this, "_tag", OP_NONE);
-    __publicField(this, "id", -1);
-    __publicField(this, "startTimeMillis", -1);
+    f(this, Dw, Xn);
+    f(this, "_tag", rs);
+    f(this, "id", -1);
+    f(this, "startTimeMillis", -1);
   }
-  [(_a = FiberIdTypeId, symbol$1)]() {
-    return emptyHash;
+  [(Dw = Xn, j)]() {
+    return Dg;
   }
-  [symbol](that) {
-    return isFiberId(that) && that._tag === OP_NONE;
+  [P](e) {
+    return zu(e) && e._tag === rs;
   }
   toString() {
-    return format$1(this.toJSON());
+    return Ie(this.toJSON());
   }
   toJSON() {
     return {
@@ -2139,27 +1570,27 @@ let None$2 = class None {
       _tag: this._tag
     };
   }
-  [NodeInspectSymbol]() {
+  [he]() {
     return this.toJSON();
   }
 };
-class Runtime {
-  constructor(id, startTimeMillis) {
-    __publicField(this, "id");
-    __publicField(this, "startTimeMillis");
-    __publicField(this, _b, FiberIdTypeId);
-    __publicField(this, "_tag", OP_RUNTIME);
-    this.id = id;
-    this.startTimeMillis = startTimeMillis;
+var Uw;
+class qg {
+  constructor(e, n) {
+    f(this, "id");
+    f(this, "startTimeMillis");
+    f(this, Uw, Xn);
+    f(this, "_tag", vo);
+    this.id = e, this.startTimeMillis = n;
   }
-  [(_b = FiberIdTypeId, symbol$1)]() {
-    return cached(this, string(`${FiberIdSymbolKey}-${this._tag}-${this.id}-${this.startTimeMillis}`));
+  [(Uw = Xn, j)]() {
+    return ue(this, me(`${Ei}-${this._tag}-${this.id}-${this.startTimeMillis}`));
   }
-  [symbol](that) {
-    return isFiberId(that) && that._tag === OP_RUNTIME && this.id === that.id && this.startTimeMillis === that.startTimeMillis;
+  [P](e) {
+    return zu(e) && e._tag === vo && this.id === e.id && this.startTimeMillis === e.startTimeMillis;
   }
   toString() {
-    return format$1(this.toJSON());
+    return Ie(this.toJSON());
   }
   toJSON() {
     return {
@@ -2169,120 +1600,77 @@ class Runtime {
       startTimeMillis: this.startTimeMillis
     };
   }
-  [NodeInspectSymbol]() {
+  [he]() {
     return this.toJSON();
   }
 }
-const none$5 = /* @__PURE__ */ new None$2();
-const isFiberId = (self) => hasProperty(self, FiberIdTypeId);
-const ids = (self) => {
-  switch (self._tag) {
-    case OP_NONE: {
-      return empty$d();
-    }
-    case OP_RUNTIME: {
-      return make$h(self.id);
-    }
-    case OP_COMPOSITE: {
-      return pipe(ids(self.left), union(ids(self.right)));
-    }
+const Bg = /* @__PURE__ */ new Ug(), zu = (t) => D(t, Xn), So = (t) => {
+  switch (t._tag) {
+    case rs:
+      return Dt();
+    case vo:
+      return wi(t.id);
+    case Lg:
+      return m(So(t.left), Qn(So(t.right)));
   }
-};
-const _fiberCounter = /* @__PURE__ */ globalValue(/* @__PURE__ */ Symbol.for("effect/Fiber/Id/_fiberCounter"), () => make$g(0));
-const threadName$1 = (self) => {
-  const identifiers = Array.from(ids(self)).map((n) => `#${n}`).join(",");
-  return identifiers;
-};
-const unsafeMake$5 = () => {
-  const id = get$3(_fiberCounter);
-  pipe(_fiberCounter, set$2(id + 1));
-  return new Runtime(id, Date.now());
-};
-const none$4 = none$5;
-const threadName = threadName$1;
-const unsafeMake$4 = unsafeMake$5;
-const empty$c = empty$f;
-const fromIterable$1 = fromIterable$4;
-const isEmpty$1 = isEmpty$2;
-const get$2 = get$4;
-const set$1 = set$3;
-const keys = keys$1;
-const size = size$3;
-const modifyAt = modifyAt$1;
-const map$1 = map$2;
-const reduce$2 = reduce$5;
-const TypeId$4 = /* @__PURE__ */ Symbol.for("effect/List");
-const toArray = (self) => fromIterable$6(self);
-const getEquivalence = (isEquivalent) => mapInput$1(getEquivalence$2(isEquivalent), toArray);
-const _equivalence = /* @__PURE__ */ getEquivalence(equals$1);
-const ConsProto = {
-  [TypeId$4]: TypeId$4,
+}, ra = /* @__PURE__ */ Q(/* @__PURE__ */ Symbol.for("effect/Fiber/Id/_fiberCounter"), () => ki(0)), Yu = (t) => Array.from(So(t)).map((n) => `#${n}`).join(","), Vg = () => {
+  const t = Ut(ra);
+  return m(ra, Rs(t + 1)), new qg(t, Date.now());
+}, Is = Bg, Kg = Yu, Qu = Vg, Oi = ws, Hg = pg, Jg = mg, Xu = _g, Zu = zn, el = Bu, Wg = ts, Gg = bi, tl = wg, nl = ks, Zn = /* @__PURE__ */ Symbol.for("effect/List"), wo = (t) => Se(t), zg = (t) => wd(hi(t), wo), Yg = /* @__PURE__ */ zg(N), Qg = {
+  [Zn]: Zn,
   _tag: "Cons",
   toString() {
-    return format$1(this.toJSON());
+    return Ie(this.toJSON());
   },
   toJSON() {
     return {
       _id: "List",
       _tag: "Cons",
-      values: toArray(this).map(toJSON)
+      values: wo(this).map(ye)
     };
   },
-  [NodeInspectSymbol]() {
+  [he]() {
     return this.toJSON();
   },
-  [symbol](that) {
-    return isList(that) && this._tag === that._tag && _equivalence(this, that);
+  [P](t) {
+    return sl(t) && this._tag === t._tag && Yg(this, t);
   },
-  [symbol$1]() {
-    return cached(this, array(toArray(this)));
+  [j]() {
+    return ue(this, sr(wo(this)));
   },
   [Symbol.iterator]() {
-    let done2 = false;
-    let self = this;
+    let t = !1, e = this;
     return {
       next() {
-        if (done2) {
+        if (t)
           return this.return();
-        }
-        if (self._tag === "Nil") {
-          done2 = true;
-          return this.return();
-        }
-        const value = self.head;
-        self = self.tail;
-        return {
-          done: done2,
-          value
+        if (e._tag === "Nil")
+          return t = !0, this.return();
+        const n = e.head;
+        return e = e.tail, {
+          done: t,
+          value: n
         };
       },
-      return(value) {
-        if (!done2) {
-          done2 = true;
-        }
-        return {
-          done: true,
-          value
+      return(n) {
+        return t || (t = !0), {
+          done: !0,
+          value: n
         };
       }
     };
   },
   pipe() {
-    return pipeArguments(this, arguments);
+    return A(this, arguments);
   }
-};
-const makeCons = (head2, tail) => {
-  const cons2 = Object.create(ConsProto);
-  cons2.head = head2;
-  cons2.tail = tail;
-  return cons2;
-};
-const NilHash = /* @__PURE__ */ string("Nil");
-const NilProto = {
-  [TypeId$4]: TypeId$4,
+}, ss = (t, e) => {
+  const n = Object.create(Qg);
+  return n.head = t, n.tail = e, n;
+}, Xg = /* @__PURE__ */ me("Nil"), Zg = {
+  [Zn]: Zn,
   _tag: "Nil",
   toString() {
-    return format$1(this.toJSON());
+    return Ie(this.toJSON());
   },
   toJSON() {
     return {
@@ -2290,662 +1678,420 @@ const NilProto = {
       _tag: "Nil"
     };
   },
-  [NodeInspectSymbol]() {
+  [he]() {
     return this.toJSON();
   },
-  [symbol$1]() {
-    return NilHash;
+  [j]() {
+    return Xg;
   },
-  [symbol](that) {
-    return isList(that) && this._tag === that._tag;
+  [P](t) {
+    return sl(t) && this._tag === t._tag;
   },
   [Symbol.iterator]() {
     return {
       next() {
         return {
-          done: true,
+          done: !0,
           value: void 0
         };
       }
     };
   },
   pipe() {
-    return pipeArguments(this, arguments);
+    return A(this, arguments);
   }
-};
-const _Nil = /* @__PURE__ */ Object.create(NilProto);
-const isList = (u) => hasProperty(u, TypeId$4);
-const isNil = (self) => self._tag === "Nil";
-const isCons = (self) => self._tag === "Cons";
-const nil = () => _Nil;
-const cons = (head2, tail) => makeCons(head2, tail);
-const empty$b = nil;
-const of = (value) => makeCons(value, _Nil);
-const appendAll = /* @__PURE__ */ dual(2, (self, that) => prependAll(that, self));
-const prepend = /* @__PURE__ */ dual(2, (self, element) => cons(element, self));
-const prependAll = /* @__PURE__ */ dual(2, (self, prefix) => {
-  if (isNil(self)) {
-    return prefix;
-  } else if (isNil(prefix)) {
-    return self;
-  } else {
-    const result = makeCons(prefix.head, self);
-    let curr = result;
-    let that = prefix.tail;
-    while (!isNil(that)) {
-      const temp = makeCons(that.head, self);
-      curr.tail = temp;
-      curr = temp;
-      that = that.tail;
+}, rl = /* @__PURE__ */ Object.create(Zg), sl = (t) => D(t, Zn), ht = (t) => t._tag === "Nil", ol = (t) => t._tag === "Cons", em = () => rl, qt = (t, e) => ss(t, e), pn = em, Ri = (t) => ss(t, rl), tm = /* @__PURE__ */ g(2, (t, e) => rm(e, t)), nm = /* @__PURE__ */ g(2, (t, e) => qt(e, t)), rm = /* @__PURE__ */ g(2, (t, e) => {
+  if (ht(t))
+    return e;
+  if (ht(e))
+    return t;
+  {
+    const n = ss(e.head, t);
+    let r = n, s = e.tail;
+    for (; !ht(s); ) {
+      const o = ss(s.head, t);
+      r.tail = o, r = o, s = s.tail;
     }
-    return result;
+    return n;
   }
-});
-const reduce$1 = /* @__PURE__ */ dual(3, (self, zero2, f) => {
-  let acc = zero2;
-  let these = self;
-  while (!isNil(these)) {
-    acc = f(acc, these.head);
-    these = these.tail;
+}), sm = /* @__PURE__ */ g(3, (t, e, n) => {
+  let r = e, s = t;
+  for (; !ht(s); )
+    r = n(r, s.head), s = s.tail;
+  return r;
+}), om = (t) => {
+  let e = pn(), n = t;
+  for (; !ht(n); )
+    e = nm(e, n.head), n = n.tail;
+  return e;
+}, Ii = /* @__PURE__ */ function() {
+  function t(e) {
+    e && Object.assign(this, e);
   }
-  return acc;
-});
-const reverse = (self) => {
-  let result = empty$b();
-  let these = self;
-  while (!isNil(these)) {
-    result = prepend(result, these.head);
-    these = these.tail;
-  }
-  return result;
-};
-const Structural = /* @__PURE__ */ function() {
-  function Structural2(args) {
-    if (args) {
-      Object.assign(this, args);
-    }
-  }
-  Structural2.prototype = StructuralPrototype;
-  return Structural2;
-}();
-const ContextPatchTypeId = /* @__PURE__ */ Symbol.for("effect/DifferContextPatch");
-function variance$3(a) {
-  return a;
+  return t.prototype = ai, t;
+}(), im = /* @__PURE__ */ Symbol.for("effect/DifferContextPatch");
+function sa(t) {
+  return t;
 }
-const PatchProto$2 = {
-  ...Structural.prototype,
-  [ContextPatchTypeId]: {
-    _Value: variance$3,
-    _Patch: variance$3
+const ir = {
+  ...Ii.prototype,
+  [im]: {
+    _Value: sa,
+    _Patch: sa
   }
-};
-const EmptyProto$2 = /* @__PURE__ */ Object.assign(/* @__PURE__ */ Object.create(PatchProto$2), {
+}, cm = /* @__PURE__ */ Object.assign(/* @__PURE__ */ Object.create(ir), {
   _tag: "Empty"
-});
-const _empty$2 = /* @__PURE__ */ Object.create(EmptyProto$2);
-const empty$a = () => _empty$2;
-const AndThenProto$2 = /* @__PURE__ */ Object.assign(/* @__PURE__ */ Object.create(PatchProto$2), {
+}), am = /* @__PURE__ */ Object.create(cm), il = () => am, um = /* @__PURE__ */ Object.assign(/* @__PURE__ */ Object.create(ir), {
   _tag: "AndThen"
-});
-const makeAndThen$2 = (first, second) => {
-  const o = Object.create(AndThenProto$2);
-  o.first = first;
-  o.second = second;
-  return o;
-};
-const AddServiceProto = /* @__PURE__ */ Object.assign(/* @__PURE__ */ Object.create(PatchProto$2), {
+}), lm = (t, e) => {
+  const n = Object.create(um);
+  return n.first = t, n.second = e, n;
+}, fm = /* @__PURE__ */ Object.assign(/* @__PURE__ */ Object.create(ir), {
   _tag: "AddService"
-});
-const makeAddService = (key, service) => {
-  const o = Object.create(AddServiceProto);
-  o.key = key;
-  o.service = service;
-  return o;
-};
-const RemoveServiceProto = /* @__PURE__ */ Object.assign(/* @__PURE__ */ Object.create(PatchProto$2), {
+}), hm = (t, e) => {
+  const n = Object.create(fm);
+  return n.key = t, n.service = e, n;
+}, dm = /* @__PURE__ */ Object.assign(/* @__PURE__ */ Object.create(ir), {
   _tag: "RemoveService"
-});
-const makeRemoveService = (key) => {
-  const o = Object.create(RemoveServiceProto);
-  o.key = key;
-  return o;
-};
-const UpdateServiceProto = /* @__PURE__ */ Object.assign(/* @__PURE__ */ Object.create(PatchProto$2), {
+}), pm = (t) => {
+  const e = Object.create(dm);
+  return e.key = t, e;
+}, gm = /* @__PURE__ */ Object.assign(/* @__PURE__ */ Object.create(ir), {
   _tag: "UpdateService"
-});
-const makeUpdateService = (key, update2) => {
-  const o = Object.create(UpdateServiceProto);
-  o.key = key;
-  o.update = update2;
-  return o;
-};
-const diff$6 = (oldValue, newValue) => {
-  const missingServices = new Map(oldValue.unsafeMap);
-  let patch2 = empty$a();
-  for (const [tag, newService] of newValue.unsafeMap.entries()) {
-    if (missingServices.has(tag)) {
-      const old = missingServices.get(tag);
-      missingServices.delete(tag);
-      if (!equals$1(old, newService)) {
-        patch2 = combine$4(makeUpdateService(tag, () => newService))(patch2);
-      }
-    } else {
-      missingServices.delete(tag);
-      patch2 = combine$4(makeAddService(tag, newService))(patch2);
-    }
-  }
-  for (const [tag] of missingServices.entries()) {
-    patch2 = combine$4(makeRemoveService(tag))(patch2);
-  }
-  return patch2;
-};
-const combine$4 = /* @__PURE__ */ dual(2, (self, that) => makeAndThen$2(self, that));
-const patch$7 = /* @__PURE__ */ dual(2, (self, context) => {
-  if (self._tag === "Empty") {
-    return context;
-  }
-  let wasServiceUpdated = false;
-  let patches = of$1(self);
-  const updatedContext = new Map(context.unsafeMap);
-  while (isNonEmpty(patches)) {
-    const head2 = headNonEmpty(patches);
-    const tail = tailNonEmpty(patches);
-    switch (head2._tag) {
+}), mm = (t, e) => {
+  const n = Object.create(gm);
+  return n.key = t, n.update = e, n;
+}, _m = (t, e) => {
+  const n = new Map(t.unsafeMap);
+  let r = il();
+  for (const [s, o] of e.unsafeMap.entries())
+    if (n.has(s)) {
+      const c = n.get(s);
+      n.delete(s), N(c, o) || (r = Dr(mm(s, () => o))(r));
+    } else
+      n.delete(s), r = Dr(hm(s, o))(r);
+  for (const [s] of n.entries())
+    r = Dr(pm(s))(r);
+  return r;
+}, Dr = /* @__PURE__ */ g(2, (t, e) => lm(t, e)), ym = /* @__PURE__ */ g(2, (t, e) => {
+  if (t._tag === "Empty")
+    return e;
+  let n = !1, r = Je(t);
+  const s = new Map(e.unsafeMap);
+  for (; xt(r); ) {
+    const c = jt(r), a = yt(r);
+    switch (c._tag) {
       case "Empty": {
-        patches = tail;
+        r = a;
         break;
       }
       case "AddService": {
-        updatedContext.set(head2.key, head2.service);
-        patches = tail;
+        s.set(c.key, c.service), r = a;
         break;
       }
       case "AndThen": {
-        patches = prepend$1(prepend$1(tail, head2.second), head2.first);
+        r = Ye(Ye(a, c.second), c.first);
         break;
       }
       case "RemoveService": {
-        updatedContext.delete(head2.key);
-        patches = tail;
+        s.delete(c.key), r = a;
         break;
       }
       case "UpdateService": {
-        updatedContext.set(head2.key, head2.update(updatedContext.get(head2.key)));
-        wasServiceUpdated = true;
-        patches = tail;
+        s.set(c.key, c.update(s.get(c.key))), n = !0, r = a;
         break;
       }
     }
   }
-  if (!wasServiceUpdated) {
-    return makeContext(updatedContext);
-  }
-  const map2 = /* @__PURE__ */ new Map();
-  for (const [tag] of context.unsafeMap) {
-    if (updatedContext.has(tag)) {
-      map2.set(tag, updatedContext.get(tag));
-      updatedContext.delete(tag);
-    }
-  }
-  for (const [tag, s] of updatedContext) {
-    map2.set(tag, s);
-  }
-  return makeContext(map2);
-});
-const HashSetPatchTypeId = /* @__PURE__ */ Symbol.for("effect/DifferHashSetPatch");
-function variance$2(a) {
-  return a;
+  if (!n)
+    return Gn(s);
+  const o = /* @__PURE__ */ new Map();
+  for (const [c] of e.unsafeMap)
+    s.has(c) && (o.set(c, s.get(c)), s.delete(c));
+  for (const [c, a] of s)
+    o.set(c, a);
+  return Gn(o);
+}), bm = /* @__PURE__ */ Symbol.for("effect/DifferHashSetPatch");
+function Xs(t) {
+  return t;
 }
-const PatchProto$1 = {
-  ...Structural.prototype,
-  [HashSetPatchTypeId]: {
-    _Value: variance$2,
-    _Key: variance$2,
-    _Patch: variance$2
+const Cs = {
+  ...Ii.prototype,
+  [bm]: {
+    _Value: Xs,
+    _Key: Xs,
+    _Patch: Xs
   }
-};
-const EmptyProto$1 = /* @__PURE__ */ Object.assign(/* @__PURE__ */ Object.create(PatchProto$1), {
+}, vm = /* @__PURE__ */ Object.assign(/* @__PURE__ */ Object.create(Cs), {
   _tag: "Empty"
-});
-const _empty$1 = /* @__PURE__ */ Object.create(EmptyProto$1);
-const empty$9 = () => _empty$1;
-const AndThenProto$1 = /* @__PURE__ */ Object.assign(/* @__PURE__ */ Object.create(PatchProto$1), {
+}), Sm = /* @__PURE__ */ Object.create(vm), cl = () => Sm, wm = /* @__PURE__ */ Object.assign(/* @__PURE__ */ Object.create(Cs), {
   _tag: "AndThen"
-});
-const makeAndThen$1 = (first, second) => {
-  const o = Object.create(AndThenProto$1);
-  o.first = first;
-  o.second = second;
-  return o;
-};
-const AddProto = /* @__PURE__ */ Object.assign(/* @__PURE__ */ Object.create(PatchProto$1), {
+}), km = (t, e) => {
+  const n = Object.create(wm);
+  return n.first = t, n.second = e, n;
+}, Em = /* @__PURE__ */ Object.assign(/* @__PURE__ */ Object.create(Cs), {
   _tag: "Add"
-});
-const makeAdd = (value) => {
-  const o = Object.create(AddProto);
-  o.value = value;
-  return o;
-};
-const RemoveProto = /* @__PURE__ */ Object.assign(/* @__PURE__ */ Object.create(PatchProto$1), {
+}), Om = (t) => {
+  const e = Object.create(Em);
+  return e.value = t, e;
+}, Rm = /* @__PURE__ */ Object.assign(/* @__PURE__ */ Object.create(Cs), {
   _tag: "Remove"
-});
-const makeRemove = (value) => {
-  const o = Object.create(RemoveProto);
-  o.value = value;
-  return o;
-};
-const diff$5 = (oldValue, newValue) => {
-  const [removed, patch2] = reduce$3([oldValue, empty$9()], ([set2, patch3], value) => {
-    if (has$1(value)(set2)) {
-      return [remove(value)(set2), patch3];
-    }
-    return [set2, combine$3(makeAdd(value))(patch3)];
-  })(newValue);
-  return reduce$3(patch2, (patch3, value) => combine$3(makeRemove(value))(patch3))(removed);
-};
-const combine$3 = /* @__PURE__ */ dual(2, (self, that) => makeAndThen$1(self, that));
-const patch$6 = /* @__PURE__ */ dual(2, (self, oldValue) => {
-  if (self._tag === "Empty") {
-    return oldValue;
-  }
-  let set2 = oldValue;
-  let patches = of$1(self);
-  while (isNonEmpty(patches)) {
-    const head2 = headNonEmpty(patches);
-    const tail = tailNonEmpty(patches);
-    switch (head2._tag) {
+}), Im = (t) => {
+  const e = Object.create(Rm);
+  return e.value = t, e;
+}, Cm = (t, e) => {
+  const [n, r] = ns([t, cl()], ([s, o], c) => xg(c)(s) ? [Gu(c)(s), o] : [s, ko(Om(c))(o)])(e);
+  return ns(r, (s, o) => ko(Im(o))(s))(n);
+}, ko = /* @__PURE__ */ g(2, (t, e) => km(t, e)), Tm = /* @__PURE__ */ g(2, (t, e) => {
+  if (t._tag === "Empty")
+    return e;
+  let n = e, r = Je(t);
+  for (; xt(r); ) {
+    const s = jt(r), o = yt(r);
+    switch (s._tag) {
       case "Empty": {
-        patches = tail;
+        r = o;
         break;
       }
       case "AndThen": {
-        patches = prepend$1(head2.first)(prepend$1(head2.second)(tail));
+        r = Ye(s.first)(Ye(s.second)(o));
         break;
       }
       case "Add": {
-        set2 = add(head2.value)(set2);
-        patches = tail;
+        n = Kn(s.value)(n), r = o;
         break;
       }
-      case "Remove": {
-        set2 = remove(head2.value)(set2);
-        patches = tail;
-      }
+      case "Remove":
+        n = Gu(s.value)(n), r = o;
     }
   }
-  return set2;
-});
-const ReadonlyArrayPatchTypeId = /* @__PURE__ */ Symbol.for("effect/DifferReadonlyArrayPatch");
-function variance$1(a) {
-  return a;
+  return n;
+}), $m = /* @__PURE__ */ Symbol.for("effect/DifferReadonlyArrayPatch");
+function oa(t) {
+  return t;
 }
-const PatchProto = {
-  ...Structural.prototype,
-  [ReadonlyArrayPatchTypeId]: {
-    _Value: variance$1,
-    _Patch: variance$1
+const cr = {
+  ...Ii.prototype,
+  [$m]: {
+    _Value: oa,
+    _Patch: oa
   }
-};
-const EmptyProto = /* @__PURE__ */ Object.assign(/* @__PURE__ */ Object.create(PatchProto), {
+}, Fm = /* @__PURE__ */ Object.assign(/* @__PURE__ */ Object.create(cr), {
   _tag: "Empty"
-});
-const _empty = /* @__PURE__ */ Object.create(EmptyProto);
-const empty$8 = () => _empty;
-const AndThenProto = /* @__PURE__ */ Object.assign(/* @__PURE__ */ Object.create(PatchProto), {
+}), Am = /* @__PURE__ */ Object.create(Fm), al = () => Am, Mm = /* @__PURE__ */ Object.assign(/* @__PURE__ */ Object.create(cr), {
   _tag: "AndThen"
-});
-const makeAndThen = (first, second) => {
-  const o = Object.create(AndThenProto);
-  o.first = first;
-  o.second = second;
-  return o;
-};
-const AppendProto = /* @__PURE__ */ Object.assign(/* @__PURE__ */ Object.create(PatchProto), {
+}), Pm = (t, e) => {
+  const n = Object.create(Mm);
+  return n.first = t, n.second = e, n;
+}, Nm = /* @__PURE__ */ Object.assign(/* @__PURE__ */ Object.create(cr), {
   _tag: "Append"
-});
-const makeAppend = (values) => {
-  const o = Object.create(AppendProto);
-  o.values = values;
-  return o;
-};
-const SliceProto = /* @__PURE__ */ Object.assign(/* @__PURE__ */ Object.create(PatchProto), {
+}), xm = (t) => {
+  const e = Object.create(Nm);
+  return e.values = t, e;
+}, jm = /* @__PURE__ */ Object.assign(/* @__PURE__ */ Object.create(cr), {
   _tag: "Slice"
-});
-const makeSlice = (from, until) => {
-  const o = Object.create(SliceProto);
-  o.from = from;
-  o.until = until;
-  return o;
-};
-const UpdateProto = /* @__PURE__ */ Object.assign(/* @__PURE__ */ Object.create(PatchProto), {
+}), Lm = (t, e) => {
+  const n = Object.create(jm);
+  return n.from = t, n.until = e, n;
+}, Dm = /* @__PURE__ */ Object.assign(/* @__PURE__ */ Object.create(cr), {
   _tag: "Update"
-});
-const makeUpdate = (index, patch2) => {
-  const o = Object.create(UpdateProto);
-  o.index = index;
-  o.patch = patch2;
-  return o;
-};
-const diff$4 = (options) => {
-  let i = 0;
-  let patch2 = empty$8();
-  while (i < options.oldValue.length && i < options.newValue.length) {
-    const oldElement = options.oldValue[i];
-    const newElement = options.newValue[i];
-    const valuePatch = options.differ.diff(oldElement, newElement);
-    if (!equals$1(valuePatch, options.differ.empty)) {
-      patch2 = combine$2(patch2, makeUpdate(i, valuePatch));
-    }
-    i = i + 1;
+}), Um = (t, e) => {
+  const n = Object.create(Dm);
+  return n.index = t, n.patch = e, n;
+}, qm = (t) => {
+  let e = 0, n = al();
+  for (; e < t.oldValue.length && e < t.newValue.length; ) {
+    const r = t.oldValue[e], s = t.newValue[e], o = t.differ.diff(r, s);
+    N(o, t.differ.empty) || (n = Ur(n, Um(e, o))), e = e + 1;
   }
-  if (i < options.oldValue.length) {
-    patch2 = combine$2(patch2, makeSlice(0, i));
-  }
-  if (i < options.newValue.length) {
-    patch2 = combine$2(patch2, makeAppend(drop$1(i)(options.newValue)));
-  }
-  return patch2;
-};
-const combine$2 = /* @__PURE__ */ dual(2, (self, that) => makeAndThen(self, that));
-const patch$5 = /* @__PURE__ */ dual(3, (self, oldValue, differ2) => {
-  if (self._tag === "Empty") {
-    return oldValue;
-  }
-  let readonlyArray2 = oldValue.slice();
-  let patches = of$2(self);
-  while (isNonEmptyArray(patches)) {
-    const head2 = headNonEmpty$1(patches);
-    const tail = tailNonEmpty$1(patches);
-    switch (head2._tag) {
+  return e < t.oldValue.length && (n = Ur(n, Lm(0, e))), e < t.newValue.length && (n = Ur(n, xm(kp(e)(t.newValue)))), n;
+}, Ur = /* @__PURE__ */ g(2, (t, e) => Pm(t, e)), Bm = /* @__PURE__ */ g(3, (t, e, n) => {
+  if (t._tag === "Empty")
+    return e;
+  let r = e.slice(), s = Xe(t);
+  for (; _p(s); ) {
+    const o = Ke(s), c = un(s);
+    switch (o._tag) {
       case "Empty": {
-        patches = tail;
+        s = c;
         break;
       }
       case "AndThen": {
-        tail.unshift(head2.first, head2.second);
-        patches = tail;
+        c.unshift(o.first, o.second), s = c;
         break;
       }
       case "Append": {
-        for (const value of head2.values) {
-          readonlyArray2.push(value);
-        }
-        patches = tail;
+        for (const a of o.values)
+          r.push(a);
+        s = c;
         break;
       }
       case "Slice": {
-        readonlyArray2 = readonlyArray2.slice(head2.from, head2.until);
-        patches = tail;
+        r = r.slice(o.from, o.until), s = c;
         break;
       }
       case "Update": {
-        readonlyArray2[head2.index] = differ2.patch(head2.patch, readonlyArray2[head2.index]);
-        patches = tail;
+        r[o.index] = n.patch(o.patch, r[o.index]), s = c;
         break;
       }
     }
   }
-  return readonlyArray2;
-});
-const DifferTypeId = /* @__PURE__ */ Symbol.for("effect/Differ");
-const DifferProto = {
-  [DifferTypeId]: {
-    _P: identity,
-    _V: identity
+  return r;
+}), Vm = /* @__PURE__ */ Symbol.for("effect/Differ"), Km = {
+  [Vm]: {
+    _P: Ve,
+    _V: Ve
   }
-};
-const make$f = (params) => {
-  const differ2 = Object.create(DifferProto);
-  differ2.empty = params.empty;
-  differ2.diff = params.diff;
-  differ2.combine = params.combine;
-  differ2.patch = params.patch;
-  return differ2;
-};
-const environment = () => make$f({
-  empty: empty$a(),
-  combine: (first, second) => combine$4(second)(first),
-  diff: (oldValue, newValue) => diff$6(oldValue, newValue),
-  patch: (patch2, oldValue) => patch$7(oldValue)(patch2)
-});
-const hashSet = () => make$f({
-  empty: empty$9(),
-  combine: (first, second) => combine$3(second)(first),
-  diff: (oldValue, newValue) => diff$5(oldValue, newValue),
-  patch: (patch2, oldValue) => patch$6(oldValue)(patch2)
-});
-const readonlyArray = (differ2) => make$f({
-  empty: empty$8(),
-  combine: (first, second) => combine$2(first, second),
-  diff: (oldValue, newValue) => diff$4({
-    oldValue,
-    newValue,
-    differ: differ2
+}, kn = (t) => {
+  const e = Object.create(Km);
+  return e.empty = t.empty, e.diff = t.diff, e.combine = t.combine, e.patch = t.patch, e;
+}, Hm = () => kn({
+  empty: il(),
+  combine: (t, e) => Dr(e)(t),
+  diff: (t, e) => _m(t, e),
+  patch: (t, e) => ym(e)(t)
+}), Jm = () => kn({
+  empty: cl(),
+  combine: (t, e) => ko(e)(t),
+  diff: (t, e) => Cm(t, e),
+  patch: (t, e) => Tm(e)(t)
+}), Wm = (t) => kn({
+  empty: al(),
+  combine: (e, n) => Ur(e, n),
+  diff: (e, n) => qm({
+    oldValue: e,
+    newValue: n,
+    differ: t
   }),
-  patch: (patch2, oldValue) => patch$5(patch2, oldValue, differ2)
-});
-const update$1 = () => updateWith((_, a) => a);
-const updateWith = (f) => make$f({
-  empty: identity,
-  combine: (first, second) => {
-    if (first === identity) {
-      return second;
-    }
-    if (second === identity) {
-      return first;
-    }
-    return (a) => second(first(a));
-  },
-  diff: (oldValue, newValue) => {
-    if (equals$1(oldValue, newValue)) {
-      return identity;
-    }
-    return constant(newValue);
-  },
-  patch: (patch2, oldValue) => f(oldValue, patch2(oldValue))
-});
-const BIT_MASK = 255;
-const BIT_SHIFT = 8;
-const active = (patch2) => patch2 & BIT_MASK;
-const enabled = (patch2) => patch2 >> BIT_SHIFT & BIT_MASK;
-const make$e = (active2, enabled2) => (active2 & BIT_MASK) + ((enabled2 & active2 & BIT_MASK) << BIT_SHIFT);
-const empty$7 = /* @__PURE__ */ make$e(0, 0);
-const enable$2 = (flag) => make$e(flag, flag);
-const disable$1 = (flag) => make$e(flag, 0);
-const exclude$1 = /* @__PURE__ */ dual(2, (self, flag) => make$e(active(self) & ~flag, enabled(self)));
-const andThen = /* @__PURE__ */ dual(2, (self, that) => self | that);
-const invert = (n) => ~n >>> 0 & BIT_MASK;
-const None$1 = 0;
-const Interruption = 1 << 0;
-const OpSupervision = 1 << 1;
-const RuntimeMetrics = 1 << 2;
-const WindDown = 1 << 4;
-const CooperativeYielding = 1 << 5;
-const cooperativeYielding = (self) => isEnabled(self, CooperativeYielding);
-const enable$1 = /* @__PURE__ */ dual(2, (self, flag) => self | flag);
-const interruptible$1 = (self) => interruption(self) && !windDown(self);
-const interruption = (self) => isEnabled(self, Interruption);
-const isEnabled = /* @__PURE__ */ dual(2, (self, flag) => (self & flag) !== 0);
-const make$d = (...flags) => flags.reduce((a, b) => a | b, 0);
-const none$3 = /* @__PURE__ */ make$d(None$1);
-const runtimeMetrics = (self) => isEnabled(self, RuntimeMetrics);
-const windDown = (self) => isEnabled(self, WindDown);
-const diff$3 = /* @__PURE__ */ dual(2, (self, that) => make$e(self ^ that, that));
-const patch$4 = /* @__PURE__ */ dual(2, (self, patch2) => self & (invert(active(patch2)) | enabled(patch2)) | active(patch2) & enabled(patch2));
-const differ$1 = /* @__PURE__ */ make$f({
-  empty: empty$7,
-  diff: (oldValue, newValue) => diff$3(oldValue, newValue),
-  combine: (first, second) => andThen(second)(first),
-  patch: (_patch, oldValue) => patch$4(oldValue, _patch)
-});
-const enable = enable$2;
-const disable = disable$1;
-const exclude = exclude$1;
-const par = (self, that) => ({
+  patch: (e, n) => Bm(e, n, t)
+}), ul = () => Gm((t, e) => e), Gm = (t) => kn({
+  empty: Ve,
+  combine: (e, n) => e === Ve ? n : n === Ve ? e : (r) => n(e(r)),
+  diff: (e, n) => N(e, n) ? Ve : ds(n),
+  patch: (e, n) => t(n, e(n))
+}), er = 255, ll = 8, Eo = (t) => t & er, Oo = (t) => t >> ll & er, ar = (t, e) => (t & er) + ((e & t & er) << ll), zm = /* @__PURE__ */ ar(0, 0), Ym = (t) => ar(t, t), Qm = (t) => ar(t, 0), Xm = /* @__PURE__ */ g(2, (t, e) => ar(Eo(t) & ~e, Oo(t))), Zm = /* @__PURE__ */ g(2, (t, e) => t | e), e_ = (t) => ~t >>> 0 & er, t_ = 0, En = 1, n_ = 2, fl = 4, Ro = 16, hl = 32, r_ = (t) => Ts(t, hl), s_ = /* @__PURE__ */ g(2, (t, e) => t | e), _t = (t) => dl(t) && !i_(t), dl = (t) => Ts(t, En), Ts = /* @__PURE__ */ g(2, (t, e) => (t & e) !== 0), pl = (...t) => t.reduce((e, n) => e | n, 0), o_ = /* @__PURE__ */ pl(t_), ia = (t) => Ts(t, fl), i_ = (t) => Ts(t, Ro), qr = /* @__PURE__ */ g(2, (t, e) => ar(t ^ e, e)), Br = /* @__PURE__ */ g(2, (t, e) => t & (e_(Eo(e)) | Oo(e)) | Eo(e) & Oo(e)), ca = /* @__PURE__ */ kn({
+  empty: zm,
+  diff: (t, e) => qr(t, e),
+  combine: (t, e) => Zm(e)(t),
+  patch: (t, e) => Br(e, t)
+}), c_ = Ym, gl = Qm, aa = Xm, ml = (t, e) => ({
   _tag: "Par",
-  left: self,
-  right: that
-});
-const seq = (self, that) => ({
+  left: t,
+  right: e
+}), Fr = (t, e) => ({
   _tag: "Seq",
-  left: self,
-  right: that
-});
-const flatten$2 = (self) => {
-  let current = of(self);
-  let updated = empty$b();
-  while (1) {
-    const [parallel2, sequential2] = reduce$1(current, [parallelCollectionEmpty(), empty$b()], ([parallel3, sequential3], blockedRequest) => {
-      const [par2, seq2] = step$1(blockedRequest);
-      return [parallelCollectionCombine(parallel3, par2), appendAll(sequential3, seq2)];
+  left: t,
+  right: e
+}), a_ = (t) => {
+  let e = Ri(t), n = pn();
+  for (; ; ) {
+    const [r, s] = sm(e, [_l(), pn()], ([o, c], a) => {
+      const [u, h] = u_(a);
+      return [p_(o, u), tm(c, h)];
     });
-    updated = merge(updated, parallel2);
-    if (isNil(sequential2)) {
-      return reverse(updated);
-    }
-    current = sequential2;
+    if (n = l_(n, r), ht(s))
+      return om(n);
+    e = s;
   }
   throw new Error("BUG: BlockedRequests.flatten - please report an issue at https://github.com/Effect-TS/effect/issues");
-};
-const step$1 = (requests) => {
-  let current = requests;
-  let parallel2 = parallelCollectionEmpty();
-  let stack = empty$b();
-  let sequential2 = empty$b();
-  while (1) {
-    switch (current._tag) {
+}, u_ = (t) => {
+  let e = t, n = _l(), r = pn(), s = pn();
+  for (; ; )
+    switch (e._tag) {
       case "Empty": {
-        if (isNil(stack)) {
-          return [parallel2, sequential2];
-        }
-        current = stack.head;
-        stack = stack.tail;
+        if (ht(r))
+          return [n, s];
+        e = r.head, r = r.tail;
         break;
       }
       case "Par": {
-        stack = cons(current.right, stack);
-        current = current.left;
+        r = qt(e.right, r), e = e.left;
         break;
       }
       case "Seq": {
-        const left2 = current.left;
-        const right2 = current.right;
-        switch (left2._tag) {
+        const o = e.left, c = e.right;
+        switch (o._tag) {
           case "Empty": {
-            current = right2;
+            e = c;
             break;
           }
           case "Par": {
-            const l = left2.left;
-            const r = left2.right;
-            current = par(seq(l, right2), seq(r, right2));
+            const a = o.left, u = o.right;
+            e = ml(Fr(a, c), Fr(u, c));
             break;
           }
           case "Seq": {
-            const l = left2.left;
-            const r = left2.right;
-            current = seq(l, seq(r, right2));
+            const a = o.left, u = o.right;
+            e = Fr(a, Fr(u, c));
             break;
           }
           case "Single": {
-            current = left2;
-            sequential2 = cons(right2, sequential2);
+            e = o, s = qt(c, s);
             break;
           }
         }
         break;
       }
       case "Single": {
-        parallel2 = parallelCollectionAdd(parallel2, current);
-        if (isNil(stack)) {
-          return [parallel2, sequential2];
-        }
-        current = stack.head;
-        stack = stack.tail;
+        if (n = d_(n, e), ht(r))
+          return [n, s];
+        e = r.head, r = r.tail;
         break;
       }
     }
-  }
   throw new Error("BUG: BlockedRequests.step - please report an issue at https://github.com/Effect-TS/effect/issues");
-};
-const merge = (sequential2, parallel2) => {
-  if (isNil(sequential2)) {
-    return of(parallelCollectionToSequentialCollection(parallel2));
-  }
-  if (parallelCollectionIsEmpty(parallel2)) {
-    return sequential2;
-  }
-  const seqHeadKeys = sequentialCollectionKeys(sequential2.head);
-  const parKeys = parallelCollectionKeys(parallel2);
-  if (seqHeadKeys.length === 1 && parKeys.length === 1 && equals$1(seqHeadKeys[0], parKeys[0])) {
-    return cons(sequentialCollectionCombine(sequential2.head, parallelCollectionToSequentialCollection(parallel2)), sequential2.tail);
-  }
-  return cons(parallelCollectionToSequentialCollection(parallel2), sequential2);
-};
-const RequestBlockParallelTypeId = /* @__PURE__ */ Symbol.for("effect/RequestBlock/RequestBlockParallel");
-const parallelVariance = {
+}, l_ = (t, e) => {
+  if (ht(t))
+    return Ri(Zs(e));
+  if (g_(e))
+    return t;
+  const n = S_(t.head), r = m_(e);
+  return n.length === 1 && r.length === 1 && N(n[0], r[0]) ? qt(v_(t.head, Zs(e)), t.tail) : qt(Zs(e), t);
+}, f_ = /* @__PURE__ */ Symbol.for("effect/RequestBlock/RequestBlockParallel"), h_ = {
   /* c8 ignore next */
-  _R: (_) => _
+  _R: (t) => t
 };
-class ParallelImpl {
-  constructor(map2) {
-    __publicField(this, "map");
-    __publicField(this, _c, parallelVariance);
-    this.map = map2;
+var qw;
+class Ci {
+  constructor(e) {
+    f(this, "map");
+    f(this, qw, h_);
+    this.map = e;
   }
 }
-_c = RequestBlockParallelTypeId;
-const parallelCollectionEmpty = () => new ParallelImpl(empty$c());
-const parallelCollectionAdd = (self, blockedRequest) => new ParallelImpl(modifyAt(self.map, blockedRequest.dataSource, (_) => orElseSome(map$4(_, append(blockedRequest.blockedRequest)), () => of$1(blockedRequest.blockedRequest))));
-const parallelCollectionCombine = (self, that) => new ParallelImpl(reduce$2(self.map, that.map, (map2, value, key) => set$1(map2, key, match$2(get$2(map2, key), {
-  onNone: () => value,
-  onSome: (other) => appendAll$1(value, other)
-}))));
-const parallelCollectionIsEmpty = (self) => isEmpty$1(self.map);
-const parallelCollectionKeys = (self) => Array.from(keys(self.map));
-const parallelCollectionToSequentialCollection = (self) => sequentialCollectionMake(map$1(self.map, (x) => of$1(x)));
-const SequentialCollectionTypeId = /* @__PURE__ */ Symbol.for("effect/RequestBlock/RequestBlockSequential");
-const sequentialVariance = {
+qw = f_;
+const _l = () => new Ci(Oi()), d_ = (t, e) => new Ci(Gg(t.map, e.dataSource, (n) => ip(ku(n, eg(e.blockedRequest)), () => Je(e.blockedRequest)))), p_ = (t, e) => new Ci(nl(t.map, e.map, (n, r, s) => Zu(n, s, ui(Xu(n, s), {
+  onNone: () => r,
+  onSome: (o) => Ze(r, o)
+})))), g_ = (t) => Jg(t.map), m_ = (t) => Array.from(el(t.map)), Zs = (t) => b_(tl(t.map, (e) => Je(e))), __ = /* @__PURE__ */ Symbol.for("effect/RequestBlock/RequestBlockSequential"), y_ = {
   /* c8 ignore next */
-  _R: (_) => _
+  _R: (t) => t
 };
-class SequentialImpl {
-  constructor(map2) {
-    __publicField(this, "map");
-    __publicField(this, _d, sequentialVariance);
-    this.map = map2;
+var Bw;
+class yl {
+  constructor(e) {
+    f(this, "map");
+    f(this, Bw, y_);
+    this.map = e;
   }
 }
-_d = SequentialCollectionTypeId;
-const sequentialCollectionMake = (map2) => new SequentialImpl(map2);
-const sequentialCollectionCombine = (self, that) => new SequentialImpl(reduce$2(that.map, self.map, (map2, value, key) => set$1(map2, key, match$2(get$2(map2, key), {
-  onNone: () => empty$g(),
-  onSome: (a) => appendAll$1(a, value)
-}))));
-const sequentialCollectionKeys = (self) => Array.from(keys(self.map));
-const sequentialCollectionToChunk = (self) => Array.from(self.map);
-const OP_DIE = "Die";
-const OP_EMPTY$2 = "Empty";
-const OP_FAIL$1 = "Fail";
-const OP_INTERRUPT = "Interrupt";
-const OP_PARALLEL = "Parallel";
-const OP_SEQUENTIAL$1 = "Sequential";
-const CauseSymbolKey = "effect/Cause";
-const CauseTypeId = /* @__PURE__ */ Symbol.for(CauseSymbolKey);
-const variance = {
+Bw = __;
+const b_ = (t) => new yl(t), v_ = (t, e) => new yl(nl(e.map, t.map, (n, r, s) => Zu(n, s, ui(Xu(n, s), {
+  onNone: () => vt(),
+  onSome: (o) => Ze(o, r)
+})))), S_ = (t) => Array.from(el(t.map)), w_ = (t) => Array.from(t.map), ur = "Die", gn = "Empty", On = "Fail", Rn = "Interrupt", mn = "Parallel", _n = "Sequential", bl = "effect/Cause", vl = /* @__PURE__ */ Symbol.for(bl), k_ = {
   /* c8 ignore next */
-  _E: (_) => _
-};
-const proto$1 = {
-  [CauseTypeId]: variance,
-  [symbol$1]() {
-    return pipe(hash(CauseSymbolKey), combine$5(hash(flattenCause(this))), cached(this));
+  _E: (t) => t
+}, In = {
+  [vl]: k_,
+  [j]() {
+    return m(I(bl), K(I(N_(this))), ue(this));
   },
-  [symbol](that) {
-    return isCause(that) && causeEquals(this, that);
+  [P](t) {
+    return E_(t) && P_(this, t);
   },
   pipe() {
-    return pipeArguments(this, arguments);
+    return A(this, arguments);
   },
   toJSON() {
     switch (this._tag) {
@@ -2958,7 +2104,7 @@ const proto$1 = {
         return {
           _id: "Cause",
           _tag: this._tag,
-          defect: toJSON(this.defect)
+          defect: ye(this.defect)
         };
       case "Interrupt":
         return {
@@ -2970,678 +2116,512 @@ const proto$1 = {
         return {
           _id: "Cause",
           _tag: this._tag,
-          failure: toJSON(this.error)
+          failure: ye(this.error)
         };
       case "Sequential":
       case "Parallel":
         return {
           _id: "Cause",
           _tag: this._tag,
-          left: toJSON(this.left),
-          right: toJSON(this.right)
+          left: ye(this.left),
+          right: ye(this.right)
         };
     }
   },
   toString() {
-    return pretty(this);
+    return Fi(this);
   },
-  [NodeInspectSymbol]() {
+  [he]() {
     return this.toJSON();
   }
-};
-const empty$6 = /* @__PURE__ */ (() => {
-  const o = /* @__PURE__ */ Object.create(proto$1);
-  o._tag = OP_EMPTY$2;
-  return o;
-})();
-const fail$1 = (error) => {
-  const o = Object.create(proto$1);
-  o._tag = OP_FAIL$1;
-  o.error = error;
-  return o;
-};
-const die$1 = (defect) => {
-  const o = Object.create(proto$1);
-  o._tag = OP_DIE;
-  o.defect = defect;
-  return o;
-};
-const interrupt = (fiberId2) => {
-  const o = Object.create(proto$1);
-  o._tag = OP_INTERRUPT;
-  o.fiberId = fiberId2;
-  return o;
-};
-const parallel = (left2, right2) => {
-  const o = Object.create(proto$1);
-  o._tag = OP_PARALLEL;
-  o.left = left2;
-  o.right = right2;
-  return o;
-};
-const sequential$1 = (left2, right2) => {
-  const o = Object.create(proto$1);
-  o._tag = OP_SEQUENTIAL$1;
-  o.left = left2;
-  o.right = right2;
-  return o;
-};
-const isCause = (u) => hasProperty(u, CauseTypeId);
-const isEmpty = (self) => {
-  if (self._tag === OP_EMPTY$2) {
-    return true;
+}, tr = /* @__PURE__ */ (() => {
+  const t = /* @__PURE__ */ Object.create(In);
+  return t._tag = gn, t;
+})(), Io = (t) => {
+  const e = Object.create(In);
+  return e._tag = On, e.error = t, e;
+}, ut = (t) => {
+  const e = Object.create(In);
+  return e._tag = ur, e.defect = t, e;
+}, Ct = (t) => {
+  const e = Object.create(In);
+  return e._tag = Rn, e.fiberId = t, e;
+}, lr = (t, e) => {
+  const n = Object.create(In);
+  return n._tag = mn, n.left = t, n.right = e, n;
+}, tt = (t, e) => {
+  const n = Object.create(In);
+  return n._tag = _n, n.left = t, n.right = e, n;
+}, E_ = (t) => D(t, vl), O_ = (t) => t._tag === gn ? !0 : yn(t, !0, (e, n) => {
+  switch (n._tag) {
+    case gn:
+      return H(e);
+    case ur:
+    case On:
+    case Rn:
+      return H(!1);
+    default:
+      return M();
   }
-  return reduce(self, true, (acc, cause) => {
-    switch (cause._tag) {
-      case OP_EMPTY$2: {
-        return some$2(acc);
-      }
-      case OP_DIE:
-      case OP_FAIL$1:
-      case OP_INTERRUPT: {
-        return some$2(false);
-      }
-      default: {
-        return none$6();
-      }
-    }
-  });
-};
-const isInterrupted = (self) => isSome(interruptOption(self));
-const isInterruptedOnly = (self) => reduceWithContext(void 0, IsInterruptedOnlyCauseReducer)(self);
-const failures = (self) => reverse$1(reduce(self, empty$g(), (list, cause) => cause._tag === OP_FAIL$1 ? some$2(pipe(list, prepend$1(cause.error))) : none$6()));
-const defects = (self) => reverse$1(reduce(self, empty$g(), (list, cause) => cause._tag === OP_DIE ? some$2(pipe(list, prepend$1(cause.defect))) : none$6()));
-const interruptors = (self) => reduce(self, empty$d(), (set2, cause) => cause._tag === OP_INTERRUPT ? some$2(pipe(set2, add(cause.fiberId))) : none$6());
-const failureOption = (self) => find(self, (cause) => cause._tag === OP_FAIL$1 ? some$2(cause.error) : none$6());
-const failureOrCause = (self) => {
-  const option = failureOption(self);
-  switch (option._tag) {
-    case "None": {
-      return right$2(self);
-    }
-    case "Some": {
-      return left$2(option.value);
-    }
+}), R_ = (t) => nt(A_(t)), Ti = (t) => $i(void 0, j_)(t), I_ = (t) => fn(yn(t, vt(), (e, n) => n._tag === On ? H(m(e, Ye(n.error))) : M())), C_ = (t) => fn(yn(t, vt(), (e, n) => n._tag === ur ? H(m(e, Ye(n.defect))) : M())), T_ = (t) => yn(t, Dt(), (e, n) => n._tag === Rn ? H(m(e, Kn(n.fiberId))) : M()), $_ = (t) => Sl(t, (e) => e._tag === On ? H(e.error) : M()), F_ = (t) => {
+  const e = $_(t);
+  switch (e._tag) {
+    case "None":
+      return at(t);
+    case "Some":
+      return Pt(e.value);
   }
-};
-const interruptOption = (self) => find(self, (cause) => cause._tag === OP_INTERRUPT ? some$2(cause.fiberId) : none$6());
-const stripFailures = (self) => match$1(self, {
-  onEmpty: empty$6,
-  onFail: () => empty$6,
-  onDie: (defect) => die$1(defect),
-  onInterrupt: (fiberId2) => interrupt(fiberId2),
-  onSequential: sequential$1,
-  onParallel: parallel
-});
-const electFailures = (self) => match$1(self, {
-  onEmpty: empty$6,
-  onFail: (failure) => die$1(failure),
-  onDie: (defect) => die$1(defect),
-  onInterrupt: (fiberId2) => interrupt(fiberId2),
-  onSequential: (left2, right2) => sequential$1(left2, right2),
-  onParallel: (left2, right2) => parallel(left2, right2)
-});
-const causeEquals = (left2, right2) => {
-  let leftStack = of$1(left2);
-  let rightStack = of$1(right2);
-  while (isNonEmpty(leftStack) && isNonEmpty(rightStack)) {
-    const [leftParallel, leftSequential] = pipe(headNonEmpty(leftStack), reduce([empty$d(), empty$g()], ([parallel2, sequential2], cause) => {
-      const [par2, seq2] = evaluateCause(cause);
-      return some$2([pipe(parallel2, union(par2)), pipe(sequential2, appendAll$1(seq2))]);
+}, A_ = (t) => Sl(t, (e) => e._tag === Rn ? H(e.fiberId) : M()), ua = (t) => wl(t, {
+  onEmpty: tr,
+  onFail: () => tr,
+  onDie: (e) => ut(e),
+  onInterrupt: (e) => Ct(e),
+  onSequential: tt,
+  onParallel: lr
+}), M_ = (t) => wl(t, {
+  onEmpty: tr,
+  onFail: (e) => ut(e),
+  onDie: (e) => ut(e),
+  onInterrupt: (e) => Ct(e),
+  onSequential: (e, n) => tt(e, n),
+  onParallel: (e, n) => lr(e, n)
+}), P_ = (t, e) => {
+  let n = Je(t), r = Je(e);
+  for (; xt(n) && xt(r); ) {
+    const [s, o] = m(jt(n), yn([Dt(), vt()], ([u, h], b) => {
+      const [y, k] = Co(b);
+      return H([m(u, Qn(y)), m(h, Ze(k))]);
+    })), [c, a] = m(jt(r), yn([Dt(), vt()], ([u, h], b) => {
+      const [y, k] = Co(b);
+      return H([m(u, Qn(y)), m(h, Ze(k))]);
     }));
-    const [rightParallel, rightSequential] = pipe(headNonEmpty(rightStack), reduce([empty$d(), empty$g()], ([parallel2, sequential2], cause) => {
-      const [par2, seq2] = evaluateCause(cause);
-      return some$2([pipe(parallel2, union(par2)), pipe(sequential2, appendAll$1(seq2))]);
-    }));
-    if (!equals$1(leftParallel, rightParallel)) {
-      return false;
-    }
-    leftStack = leftSequential;
-    rightStack = rightSequential;
+    if (!N(s, c))
+      return !1;
+    n = o, r = a;
   }
-  return true;
-};
-const flattenCause = (cause) => {
-  return flattenCauseLoop(of$1(cause), empty$g());
-};
-const flattenCauseLoop = (causes, flattened) => {
-  while (1) {
-    const [parallel2, sequential2] = pipe(causes, reduce$6([empty$d(), empty$g()], ([parallel3, sequential3], cause) => {
-      const [par2, seq2] = evaluateCause(cause);
-      return [pipe(parallel3, union(par2)), pipe(sequential3, appendAll$1(seq2))];
-    }));
-    const updated = size$1(parallel2) > 0 ? pipe(flattened, prepend$1(parallel2)) : flattened;
-    if (isEmpty$3(sequential2)) {
-      return reverse$1(updated);
-    }
-    causes = sequential2;
-    flattened = updated;
+  return !0;
+}, N_ = (t) => x_(Je(t), vt()), x_ = (t, e) => {
+  for (; ; ) {
+    const [n, r] = m(t, Wn([Dt(), vt()], ([o, c], a) => {
+      const [u, h] = Co(a);
+      return [m(o, Qn(u)), m(c, Ze(h))];
+    })), s = Wu(n) > 0 ? m(e, Ye(n)) : e;
+    if (tg(r))
+      return fn(s);
+    t = r, e = s;
   }
-  throw new Error(getBugErrorMessage("Cause.flattenCauseLoop"));
-};
-const find = /* @__PURE__ */ dual(2, (self, pf) => {
-  const stack = [self];
-  while (stack.length > 0) {
-    const item = stack.pop();
-    const option = pf(item);
-    switch (option._tag) {
+  throw new Error(ni("Cause.flattenCauseLoop"));
+}, Sl = /* @__PURE__ */ g(2, (t, e) => {
+  const n = [t];
+  for (; n.length > 0; ) {
+    const r = n.pop(), s = e(r);
+    switch (s._tag) {
       case "None": {
-        switch (item._tag) {
-          case OP_SEQUENTIAL$1:
-          case OP_PARALLEL: {
-            stack.push(item.right);
-            stack.push(item.left);
+        switch (r._tag) {
+          case _n:
+          case mn: {
+            n.push(r.right), n.push(r.left);
             break;
           }
         }
         break;
       }
-      case "Some": {
-        return option;
-      }
+      case "Some":
+        return s;
     }
   }
-  return none$6();
-});
-const evaluateCause = (self) => {
-  let cause = self;
-  const stack = [];
-  let _parallel = empty$d();
-  let _sequential = empty$g();
-  while (cause !== void 0) {
-    switch (cause._tag) {
-      case OP_EMPTY$2: {
-        if (stack.length === 0) {
-          return [_parallel, _sequential];
-        }
-        cause = stack.pop();
+  return M();
+}), Co = (t) => {
+  let e = t;
+  const n = [];
+  let r = Dt(), s = vt();
+  for (; e !== void 0; )
+    switch (e._tag) {
+      case gn: {
+        if (n.length === 0)
+          return [r, s];
+        e = n.pop();
         break;
       }
-      case OP_FAIL$1: {
-        _parallel = add(_parallel, make$k(cause._tag, cause.error));
-        if (stack.length === 0) {
-          return [_parallel, _sequential];
-        }
-        cause = stack.pop();
+      case On: {
+        if (r = Kn(r, Qs(e._tag, e.error)), n.length === 0)
+          return [r, s];
+        e = n.pop();
         break;
       }
-      case OP_DIE: {
-        _parallel = add(_parallel, make$k(cause._tag, cause.defect));
-        if (stack.length === 0) {
-          return [_parallel, _sequential];
-        }
-        cause = stack.pop();
+      case ur: {
+        if (r = Kn(r, Qs(e._tag, e.defect)), n.length === 0)
+          return [r, s];
+        e = n.pop();
         break;
       }
-      case OP_INTERRUPT: {
-        _parallel = add(_parallel, make$k(cause._tag, cause.fiberId));
-        if (stack.length === 0) {
-          return [_parallel, _sequential];
-        }
-        cause = stack.pop();
+      case Rn: {
+        if (r = Kn(r, Qs(e._tag, e.fiberId)), n.length === 0)
+          return [r, s];
+        e = n.pop();
         break;
       }
-      case OP_SEQUENTIAL$1: {
-        switch (cause.left._tag) {
-          case OP_EMPTY$2: {
-            cause = cause.right;
+      case _n: {
+        switch (e.left._tag) {
+          case gn: {
+            e = e.right;
             break;
           }
-          case OP_SEQUENTIAL$1: {
-            cause = sequential$1(cause.left.left, sequential$1(cause.left.right, cause.right));
+          case _n: {
+            e = tt(e.left.left, tt(e.left.right, e.right));
             break;
           }
-          case OP_PARALLEL: {
-            cause = parallel(sequential$1(cause.left.left, cause.right), sequential$1(cause.left.right, cause.right));
+          case mn: {
+            e = lr(tt(e.left.left, e.right), tt(e.left.right, e.right));
             break;
           }
           default: {
-            _sequential = prepend$1(_sequential, cause.right);
-            cause = cause.left;
+            s = Ye(s, e.right), e = e.left;
             break;
           }
         }
         break;
       }
-      case OP_PARALLEL: {
-        stack.push(cause.right);
-        cause = cause.left;
+      case mn: {
+        n.push(e.right), e = e.left;
         break;
       }
     }
-  }
-  throw new Error(getBugErrorMessage("Cause.evaluateCauseLoop"));
-};
-const IsInterruptedOnlyCauseReducer = {
-  emptyCase: constTrue,
-  failCase: constFalse,
-  dieCase: constFalse,
-  interruptCase: constTrue,
-  sequentialCase: (_, left2, right2) => left2 && right2,
-  parallelCase: (_, left2, right2) => left2 && right2
-};
-const OP_SEQUENTIAL_CASE = "SequentialCase";
-const OP_PARALLEL_CASE = "ParallelCase";
-const match$1 = /* @__PURE__ */ dual(2, (self, {
-  onDie,
-  onEmpty,
-  onFail,
-  onInterrupt: onInterrupt2,
-  onParallel,
-  onSequential
-}) => {
-  return reduceWithContext(self, void 0, {
-    emptyCase: () => onEmpty,
-    failCase: (_, error) => onFail(error),
-    dieCase: (_, defect) => onDie(defect),
-    interruptCase: (_, fiberId2) => onInterrupt2(fiberId2),
-    sequentialCase: (_, left2, right2) => onSequential(left2, right2),
-    parallelCase: (_, left2, right2) => onParallel(left2, right2)
-  });
-});
-const reduce = /* @__PURE__ */ dual(3, (self, zero2, pf) => {
-  let accumulator = zero2;
-  let cause = self;
-  const causes = [];
-  while (cause !== void 0) {
-    const option = pf(accumulator, cause);
-    accumulator = isSome(option) ? option.value : accumulator;
-    switch (cause._tag) {
-      case OP_SEQUENTIAL$1: {
-        causes.push(cause.right);
-        cause = cause.left;
+  throw new Error(ni("Cause.evaluateCauseLoop"));
+}, j_ = {
+  emptyCase: zc,
+  failCase: ho,
+  dieCase: ho,
+  interruptCase: zc,
+  sequentialCase: (t, e, n) => e && n,
+  parallelCase: (t, e, n) => e && n
+}, la = "SequentialCase", fa = "ParallelCase", wl = /* @__PURE__ */ g(2, (t, {
+  onDie: e,
+  onEmpty: n,
+  onFail: r,
+  onInterrupt: s,
+  onParallel: o,
+  onSequential: c
+}) => $i(t, void 0, {
+  emptyCase: () => n,
+  failCase: (a, u) => r(u),
+  dieCase: (a, u) => e(u),
+  interruptCase: (a, u) => s(u),
+  sequentialCase: (a, u, h) => c(u, h),
+  parallelCase: (a, u, h) => o(u, h)
+})), yn = /* @__PURE__ */ g(3, (t, e, n) => {
+  let r = e, s = t;
+  const o = [];
+  for (; s !== void 0; ) {
+    const c = n(r, s);
+    switch (r = nt(c) ? c.value : r, s._tag) {
+      case _n: {
+        o.push(s.right), s = s.left;
         break;
       }
-      case OP_PARALLEL: {
-        causes.push(cause.right);
-        cause = cause.left;
+      case mn: {
+        o.push(s.right), s = s.left;
         break;
       }
       default: {
-        cause = void 0;
+        s = void 0;
         break;
       }
     }
-    if (cause === void 0 && causes.length > 0) {
-      cause = causes.pop();
-    }
+    s === void 0 && o.length > 0 && (s = o.pop());
   }
-  return accumulator;
-});
-const reduceWithContext = /* @__PURE__ */ dual(3, (self, context, reducer) => {
-  const input = [self];
-  const output = [];
-  while (input.length > 0) {
-    const cause = input.pop();
-    switch (cause._tag) {
-      case OP_EMPTY$2: {
-        output.push(right$2(reducer.emptyCase(context)));
+  return r;
+}), $i = /* @__PURE__ */ g(3, (t, e, n) => {
+  const r = [t], s = [];
+  for (; r.length > 0; ) {
+    const c = r.pop();
+    switch (c._tag) {
+      case gn: {
+        s.push(at(n.emptyCase(e)));
         break;
       }
-      case OP_FAIL$1: {
-        output.push(right$2(reducer.failCase(context, cause.error)));
+      case On: {
+        s.push(at(n.failCase(e, c.error)));
         break;
       }
-      case OP_DIE: {
-        output.push(right$2(reducer.dieCase(context, cause.defect)));
+      case ur: {
+        s.push(at(n.dieCase(e, c.defect)));
         break;
       }
-      case OP_INTERRUPT: {
-        output.push(right$2(reducer.interruptCase(context, cause.fiberId)));
+      case Rn: {
+        s.push(at(n.interruptCase(e, c.fiberId)));
         break;
       }
-      case OP_SEQUENTIAL$1: {
-        input.push(cause.right);
-        input.push(cause.left);
-        output.push(left$2({
-          _tag: OP_SEQUENTIAL_CASE
+      case _n: {
+        r.push(c.right), r.push(c.left), s.push(Pt({
+          _tag: la
         }));
         break;
       }
-      case OP_PARALLEL: {
-        input.push(cause.right);
-        input.push(cause.left);
-        output.push(left$2({
-          _tag: OP_PARALLEL_CASE
+      case mn: {
+        r.push(c.right), r.push(c.left), s.push(Pt({
+          _tag: fa
         }));
         break;
       }
     }
   }
-  const accumulator = [];
-  while (output.length > 0) {
-    const either2 = output.pop();
-    switch (either2._tag) {
+  const o = [];
+  for (; s.length > 0; ) {
+    const c = s.pop();
+    switch (c._tag) {
       case "Left": {
-        switch (either2.left._tag) {
-          case OP_SEQUENTIAL_CASE: {
-            const left2 = accumulator.pop();
-            const right2 = accumulator.pop();
-            const value = reducer.sequentialCase(context, left2, right2);
-            accumulator.push(value);
+        switch (c.left._tag) {
+          case la: {
+            const a = o.pop(), u = o.pop(), h = n.sequentialCase(e, a, u);
+            o.push(h);
             break;
           }
-          case OP_PARALLEL_CASE: {
-            const left2 = accumulator.pop();
-            const right2 = accumulator.pop();
-            const value = reducer.parallelCase(context, left2, right2);
-            accumulator.push(value);
+          case fa: {
+            const a = o.pop(), u = o.pop(), h = n.parallelCase(e, a, u);
+            o.push(h);
             break;
           }
         }
         break;
       }
       case "Right": {
-        accumulator.push(either2.right);
+        o.push(c.right);
         break;
       }
     }
   }
-  if (accumulator.length === 0) {
+  if (o.length === 0)
     throw new Error("BUG: Cause.reduceWithContext - please report an issue at https://github.com/Effect-TS/effect/issues");
-  }
-  return accumulator.pop();
-});
-const pretty = (cause) => {
-  if (isInterruptedOnly(cause)) {
-    return "All fibers interrupted without errors.";
-  }
-  return prettyErrors(cause).map((e) => e.stack).join("\n");
-};
-class PrettyError extends globalThis.Error {
-  constructor(originalError) {
-    const prevLimit = Error.stackTraceLimit;
+  return o.pop();
+}), Fi = (t) => Ti(t) ? "All fibers interrupted without errors." : kl(t).map((e) => e.stack).join(`
+`);
+class ha extends globalThis.Error {
+  constructor(n) {
+    const r = Error.stackTraceLimit;
     Error.stackTraceLimit = 0;
-    super(prettyErrorMessage(originalError));
-    __publicField(this, "span");
-    Error.stackTraceLimit = prevLimit;
-    this.name = originalError instanceof Error ? originalError.name : "Error";
-    if (typeof originalError === "object" && originalError !== null) {
-      if (spanSymbol$1 in originalError) {
-        this.span = originalError[spanSymbol$1];
-      }
-      Object.keys(originalError).forEach((key) => {
-        if (!(key in this)) {
-          this[key] = originalError[key];
-        }
-      });
-    }
-    this.stack = prettyErrorStack(this.message, originalError instanceof Error && originalError.stack ? originalError.stack : "", this.span);
+    super(L_(n));
+    f(this, "span");
+    Error.stackTraceLimit = r, this.name = n instanceof Error ? n.name : "Error", typeof n == "object" && n !== null && (da in n && (this.span = n[da]), Object.keys(n).forEach((s) => {
+      s in this || (this[s] = n[s]);
+    })), this.stack = U_(this.message, n instanceof Error && n.stack ? n.stack : "", this.span);
   }
   toJSON() {
-    const out = {
+    const n = {
       message: this.message,
       stack: this.stack
     };
-    if (this.span) {
-      out.span = this.span;
-    }
-    return out;
+    return this.span && (n.span = this.span), n;
   }
 }
-const prettyErrorMessage = (u) => {
-  if (typeof u === "string") {
-    return `Error: ${u}`;
-  }
+const L_ = (t) => {
+  if (typeof t == "string")
+    return `Error: ${t}`;
   try {
-    if (hasProperty(u, "toString") && isFunction(u["toString"]) && u["toString"] !== Object.prototype.toString && u["toString"] !== globalThis.Array.prototype.toString) {
-      return u["toString"]();
-    }
+    if (D(t, "toString") && ps(t.toString) && t.toString !== Object.prototype.toString && t.toString !== globalThis.Array.prototype.toString)
+      return t.toString();
   } catch {
   }
-  return `Error: ${JSON.stringify(u)}`;
-};
-const locationRegex = /\((.*)\)/;
-const prettyErrorStack = (message, stack, span2) => {
-  const out = [message];
-  const lines = stack.split("\n");
-  for (let i = 1; i < lines.length; i++) {
-    if (lines[i].includes("effect_cutpoint") || lines[i].includes("Generator.next")) {
-      break;
-    }
-    out.push(lines[i].replace(/at .*effect_instruction_i.*\((.*)\)/, "at $1").replace(/EffectPrimitive\.\w+/, "<anonymous>"));
-    if (lines[i].includes("effect_instruction_i")) {
-      break;
-    }
-  }
-  if (span2) {
-    let current = span2;
-    let i = 0;
-    while (current && current._tag === "Span" && i < 10) {
-      const stack2 = current.attributes.get("code.stacktrace");
-      if (typeof stack2 === "string") {
-        const locationMatch = stack2.match(locationRegex);
-        const location = locationMatch ? locationMatch[1] : stack2.replace(/^at /, "");
-        out.push(`    at ${current.name} (${location})`);
-      } else {
-        out.push(`    at ${current.name}`);
-      }
-      current = getOrUndefined(current.parent);
-      i++;
+  return `Error: ${JSON.stringify(t)}`;
+}, D_ = /\((.*)\)/, U_ = (t, e, n) => {
+  const r = [t], s = e.split(`
+`);
+  for (let o = 1; o < s.length && !(s[o].includes("effect_cutpoint") || s[o].includes("Generator.next") || (r.push(s[o].replace(/at .*effect_instruction_i.*\((.*)\)/, "at $1").replace(/EffectPrimitive\.\w+/, "<anonymous>")), s[o].includes("effect_instruction_i"))); o++)
+    ;
+  if (n) {
+    let o = n, c = 0;
+    for (; o && o._tag === "Span" && c < 10; ) {
+      const a = o.attributes.get("code.stacktrace");
+      if (typeof a == "string") {
+        const u = a.match(D_), h = u ? u[1] : a.replace(/^at /, "");
+        r.push(`    at ${o.name} (${h})`);
+      } else
+        r.push(`    at ${o.name}`);
+      o = Rt(o.parent), c++;
     }
   }
-  return out.join("\n");
-};
-const spanSymbol$1 = /* @__PURE__ */ Symbol.for("effect/SpanAnnotation");
-const prettyErrors = (cause) => reduceWithContext(cause, void 0, {
+  return r.join(`
+`);
+}, da = /* @__PURE__ */ Symbol.for("effect/SpanAnnotation"), kl = (t) => $i(t, void 0, {
   emptyCase: () => [],
-  dieCase: (_, unknownError) => {
-    return [new PrettyError(unknownError)];
-  },
-  failCase: (_, error) => {
-    return [new PrettyError(error)];
-  },
+  dieCase: (e, n) => [new ha(n)],
+  failCase: (e, n) => [new ha(n)],
   interruptCase: () => [],
-  parallelCase: (_, l, r) => [...l, ...r],
-  sequentialCase: (_, l, r) => [...l, ...r]
+  parallelCase: (e, n, r) => [...n, ...r],
+  sequentialCase: (e, n, r) => [...n, ...r]
+}), fr = "Pending", Ai = "Done", q_ = "effect/Deferred", B_ = /* @__PURE__ */ Symbol.for(q_), V_ = {
+  /* c8 ignore next */
+  _E: (t) => t,
+  /* c8 ignore next */
+  _A: (t) => t
+}, K_ = (t) => ({
+  _tag: fr,
+  joiners: t
+}), El = (t) => ({
+  _tag: Ai,
+  effect: t
 });
-const OP_STATE_PENDING = "Pending";
-const OP_STATE_DONE = "Done";
-const DeferredSymbolKey = "effect/Deferred";
-const DeferredTypeId = /* @__PURE__ */ Symbol.for(DeferredSymbolKey);
-const deferredVariance = {
-  /* c8 ignore next */
-  _E: (_) => _,
-  /* c8 ignore next */
-  _A: (_) => _
-};
-const pending = (joiners) => {
-  return {
-    _tag: OP_STATE_PENDING,
-    joiners
-  };
-};
-const done$2 = (effect) => {
-  return {
-    _tag: OP_STATE_DONE,
-    effect
-  };
-};
-class SingleShotGen2 {
-  constructor(self) {
-    __publicField(this, "self");
-    __publicField(this, "called", false);
-    this.self = self;
+class hr {
+  constructor(e) {
+    f(this, "self");
+    f(this, "called", !1);
+    this.self = e;
   }
-  next(a) {
+  next(e) {
     return this.called ? {
-      value: a,
-      done: true
-    } : (this.called = true, {
+      value: e,
+      done: !0
+    } : (this.called = !0, {
       value: this.self,
-      done: false
+      done: !1
     });
   }
-  return(a) {
+  return(e) {
     return {
-      value: a,
-      done: true
+      value: e,
+      done: !0
     };
   }
   throw(e) {
     throw e;
   }
   [Symbol.iterator]() {
-    return new SingleShotGen2(this.self);
+    return new hr(this.self);
   }
 }
-const TracerTypeId = /* @__PURE__ */ Symbol.for("effect/Tracer");
-const make$c = (options) => ({
-  [TracerTypeId]: TracerTypeId,
-  ...options
-});
-const tracerTag = /* @__PURE__ */ GenericTag("effect/Tracer");
-const spanTag = /* @__PURE__ */ GenericTag("effect/ParentSpan");
-const randomHexString = /* @__PURE__ */ function() {
-  const characters = "abcdef0123456789";
-  const charactersLength = characters.length;
-  return function(length) {
-    let result = "";
-    for (let i = 0; i < length; i++) {
-      result += characters.charAt(Math.floor(Math.random() * charactersLength));
-    }
-    return result;
+const pa = /* @__PURE__ */ Symbol.for("effect/Tracer"), H_ = (t) => ({
+  [pa]: pa,
+  ...t
+}), To = /* @__PURE__ */ wn("effect/Tracer"), Ol = /* @__PURE__ */ wn("effect/ParentSpan"), ga = /* @__PURE__ */ function() {
+  const t = "abcdef0123456789", e = t.length;
+  return function(n) {
+    let r = "";
+    for (let s = 0; s < n; s++)
+      r += t.charAt(Math.floor(Math.random() * e));
+    return r;
   };
 }();
-class NativeSpan {
-  constructor(name, parent, context, links, startTime, kind) {
-    __publicField(this, "name");
-    __publicField(this, "parent");
-    __publicField(this, "context");
-    __publicField(this, "links");
-    __publicField(this, "startTime");
-    __publicField(this, "kind");
-    __publicField(this, "_tag", "Span");
-    __publicField(this, "spanId");
-    __publicField(this, "traceId", "native");
-    __publicField(this, "sampled", true);
-    __publicField(this, "status");
-    __publicField(this, "attributes");
-    __publicField(this, "events", []);
-    this.name = name;
-    this.parent = parent;
-    this.context = context;
-    this.links = links;
-    this.startTime = startTime;
-    this.kind = kind;
-    this.status = {
+class J_ {
+  constructor(e, n, r, s, o, c) {
+    f(this, "name");
+    f(this, "parent");
+    f(this, "context");
+    f(this, "links");
+    f(this, "startTime");
+    f(this, "kind");
+    f(this, "_tag", "Span");
+    f(this, "spanId");
+    f(this, "traceId", "native");
+    f(this, "sampled", !0);
+    f(this, "status");
+    f(this, "attributes");
+    f(this, "events", []);
+    this.name = e, this.parent = n, this.context = r, this.links = s, this.startTime = o, this.kind = c, this.status = {
       _tag: "Started",
-      startTime
-    };
-    this.attributes = /* @__PURE__ */ new Map();
-    this.traceId = parent._tag === "Some" ? parent.value.traceId : randomHexString(32);
-    this.spanId = randomHexString(16);
+      startTime: o
+    }, this.attributes = /* @__PURE__ */ new Map(), this.traceId = n._tag === "Some" ? n.value.traceId : ga(32), this.spanId = ga(16);
   }
-  end(endTime, exit2) {
+  end(e, n) {
     this.status = {
       _tag: "Ended",
-      endTime,
-      exit: exit2,
+      endTime: e,
+      exit: n,
       startTime: this.status.startTime
     };
   }
-  attribute(key, value) {
-    this.attributes.set(key, value);
+  attribute(e, n) {
+    this.attributes.set(e, n);
   }
-  event(name, startTime, attributes) {
-    this.events.push([name, startTime, attributes ?? {}]);
-  }
-}
-const nativeTracer = /* @__PURE__ */ make$c({
-  span: (name, parent, context, links, startTime, kind) => new NativeSpan(name, parent, context, links, startTime, kind),
-  context: (f) => f()
-});
-const EffectErrorSymbolKey = "effect/EffectError";
-const EffectErrorTypeId = /* @__PURE__ */ Symbol.for(EffectErrorSymbolKey);
-const isEffectError = (u) => hasProperty(u, EffectErrorTypeId);
-const blocked = (blockedRequests, _continue) => {
-  const effect = new EffectPrimitive("Blocked");
-  effect.effect_instruction_i0 = blockedRequests;
-  effect.effect_instruction_i1 = _continue;
-  return effect;
-};
-const runRequestBlock = (blockedRequests) => {
-  const effect = new EffectPrimitive("RunBlocked");
-  effect.effect_instruction_i0 = blockedRequests;
-  return effect;
-};
-const EffectTypeId$1 = /* @__PURE__ */ Symbol.for("effect/Effect");
-class RevertFlags {
-  constructor(patch2, op) {
-    __publicField(this, "patch");
-    __publicField(this, "op");
-    __publicField(this, "_op", OP_REVERT_FLAGS);
-    this.patch = patch2;
-    this.op = op;
+  event(e, n, r) {
+    this.events.push([e, n, r ?? {}]);
   }
 }
-class EffectPrimitive {
-  constructor(_op) {
-    __publicField(this, "_op");
-    __publicField(this, "effect_instruction_i0");
-    __publicField(this, "effect_instruction_i1");
-    __publicField(this, "effect_instruction_i2");
-    __publicField(this, "trace");
-    __publicField(this, _e, effectVariance);
-    this._op = _op;
+const W_ = /* @__PURE__ */ H_({
+  span: (t, e, n, r, s, o) => new J_(t, e, n, r, s, o),
+  context: (t) => t()
+}), G_ = "effect/EffectError", z_ = /* @__PURE__ */ Symbol.for(G_), Y_ = (t) => D(t, z_), Rl = (t, e) => {
+  const n = new Ne("Blocked");
+  return n.effect_instruction_i0 = t, n.effect_instruction_i1 = e, n;
+}, Q_ = (t) => {
+  const e = new Ne("RunBlocked");
+  return e.effect_instruction_i0 = t, e;
+}, $s = /* @__PURE__ */ Symbol.for("effect/Effect");
+class X_ {
+  constructor(e, n) {
+    f(this, "patch");
+    f(this, "op");
+    f(this, "_op", ci);
+    this.patch = e, this.op = n;
   }
-  [(_e = EffectTypeId$1, symbol)](that) {
-    return this === that;
+}
+var Vw;
+class Ne {
+  constructor(e) {
+    f(this, "_op");
+    f(this, "effect_instruction_i0");
+    f(this, "effect_instruction_i1");
+    f(this, "effect_instruction_i2");
+    f(this, "trace");
+    f(this, Vw, an);
+    this._op = e;
   }
-  [symbol$1]() {
-    return cached(this, random(this));
+  [(Vw = $s, P)](e) {
+    return this === e;
+  }
+  [j]() {
+    return ue(this, ri(this));
   }
   pipe() {
-    return pipeArguments(this, arguments);
+    return A(this, arguments);
   }
   toJSON() {
     return {
       _id: "Effect",
       _op: this._op,
-      effect_instruction_i0: toJSON(this.effect_instruction_i0),
-      effect_instruction_i1: toJSON(this.effect_instruction_i1),
-      effect_instruction_i2: toJSON(this.effect_instruction_i2)
+      effect_instruction_i0: ye(this.effect_instruction_i0),
+      effect_instruction_i1: ye(this.effect_instruction_i1),
+      effect_instruction_i2: ye(this.effect_instruction_i2)
     };
   }
   toString() {
-    return format$1(this.toJSON());
+    return Ie(this.toJSON());
   }
-  [NodeInspectSymbol]() {
+  [he]() {
     return this.toJSON();
   }
   [Symbol.iterator]() {
-    return new SingleShotGen2(new YieldWrap(this));
+    return new hr(new gs(this));
   }
 }
-class EffectPrimitiveFailure {
-  constructor(_op) {
-    __publicField(this, "_op");
-    __publicField(this, "effect_instruction_i0");
-    __publicField(this, "effect_instruction_i1");
-    __publicField(this, "effect_instruction_i2");
-    __publicField(this, "trace");
-    __publicField(this, _f, effectVariance);
-    this._op = _op;
-    this._tag = _op;
+var Kw;
+class Il {
+  constructor(e) {
+    f(this, "_op");
+    f(this, "effect_instruction_i0");
+    f(this, "effect_instruction_i1");
+    f(this, "effect_instruction_i2");
+    f(this, "trace");
+    f(this, Kw, an);
+    this._op = e, this._tag = e;
   }
-  [(_f = EffectTypeId$1, symbol)](that) {
-    return exitIsExit(that) && that._op === "Failure" && // @ts-expect-error
-    equals$1(this.effect_instruction_i0, that.effect_instruction_i0);
+  [(Kw = $s, P)](e) {
+    return Wi(e) && e._op === "Failure" && // @ts-expect-error
+    N(this.effect_instruction_i0, e.effect_instruction_i0);
   }
-  [symbol$1]() {
-    return pipe(
+  [j]() {
+    return m(
       // @ts-expect-error
-      string(this._tag),
+      me(this._tag),
       // @ts-expect-error
-      combine$5(hash(this.effect_instruction_i0)),
-      cached(this)
+      K(I(this.effect_instruction_i0)),
+      ue(this)
     );
   }
   get cause() {
     return this.effect_instruction_i0;
   }
   pipe() {
-    return pipeArguments(this, arguments);
+    return A(this, arguments);
   }
   toJSON() {
     return {
@@ -3651,512 +2631,345 @@ class EffectPrimitiveFailure {
     };
   }
   toString() {
-    return format$1(this.toJSON());
+    return Ie(this.toJSON());
   }
-  [NodeInspectSymbol]() {
+  [he]() {
     return this.toJSON();
   }
   [Symbol.iterator]() {
-    return new SingleShotGen2(new YieldWrap(this));
+    return new hr(new gs(this));
   }
 }
-class EffectPrimitiveSuccess {
-  constructor(_op) {
-    __publicField(this, "_op");
-    __publicField(this, "effect_instruction_i0");
-    __publicField(this, "effect_instruction_i1");
-    __publicField(this, "effect_instruction_i2");
-    __publicField(this, "trace");
-    __publicField(this, _g, effectVariance);
-    this._op = _op;
-    this._tag = _op;
+var Hw;
+class Cl {
+  constructor(e) {
+    f(this, "_op");
+    f(this, "effect_instruction_i0");
+    f(this, "effect_instruction_i1");
+    f(this, "effect_instruction_i2");
+    f(this, "trace");
+    f(this, Hw, an);
+    this._op = e, this._tag = e;
   }
-  [(_g = EffectTypeId$1, symbol)](that) {
-    return exitIsExit(that) && that._op === "Success" && // @ts-expect-error
-    equals$1(this.effect_instruction_i0, that.effect_instruction_i0);
+  [(Hw = $s, P)](e) {
+    return Wi(e) && e._op === "Success" && // @ts-expect-error
+    N(this.effect_instruction_i0, e.effect_instruction_i0);
   }
-  [symbol$1]() {
-    return pipe(
+  [j]() {
+    return m(
       // @ts-expect-error
-      string(this._tag),
+      me(this._tag),
       // @ts-expect-error
-      combine$5(hash(this.effect_instruction_i0)),
-      cached(this)
+      K(I(this.effect_instruction_i0)),
+      ue(this)
     );
   }
   get value() {
     return this.effect_instruction_i0;
   }
   pipe() {
-    return pipeArguments(this, arguments);
+    return A(this, arguments);
   }
   toJSON() {
     return {
       _id: "Exit",
       _tag: this._op,
-      value: toJSON(this.value)
+      value: ye(this.value)
     };
   }
   toString() {
-    return format$1(this.toJSON());
+    return Ie(this.toJSON());
   }
-  [NodeInspectSymbol]() {
+  [he]() {
     return this.toJSON();
   }
   [Symbol.iterator]() {
-    return new SingleShotGen2(new YieldWrap(this));
+    return new hr(new gs(this));
   }
 }
-const isEffect = (u) => hasProperty(u, EffectTypeId$1);
-const withFiberRuntime = (withRuntime) => {
-  const effect = new EffectPrimitive(OP_WITH_RUNTIME);
-  effect.effect_instruction_i0 = withRuntime;
-  return effect;
-};
-const acquireUseRelease = /* @__PURE__ */ dual(3, (acquire, use, release) => uninterruptibleMask((restore) => flatMap$1(acquire, (a) => flatMap$1(exit(suspend(() => restore(use(a)))), (exit2) => {
-  return suspend(() => release(a, exit2)).pipe(matchCauseEffect({
-    onFailure: (cause) => {
-      switch (exit2._tag) {
-        case OP_FAILURE:
-          return failCause(parallel(exit2.effect_instruction_i0, cause));
-        case OP_SUCCESS:
-          return failCause(cause);
-      }
-    },
-    onSuccess: () => exit2
-  }));
-}))));
-const as = /* @__PURE__ */ dual(2, (self, value) => flatMap$1(self, () => succeed(value)));
-const asVoid = (self) => as(self, void 0);
-function commitCallCutpoint() {
+const Tl = (t) => D(t, $s), rt = (t) => {
+  const e = new Ne(iu);
+  return e.effect_instruction_i0 = t, e;
+}, Z_ = /* @__PURE__ */ g(3, (t, e, n) => dr((r) => T(t, (s) => T(Ml(Ae(() => r(e(s)))), (o) => Ae(() => n(s, o)).pipe(bn({
+  onFailure: (c) => {
+    switch (o._tag) {
+      case je:
+        return Qe(lr(o.effect_instruction_i0, c));
+      case Le:
+        return Qe(c);
+    }
+  },
+  onSuccess: () => o
+})))))), Cn = /* @__PURE__ */ g(2, (t, e) => T(t, () => ie(e))), Ht = (t) => Cn(t, void 0);
+function ey() {
   return this.effect_cutpoint();
 }
-const custom = function() {
-  const wrapper = new EffectPrimitive(OP_COMMIT);
-  wrapper.commit = commitCallCutpoint;
-  switch (arguments.length) {
+const $l = function() {
+  const t = new Ne(ii);
+  switch (t.commit = ey, arguments.length) {
     case 2: {
-      wrapper.effect_instruction_i0 = arguments[0];
-      wrapper.effect_cutpoint = arguments[1];
+      t.effect_instruction_i0 = arguments[0], t.effect_cutpoint = arguments[1];
       break;
     }
     case 3: {
-      wrapper.effect_instruction_i0 = arguments[0];
-      wrapper.effect_instruction_i1 = arguments[1];
-      wrapper.effect_cutpoint = arguments[2];
+      t.effect_instruction_i0 = arguments[0], t.effect_instruction_i1 = arguments[1], t.effect_cutpoint = arguments[2];
       break;
     }
     case 4: {
-      wrapper.effect_instruction_i0 = arguments[0];
-      wrapper.effect_instruction_i1 = arguments[1];
-      wrapper.effect_instruction_i2 = arguments[2];
-      wrapper.effect_cutpoint = arguments[3];
+      t.effect_instruction_i0 = arguments[0], t.effect_instruction_i1 = arguments[1], t.effect_instruction_i2 = arguments[2], t.effect_cutpoint = arguments[3];
       break;
     }
-    default: {
-      throw new Error(getBugErrorMessage("you're not supposed to end up here"));
-    }
+    default:
+      throw new Error(ni("you're not supposed to end up here"));
   }
-  return wrapper;
-};
-const async$1 = (register, blockingOn = none$4) => {
-  return custom(register, function() {
-    let backingResume = void 0;
-    let pendingEffect = void 0;
-    function proxyResume(effect2) {
-      if (backingResume) {
-        backingResume(effect2);
-      } else if (pendingEffect === void 0) {
-        pendingEffect = effect2;
-      }
-    }
-    const effect = new EffectPrimitive(OP_ASYNC);
-    effect.effect_instruction_i0 = (resume2) => {
-      backingResume = resume2;
-      if (pendingEffect) {
-        resume2(pendingEffect);
-      }
-    };
-    effect.effect_instruction_i1 = blockingOn;
-    let cancelerRef = void 0;
-    let controllerRef = void 0;
-    if (this.effect_instruction_i0.length !== 1) {
-      controllerRef = new AbortController();
-      cancelerRef = this.effect_instruction_i0(proxyResume, controllerRef.signal);
-    } else {
-      cancelerRef = this.effect_instruction_i0(proxyResume);
-    }
-    return cancelerRef || controllerRef ? onInterrupt(effect, (_) => {
-      if (controllerRef) {
-        controllerRef.abort();
-      }
-      return cancelerRef ?? void_;
-    }) : effect;
-  });
-};
-const catchAll = /* @__PURE__ */ dual(2, (self, f) => matchEffect(self, {
-  onFailure: f,
-  onSuccess: succeed
-}));
-const spanSymbol = /* @__PURE__ */ Symbol.for("effect/SpanAnnotation");
-const originalSymbol = /* @__PURE__ */ Symbol.for("effect/OriginalAnnotation");
-const capture = (obj, span2) => {
-  if (isSome(span2)) {
-    return new Proxy(obj, {
-      has(target, p) {
-        return p === spanSymbol || p === originalSymbol || p in target;
-      },
-      get(target, p) {
-        if (p === spanSymbol) {
-          return span2.value;
-        }
-        if (p === originalSymbol) {
-          return obj;
-        }
-        return target[p];
-      }
-    });
+  return t;
+}, lt = (t, e = Is) => $l(t, function() {
+  let n, r;
+  function s(u) {
+    n ? n(u) : r === void 0 && (r = u);
   }
-  return obj;
-};
-const die = (defect) => isObject(defect) && !(spanSymbol in defect) ? withFiberRuntime((fiber) => failCause(die$1(capture(defect, currentSpanFromFiber(fiber))))) : failCause(die$1(defect));
-const dieMessage = (message) => failCauseSync(() => die$1(new RuntimeException(message)));
-const dieSync = (evaluate) => flatMap$1(sync(evaluate), die);
-const either = (self) => matchEffect(self, {
-  onFailure: (e) => succeed(left$2(e)),
-  onSuccess: (a) => succeed(right$2(a))
-});
-const exit = (self) => matchCause(self, {
-  onFailure: exitFailCause,
-  onSuccess: exitSucceed
-});
-const fail = (error) => isObject(error) && !(spanSymbol in error) ? withFiberRuntime((fiber) => failCause(fail$1(capture(error, currentSpanFromFiber(fiber))))) : failCause(fail$1(error));
-const failSync = (evaluate) => flatMap$1(sync(evaluate), fail);
-const failCause = (cause) => {
-  const effect = new EffectPrimitiveFailure(OP_FAILURE);
-  effect.effect_instruction_i0 = cause;
-  return effect;
-};
-const failCauseSync = (evaluate) => flatMap$1(sync(evaluate), failCause);
-const fiberId = /* @__PURE__ */ withFiberRuntime((state) => succeed(state.id()));
-const fiberIdWith = (f) => withFiberRuntime((state) => f(state.id()));
-const flatMap$1 = /* @__PURE__ */ dual(2, (self, f) => {
-  const effect = new EffectPrimitive(OP_ON_SUCCESS);
-  effect.effect_instruction_i0 = self;
-  effect.effect_instruction_i1 = f;
-  return effect;
-});
-const step = (self) => {
-  const effect = new EffectPrimitive("OnStep");
-  effect.effect_instruction_i0 = self;
-  return effect;
-};
-const flatten$1 = (self) => flatMap$1(self, identity);
-const matchCause = /* @__PURE__ */ dual(2, (self, options) => matchCauseEffect(self, {
-  onFailure: (cause) => succeed(options.onFailure(cause)),
-  onSuccess: (a) => succeed(options.onSuccess(a))
-}));
-const matchCauseEffect = /* @__PURE__ */ dual(2, (self, options) => {
-  const effect = new EffectPrimitive(OP_ON_SUCCESS_AND_FAILURE);
-  effect.effect_instruction_i0 = self;
-  effect.effect_instruction_i1 = options.onFailure;
-  effect.effect_instruction_i2 = options.onSuccess;
-  return effect;
-});
-const matchEffect = /* @__PURE__ */ dual(2, (self, options) => matchCauseEffect(self, {
-  onFailure: (cause) => {
-    const defects$1 = defects(cause);
-    if (defects$1.length > 0) {
-      return failCause(electFailures(cause));
-    }
-    const failures$1 = failures(cause);
-    if (failures$1.length > 0) {
-      return options.onFailure(unsafeHead(failures$1));
-    }
-    return failCause(cause);
+  const o = new Ne(jr);
+  o.effect_instruction_i0 = (u) => {
+    n = u, r && u(r);
+  }, o.effect_instruction_i1 = e;
+  let c, a;
+  return this.effect_instruction_i0.length !== 1 ? (a = new AbortController(), c = this.effect_instruction_i0(s, a.signal)) : c = this.effect_instruction_i0(s), c || a ? Ll(o, (u) => (a && a.abort(), c ?? Ue)) : o;
+}), ma = /* @__PURE__ */ g(2, (t, e) => Pi(t, {
+  onFailure: e,
+  onSuccess: ie
+})), os = /* @__PURE__ */ Symbol.for("effect/SpanAnnotation"), _a = /* @__PURE__ */ Symbol.for("effect/OriginalAnnotation"), Fl = (t, e) => nt(e) ? new Proxy(t, {
+  has(n, r) {
+    return r === os || r === _a || r in n;
   },
-  onSuccess: options.onSuccess
-}));
-const forEachSequential = /* @__PURE__ */ dual(2, (self, f) => suspend(() => {
-  const arr = fromIterable$6(self);
-  const ret = allocate(arr.length);
-  let i = 0;
-  return as(whileLoop({
-    while: () => i < arr.length,
-    body: () => f(arr[i], i),
-    step: (b) => {
-      ret[i++] = b;
+  get(n, r) {
+    return r === os ? e.value : r === _a ? t : n[r];
+  }
+}) : t, Al = (t) => ti(t) && !(os in t) ? rt((e) => Qe(ut(Fl(t, ef(e))))) : Qe(ut(t)), ty = (t) => ry(() => ut(new Ty(t))), ny = (t) => T($(t), Al), $o = (t) => Pi(t, {
+  onFailure: (e) => ie(Pt(e)),
+  onSuccess: (e) => ie(at(e))
+}), Ml = (t) => oy(t, {
+  onFailure: Z,
+  onSuccess: Oe
+}), Be = (t) => ti(t) && !(os in t) ? rt((e) => Qe(Io(Fl(t, ef(e))))) : Qe(Io(t)), Pl = (t) => T($(t), Be), Qe = (t) => {
+  const e = new Il(je);
+  return e.effect_instruction_i0 = t, e;
+}, ry = (t) => T($(t), Qe), Nl = /* @__PURE__ */ rt((t) => ie(t.id())), xl = (t) => rt((e) => t(e.id())), T = /* @__PURE__ */ g(2, (t, e) => {
+  const n = new Ne(zr);
+  return n.effect_instruction_i0 = t, n.effect_instruction_i1 = e, n;
+}), sy = (t) => {
+  const e = new Ne("OnStep");
+  return e.effect_instruction_i0 = t, e;
+}, Mi = (t) => T(t, Ve), oy = /* @__PURE__ */ g(2, (t, e) => bn(t, {
+  onFailure: (n) => ie(e.onFailure(n)),
+  onSuccess: (n) => ie(e.onSuccess(n))
+})), bn = /* @__PURE__ */ g(2, (t, e) => {
+  const n = new Ne(Yr);
+  return n.effect_instruction_i0 = t, n.effect_instruction_i1 = e.onFailure, n.effect_instruction_i2 = e.onSuccess, n;
+}), Pi = /* @__PURE__ */ g(2, (t, e) => bn(t, {
+  onFailure: (n) => {
+    if (C_(n).length > 0)
+      return Qe(M_(n));
+    const s = I_(n);
+    return s.length > 0 ? e.onFailure(Nu(s)) : Qe(n);
+  },
+  onSuccess: e.onSuccess
+})), bt = /* @__PURE__ */ g(2, (t, e) => Ae(() => {
+  const n = Se(t), r = fi(n.length);
+  let s = 0;
+  return Cn(Li({
+    while: () => s < n.length,
+    body: () => e(n[s], s),
+    step: (o) => {
+      r[s++] = o;
     }
-  }), ret);
-}));
-const forEachSequentialDiscard = /* @__PURE__ */ dual(2, (self, f) => suspend(() => {
-  const arr = fromIterable$6(self);
-  let i = 0;
-  return whileLoop({
-    while: () => i < arr.length,
-    body: () => f(arr[i], i),
+  }), r);
+})), Ni = /* @__PURE__ */ g(2, (t, e) => Ae(() => {
+  const n = Se(t);
+  let r = 0;
+  return Li({
+    while: () => r < n.length,
+    body: () => e(n[r], r),
     step: () => {
-      i++;
+      r++;
     }
   });
-}));
-const interruptible = (self) => {
-  const effect = new EffectPrimitive(OP_UPDATE_RUNTIME_FLAGS);
-  effect.effect_instruction_i0 = enable(Interruption);
-  effect.effect_instruction_i1 = () => self;
-  return effect;
-};
-const map = /* @__PURE__ */ dual(2, (self, f) => flatMap$1(self, (a) => sync(() => f(a))));
-const mapBoth = /* @__PURE__ */ dual(2, (self, options) => matchEffect(self, {
-  onFailure: (e) => failSync(() => options.onFailure(e)),
-  onSuccess: (a) => sync(() => options.onSuccess(a))
-}));
-const mapError = /* @__PURE__ */ dual(2, (self, f) => matchCauseEffect(self, {
-  onFailure: (cause) => {
-    const either2 = failureOrCause(cause);
-    switch (either2._tag) {
-      case "Left": {
-        return failSync(() => f(either2.left));
-      }
-      case "Right": {
-        return failCause(either2.right);
-      }
+})), is = (t) => {
+  const e = new Ne(or);
+  return e.effect_instruction_i0 = c_(En), e.effect_instruction_i1 = () => t, e;
+}, Me = /* @__PURE__ */ g(2, (t, e) => T(t, (n) => $(() => e(n)))), jl = /* @__PURE__ */ g(2, (t, e) => Pi(t, {
+  onFailure: (n) => Pl(() => e.onFailure(n)),
+  onSuccess: (n) => $(() => e.onSuccess(n))
+})), xi = /* @__PURE__ */ g(2, (t, e) => bn(t, {
+  onFailure: (n) => {
+    const r = F_(n);
+    switch (r._tag) {
+      case "Left":
+        return Pl(() => e(r.left));
+      case "Right":
+        return Qe(r.right);
     }
   },
-  onSuccess: succeed
-}));
-const onExit = /* @__PURE__ */ dual(2, (self, cleanup) => uninterruptibleMask((restore) => matchCauseEffect(restore(self), {
-  onFailure: (cause1) => {
-    const result = exitFailCause(cause1);
-    return matchCauseEffect(cleanup(result), {
-      onFailure: (cause2) => exitFailCause(sequential$1(cause1, cause2)),
-      onSuccess: () => result
+  onSuccess: ie
+})), ji = /* @__PURE__ */ g(2, (t, e) => dr((n) => bn(n(t), {
+  onFailure: (r) => {
+    const s = Z(r);
+    return bn(e(s), {
+      onFailure: (o) => Z(tt(r, o)),
+      onSuccess: () => s
     });
   },
-  onSuccess: (success) => {
-    const result = exitSucceed(success);
-    return zipRight(cleanup(result), result);
+  onSuccess: (r) => {
+    const s = Oe(r);
+    return Ui(e(s), s);
   }
-})));
-const onInterrupt = /* @__PURE__ */ dual(2, (self, cleanup) => onExit(self, exitMatch({
-  onFailure: (cause) => isInterruptedOnly(cause) ? asVoid(cleanup(interruptors(cause))) : void_,
-  onSuccess: () => void_
-})));
-const succeed = (value) => {
-  const effect = new EffectPrimitiveSuccess(OP_SUCCESS);
-  effect.effect_instruction_i0 = value;
-  return effect;
-};
-const suspend = (effect) => flatMap$1(sync(effect), identity);
-const sync = (evaluate) => {
-  const effect = new EffectPrimitive(OP_SYNC);
-  effect.effect_instruction_i0 = evaluate;
-  return effect;
-};
-const tap = /* @__PURE__ */ dual(2, (self, f) => flatMap$1(self, (a) => {
-  const b = typeof f === "function" ? f(a) : f;
-  if (isEffect(b)) {
-    return as(b, a);
-  } else if (isPromiseLike(b)) {
-    return async$1((resume2) => {
-      b.then((_) => resume2(succeed(a)), (e) => resume2(fail(new UnknownException(e))));
-    });
-  }
-  return succeed(a);
-}));
-const transplant = (f) => withFiberRuntime((state) => {
-  const scopeOverride = state.getFiberRef(currentForkScopeOverride);
-  const scope = pipe(scopeOverride, getOrElse(() => state.scope()));
-  return f(fiberRefLocally(currentForkScopeOverride, some$2(scope)));
-});
-const uninterruptible = (self) => {
-  const effect = new EffectPrimitive(OP_UPDATE_RUNTIME_FLAGS);
-  effect.effect_instruction_i0 = disable(Interruption);
-  effect.effect_instruction_i1 = () => self;
-  return effect;
-};
-const uninterruptibleMask = (f) => custom(f, function() {
-  const effect = new EffectPrimitive(OP_UPDATE_RUNTIME_FLAGS);
-  effect.effect_instruction_i0 = disable(Interruption);
-  effect.effect_instruction_i1 = (oldFlags) => interruption(oldFlags) ? this.effect_instruction_i0(interruptible) : this.effect_instruction_i0(uninterruptible);
-  return effect;
-});
-const void_ = /* @__PURE__ */ succeed(void 0);
-const updateRuntimeFlags = (patch2) => {
-  const effect = new EffectPrimitive(OP_UPDATE_RUNTIME_FLAGS);
-  effect.effect_instruction_i0 = patch2;
-  effect.effect_instruction_i1 = void 0;
-  return effect;
-};
-const whileLoop = (options) => {
-  const effect = new EffectPrimitive(OP_WHILE);
-  effect.effect_instruction_i0 = options.while;
-  effect.effect_instruction_i1 = options.body;
-  effect.effect_instruction_i2 = options.step;
-  return effect;
-};
-const yieldNow$1 = (options) => {
-  const effect = new EffectPrimitive(OP_YIELD);
-  return typeof (options == null ? void 0 : options.priority) !== "undefined" ? withSchedulingPriority(effect, options.priority) : effect;
-};
-const zip = /* @__PURE__ */ dual(2, (self, that) => flatMap$1(self, (a) => map(that, (b) => [a, b])));
-const zipLeft = /* @__PURE__ */ dual(2, (self, that) => flatMap$1(self, (a) => as(that, a)));
-const zipRight = /* @__PURE__ */ dual(2, (self, that) => flatMap$1(self, () => that));
-const interruptFiber = (self) => flatMap$1(fiberId, (fiberId2) => pipe(self, interruptAsFiber(fiberId2)));
-const interruptAsFiber = /* @__PURE__ */ dual(2, (self, fiberId2) => flatMap$1(self.interruptAsFork(fiberId2), () => self.await));
-const logLevelAll = {
+}))), Ll = /* @__PURE__ */ g(2, (t, e) => ji(t, zl({
+  onFailure: (n) => Ti(n) ? Ht(e(T_(n))) : Ue,
+  onSuccess: () => Ue
+}))), ie = (t) => {
+  const e = new Cl(Le);
+  return e.effect_instruction_i0 = t, e;
+}, Ae = (t) => T($(t), Ve), $ = (t) => {
+  const e = new Ne(ou);
+  return e.effect_instruction_i0 = t, e;
+}, Dl = /* @__PURE__ */ g(2, (t, e) => T(t, (n) => {
+  const r = typeof e == "function" ? e(n) : e;
+  return Tl(r) ? Cn(r, n) : Id(r) ? lt((s) => {
+    r.then((o) => s(ie(n)), (o) => s(Be(new My(o))));
+  }) : ie(n);
+})), iy = (t) => rt((e) => {
+  const n = e.getFiberRef(Ao), r = m(n, Nt(() => e.scope()));
+  return t(Ki(Ao, H(r)));
+}), Ul = (t) => {
+  const e = new Ne(or);
+  return e.effect_instruction_i0 = gl(En), e.effect_instruction_i1 = () => t, e;
+}, dr = (t) => $l(t, function() {
+  const e = new Ne(or);
+  return e.effect_instruction_i0 = gl(En), e.effect_instruction_i1 = (n) => dl(n) ? this.effect_instruction_i0(is) : this.effect_instruction_i0(Ul), e;
+}), Ue = /* @__PURE__ */ ie(void 0), cy = (t) => {
+  const e = new Ne(or);
+  return e.effect_instruction_i0 = t, e.effect_instruction_i1 = void 0, e;
+}, Li = (t) => {
+  const e = new Ne(Qr);
+  return e.effect_instruction_i0 = t.while, e.effect_instruction_i1 = t.body, e.effect_instruction_i2 = t.step, e;
+}, Di = (t) => {
+  const e = new Ne(Lr);
+  return typeof (t == null ? void 0 : t.priority) < "u" ? Ey(e, t.priority) : e;
+}, ql = /* @__PURE__ */ g(2, (t, e) => T(t, (n) => Me(e, (r) => [n, r]))), Fs = /* @__PURE__ */ g(2, (t, e) => T(t, (n) => Cn(e, n))), Ui = /* @__PURE__ */ g(2, (t, e) => T(t, () => e)), qi = (t) => T(Nl, (e) => m(t, Bi(e))), Bi = /* @__PURE__ */ g(2, (t, e) => T(t.interruptAsFork(e), () => t.await)), ay = {
   _tag: "All",
   syslog: 0,
   label: "ALL",
   ordinal: Number.MIN_SAFE_INTEGER,
   pipe() {
-    return pipeArguments(this, arguments);
+    return A(this, arguments);
   }
-};
-const logLevelFatal = {
+}, uy = {
   _tag: "Fatal",
   syslog: 2,
   label: "FATAL",
   ordinal: 5e4,
   pipe() {
-    return pipeArguments(this, arguments);
+    return A(this, arguments);
   }
-};
-const logLevelError = {
+}, ly = {
   _tag: "Error",
   syslog: 3,
   label: "ERROR",
   ordinal: 4e4,
   pipe() {
-    return pipeArguments(this, arguments);
+    return A(this, arguments);
   }
-};
-const logLevelWarning = {
+}, fy = {
   _tag: "Warning",
   syslog: 4,
   label: "WARN",
   ordinal: 3e4,
   pipe() {
-    return pipeArguments(this, arguments);
+    return A(this, arguments);
   }
-};
-const logLevelInfo = {
+}, Bl = {
   _tag: "Info",
   syslog: 6,
   label: "INFO",
   ordinal: 2e4,
   pipe() {
-    return pipeArguments(this, arguments);
+    return A(this, arguments);
   }
-};
-const logLevelDebug = {
+}, Vl = {
   _tag: "Debug",
   syslog: 7,
   label: "DEBUG",
   ordinal: 1e4,
   pipe() {
-    return pipeArguments(this, arguments);
+    return A(this, arguments);
   }
-};
-const logLevelTrace = {
+}, hy = {
   _tag: "Trace",
   syslog: 7,
   label: "TRACE",
   ordinal: 0,
   pipe() {
-    return pipeArguments(this, arguments);
+    return A(this, arguments);
   }
-};
-const logLevelNone = {
+}, dy = {
   _tag: "None",
   syslog: 7,
   label: "OFF",
   ordinal: Number.MAX_SAFE_INTEGER,
   pipe() {
-    return pipeArguments(this, arguments);
+    return A(this, arguments);
   }
-};
-const FiberRefSymbolKey = "effect/FiberRef";
-const FiberRefTypeId = /* @__PURE__ */ Symbol.for(FiberRefSymbolKey);
-const fiberRefVariance = {
+}, py = "effect/FiberRef", gy = /* @__PURE__ */ Symbol.for(py), my = {
   /* c8 ignore next */
-  _A: (_) => _
-};
-const fiberRefGet = (self) => fiberRefModify(self, (a) => [a, a]);
-const fiberRefGetWith = /* @__PURE__ */ dual(2, (self, f) => flatMap$1(fiberRefGet(self), f));
-const fiberRefSet = /* @__PURE__ */ dual(2, (self, value) => fiberRefModify(self, () => [void 0, value]));
-const fiberRefModify = /* @__PURE__ */ dual(2, (self, f) => withFiberRuntime((state) => {
-  const [b, a] = f(state.getFiberRef(self));
-  state.setFiberRef(self, a);
-  return succeed(b);
-}));
-const fiberRefLocally = /* @__PURE__ */ dual(3, (use, self, value) => acquireUseRelease(zipLeft(fiberRefGet(self), fiberRefSet(self, value)), () => use, (oldValue) => fiberRefSet(self, oldValue)));
-const fiberRefUnsafeMake = (initial, options) => fiberRefUnsafeMakePatch(initial, {
-  differ: update$1(),
-  fork: (options == null ? void 0 : options.fork) ?? identity,
-  join: options == null ? void 0 : options.join
-});
-const fiberRefUnsafeMakeHashSet = (initial) => {
-  const differ2 = hashSet();
-  return fiberRefUnsafeMakePatch(initial, {
-    differ: differ2,
-    fork: differ2.empty
+  _A: (t) => t
+}, Vi = (t) => Hl(t, (e) => [e, e]), Kl = /* @__PURE__ */ g(2, (t, e) => T(Vi(t), e)), ya = /* @__PURE__ */ g(2, (t, e) => Hl(t, () => [void 0, e])), Hl = /* @__PURE__ */ g(2, (t, e) => rt((n) => {
+  const [r, s] = e(n.getFiberRef(t));
+  return n.setFiberRef(t, s), ie(r);
+})), Ki = /* @__PURE__ */ g(3, (t, e, n) => Z_(Fs(Vi(e), ya(e, n)), () => t, (r) => ya(e, r))), st = (t, e) => Tn(t, {
+  differ: ul(),
+  fork: (e == null ? void 0 : e.fork) ?? Ve,
+  join: e == null ? void 0 : e.join
+}), _y = (t) => {
+  const e = Jm();
+  return Tn(t, {
+    differ: e,
+    fork: e.empty
   });
-};
-const fiberRefUnsafeMakeReadonlyArray = (initial) => {
-  const differ2 = readonlyArray(update$1());
-  return fiberRefUnsafeMakePatch(initial, {
-    differ: differ2,
-    fork: differ2.empty
+}, yy = (t) => {
+  const e = Wm(ul());
+  return Tn(t, {
+    differ: e,
+    fork: e.empty
   });
-};
-const fiberRefUnsafeMakeContext = (initial) => {
-  const differ2 = environment();
-  return fiberRefUnsafeMakePatch(initial, {
-    differ: differ2,
-    fork: differ2.empty
+}, Jl = (t) => {
+  const e = Hm();
+  return Tn(t, {
+    differ: e,
+    fork: e.empty
   });
-};
-const fiberRefUnsafeMakePatch = (initial, options) => ({
-  [FiberRefTypeId]: fiberRefVariance,
-  initial,
-  diff: (oldValue, newValue) => options.differ.diff(oldValue, newValue),
-  combine: (first, second) => options.differ.combine(first, second),
-  patch: (patch2) => (oldValue) => options.differ.patch(patch2, oldValue),
-  fork: options.fork,
-  join: options.join ?? ((_, n) => n),
+}, Tn = (t, e) => ({
+  [gy]: my,
+  initial: t,
+  diff: (n, r) => e.differ.diff(n, r),
+  combine: (n, r) => e.differ.combine(n, r),
+  patch: (n) => (r) => e.differ.patch(n, r),
+  fork: e.fork,
+  join: e.join ?? ((n, r) => r),
   pipe() {
-    return pipeArguments(this, arguments);
+    return A(this, arguments);
   }
-});
-const fiberRefUnsafeMakeRuntimeFlags = (initial) => fiberRefUnsafeMakePatch(initial, {
-  differ: differ$1,
-  fork: differ$1.empty
-});
-const currentContext = /* @__PURE__ */ globalValue(/* @__PURE__ */ Symbol.for("effect/FiberRef/currentContext"), () => fiberRefUnsafeMakeContext(empty$h()));
-const currentSchedulingPriority = /* @__PURE__ */ globalValue(/* @__PURE__ */ Symbol.for("effect/FiberRef/currentSchedulingPriority"), () => fiberRefUnsafeMake(0));
-const currentMaxOpsBeforeYield = /* @__PURE__ */ globalValue(/* @__PURE__ */ Symbol.for("effect/FiberRef/currentMaxOpsBeforeYield"), () => fiberRefUnsafeMake(2048));
-const currentLogAnnotations = /* @__PURE__ */ globalValue(/* @__PURE__ */ Symbol.for("effect/FiberRef/currentLogAnnotation"), () => fiberRefUnsafeMake(empty$c()));
-const currentLogLevel = /* @__PURE__ */ globalValue(/* @__PURE__ */ Symbol.for("effect/FiberRef/currentLogLevel"), () => fiberRefUnsafeMake(logLevelInfo));
-const currentLogSpan = /* @__PURE__ */ globalValue(/* @__PURE__ */ Symbol.for("effect/FiberRef/currentLogSpan"), () => fiberRefUnsafeMake(empty$b()));
-const withSchedulingPriority = /* @__PURE__ */ dual(2, (self, scheduler) => fiberRefLocally(self, currentSchedulingPriority, scheduler));
-const currentUnhandledErrorLogLevel = /* @__PURE__ */ globalValue(/* @__PURE__ */ Symbol.for("effect/FiberRef/currentUnhandledErrorLogLevel"), () => fiberRefUnsafeMake(some$2(logLevelDebug)));
-const currentMetricLabels = /* @__PURE__ */ globalValue(/* @__PURE__ */ Symbol.for("effect/FiberRef/currentMetricLabels"), () => fiberRefUnsafeMakeReadonlyArray(empty$j()));
-const currentForkScopeOverride = /* @__PURE__ */ globalValue(/* @__PURE__ */ Symbol.for("effect/FiberRef/currentForkScopeOverride"), () => fiberRefUnsafeMake(none$6(), {
-  fork: () => none$6(),
-  join: (parent, _) => parent
-}));
-const currentInterruptedCause = /* @__PURE__ */ globalValue(/* @__PURE__ */ Symbol.for("effect/FiberRef/currentInterruptedCause"), () => fiberRefUnsafeMake(empty$6, {
-  fork: () => empty$6,
-  join: (parent, _) => parent
-}));
-const scopeAddFinalizer = (self, finalizer) => self.addFinalizer(() => asVoid(finalizer));
-const scopeClose = (self, exit2) => self.close(exit2);
-const scopeFork = (self, strategy) => self.fork(strategy);
-const YieldableError = /* @__PURE__ */ function() {
-  class YieldableError2 extends globalThis.Error {
+}), by = (t) => Tn(t, {
+  differ: ca,
+  fork: ca.empty
+}), pr = /* @__PURE__ */ Q(/* @__PURE__ */ Symbol.for("effect/FiberRef/currentContext"), () => Jl(di())), Hi = /* @__PURE__ */ Q(/* @__PURE__ */ Symbol.for("effect/FiberRef/currentSchedulingPriority"), () => st(0)), vy = /* @__PURE__ */ Q(/* @__PURE__ */ Symbol.for("effect/FiberRef/currentMaxOpsBeforeYield"), () => st(2048)), Sy = /* @__PURE__ */ Q(/* @__PURE__ */ Symbol.for("effect/FiberRef/currentLogAnnotation"), () => st(Oi())), wy = /* @__PURE__ */ Q(/* @__PURE__ */ Symbol.for("effect/FiberRef/currentLogLevel"), () => st(Bl)), ky = /* @__PURE__ */ Q(/* @__PURE__ */ Symbol.for("effect/FiberRef/currentLogSpan"), () => st(pn())), Ey = /* @__PURE__ */ g(2, (t, e) => Ki(t, Hi, e)), Oy = /* @__PURE__ */ Q(/* @__PURE__ */ Symbol.for("effect/FiberRef/currentUnhandledErrorLogLevel"), () => st(H(Vl))), Fo = /* @__PURE__ */ Q(/* @__PURE__ */ Symbol.for("effect/FiberRef/currentMetricLabels"), () => yy(ln())), Ao = /* @__PURE__ */ Q(/* @__PURE__ */ Symbol.for("effect/FiberRef/currentForkScopeOverride"), () => st(M(), {
+  fork: () => M(),
+  join: (t, e) => t
+})), Ar = /* @__PURE__ */ Q(/* @__PURE__ */ Symbol.for("effect/FiberRef/currentInterruptedCause"), () => st(tr, {
+  fork: () => tr,
+  join: (t, e) => t
+})), Ry = (t, e) => t.addFinalizer(() => Ht(e)), Iy = (t, e) => t.close(e), Cy = (t, e) => t.fork(e), Wl = /* @__PURE__ */ function() {
+  class t extends globalThis.Error {
     commit() {
-      return fail(this);
+      return Be(this);
     }
     toString() {
       return this.message ? `${this.name}: ${this.message}` : this.name;
@@ -4166,284 +2979,210 @@ const YieldableError = /* @__PURE__ */ function() {
         ...this
       };
     }
-    [NodeInspectSymbol]() {
-      const stack = this.stack;
-      if (stack) {
-        return `${this.toString()}
-${stack.split("\n").slice(1).join("\n")}`;
-      }
-      return this.toString();
+    [he]() {
+      const n = this.stack;
+      return n ? `${this.toString()}
+${n.split(`
+`).slice(1).join(`
+`)}` : this.toString();
     }
   }
-  Object.assign(YieldableError2.prototype, StructuralCommitPrototype);
-  return YieldableError2;
-}();
-const makeException = (proto2, tag) => {
-  class Base extends YieldableError {
+  return Object.assign(t.prototype, Gd), t;
+}(), Ji = (t, e) => {
+  class n extends Wl {
     constructor() {
       super(...arguments);
-      __publicField(this, "_tag", tag);
+      f(this, "_tag", e);
     }
   }
-  Object.assign(Base.prototype, proto2);
-  Base.prototype.name = tag;
-  return Base;
-};
-const RuntimeExceptionTypeId = /* @__PURE__ */ Symbol.for("effect/Cause/errors/RuntimeException");
-const RuntimeException = /* @__PURE__ */ makeException({
-  [RuntimeExceptionTypeId]: RuntimeExceptionTypeId
-}, "RuntimeException");
-const InterruptedExceptionTypeId = /* @__PURE__ */ Symbol.for("effect/Cause/errors/InterruptedException");
-const isInterruptedException = (u) => hasProperty(u, InterruptedExceptionTypeId);
-const IllegalArgumentExceptionTypeId = /* @__PURE__ */ Symbol.for("effect/Cause/errors/IllegalArgument");
-const IllegalArgumentException = /* @__PURE__ */ makeException({
-  [IllegalArgumentExceptionTypeId]: IllegalArgumentExceptionTypeId
-}, "IllegalArgumentException");
-const NoSuchElementExceptionTypeId = /* @__PURE__ */ Symbol.for("effect/Cause/errors/NoSuchElement");
-const NoSuchElementException = /* @__PURE__ */ makeException({
-  [NoSuchElementExceptionTypeId]: NoSuchElementExceptionTypeId
-}, "NoSuchElementException");
-const UnknownExceptionTypeId = /* @__PURE__ */ Symbol.for("effect/Cause/errors/UnknownException");
-const UnknownException = /* @__PURE__ */ function() {
-  class UnknownException2 extends YieldableError {
-    constructor(error, message) {
-      super(message ?? (hasProperty(error, "message") && isString(error.message) ? error.message : void 0));
-      __publicField(this, "error");
-      __publicField(this, "_tag", "UnknownException");
-      this.error = error;
+  return Object.assign(n.prototype, t), n.prototype.name = e, n;
+}, ba = /* @__PURE__ */ Symbol.for("effect/Cause/errors/RuntimeException"), Ty = /* @__PURE__ */ Ji({
+  [ba]: ba
+}, "RuntimeException"), $y = /* @__PURE__ */ Symbol.for("effect/Cause/errors/InterruptedException"), Fy = (t) => D(t, $y), va = /* @__PURE__ */ Symbol.for("effect/Cause/errors/IllegalArgument"), Ay = /* @__PURE__ */ Ji({
+  [va]: va
+}, "IllegalArgumentException"), Sa = /* @__PURE__ */ Symbol.for("effect/Cause/errors/NoSuchElement"), Gl = /* @__PURE__ */ Ji({
+  [Sa]: Sa
+}, "NoSuchElementException"), wa = /* @__PURE__ */ Symbol.for("effect/Cause/errors/UnknownException"), My = /* @__PURE__ */ function() {
+  class t extends Wl {
+    constructor(r, s) {
+      super(s ?? (D(r, "message") && eu(r.message) ? r.message : void 0));
+      f(this, "error");
+      f(this, "_tag", "UnknownException");
+      this.error = r;
     }
   }
-  Object.assign(UnknownException2.prototype, {
-    [UnknownExceptionTypeId]: UnknownExceptionTypeId,
+  return Object.assign(t.prototype, {
+    [wa]: wa,
     name: "UnknownException"
-  });
-  return UnknownException2;
-}();
-const exitIsExit = (u) => isEffect(u) && "_tag" in u && (u._tag === "Success" || u._tag === "Failure");
-const exitCollectAll = (exits, options) => exitCollectAllInternal(exits, (options == null ? void 0 : options.parallel) ? parallel : sequential$1);
-const exitDie = (defect) => exitFailCause(die$1(defect));
-const exitFail = (error) => exitFailCause(fail$1(error));
-const exitFailCause = (cause) => {
-  const effect = new EffectPrimitiveFailure(OP_FAILURE);
-  effect.effect_instruction_i0 = cause;
-  return effect;
-};
-const exitFlatMap = /* @__PURE__ */ dual(2, (self, f) => {
-  switch (self._tag) {
-    case OP_FAILURE: {
-      return exitFailCause(self.effect_instruction_i0);
-    }
-    case OP_SUCCESS: {
-      return f(self.effect_instruction_i0);
-    }
+  }), t;
+}(), Wi = (t) => Tl(t) && "_tag" in t && (t._tag === "Success" || t._tag === "Failure"), eo = (t, e) => Dy(t, e != null && e.parallel ? lr : tt), ka = (t) => Z(ut(t)), Ea = (t) => Z(Io(t)), Z = (t) => {
+  const e = new Il(je);
+  return e.effect_instruction_i0 = t, e;
+}, Py = /* @__PURE__ */ g(2, (t, e) => {
+  switch (t._tag) {
+    case je:
+      return Z(t.effect_instruction_i0);
+    case Le:
+      return e(t.effect_instruction_i0);
   }
-});
-const exitFlatten = (self) => pipe(self, exitFlatMap(identity));
-const exitInterrupt = (fiberId2) => exitFailCause(interrupt(fiberId2));
-const exitMap = /* @__PURE__ */ dual(2, (self, f) => {
-  switch (self._tag) {
-    case OP_FAILURE:
-      return exitFailCause(self.effect_instruction_i0);
-    case OP_SUCCESS:
-      return exitSucceed(f(self.effect_instruction_i0));
+}), Ny = (t) => m(t, Py(Ve)), xy = (t) => Z(Ct(t)), to = /* @__PURE__ */ g(2, (t, e) => {
+  switch (t._tag) {
+    case je:
+      return Z(t.effect_instruction_i0);
+    case Le:
+      return Oe(e(t.effect_instruction_i0));
   }
-});
-const exitMatch = /* @__PURE__ */ dual(2, (self, {
-  onFailure,
-  onSuccess
+}), zl = /* @__PURE__ */ g(2, (t, {
+  onFailure: e,
+  onSuccess: n
 }) => {
-  switch (self._tag) {
-    case OP_FAILURE:
-      return onFailure(self.effect_instruction_i0);
-    case OP_SUCCESS:
-      return onSuccess(self.effect_instruction_i0);
+  switch (t._tag) {
+    case je:
+      return e(t.effect_instruction_i0);
+    case Le:
+      return n(t.effect_instruction_i0);
   }
-});
-const exitMatchEffect = /* @__PURE__ */ dual(2, (self, {
-  onFailure,
-  onSuccess
+}), jy = /* @__PURE__ */ g(2, (t, {
+  onFailure: e,
+  onSuccess: n
 }) => {
-  switch (self._tag) {
-    case OP_FAILURE:
-      return onFailure(self.effect_instruction_i0);
-    case OP_SUCCESS:
-      return onSuccess(self.effect_instruction_i0);
+  switch (t._tag) {
+    case je:
+      return e(t.effect_instruction_i0);
+    case Le:
+      return n(t.effect_instruction_i0);
   }
-});
-const exitSucceed = (value) => {
-  const effect = new EffectPrimitiveSuccess(OP_SUCCESS);
-  effect.effect_instruction_i0 = value;
-  return effect;
-};
-const exitVoid = /* @__PURE__ */ exitSucceed(void 0);
-const exitZipWith = /* @__PURE__ */ dual(3, (self, that, {
-  onFailure,
-  onSuccess
+}), Oe = (t) => {
+  const e = new Cl(Le);
+  return e.effect_instruction_i0 = t, e;
+}, Tt = /* @__PURE__ */ Oe(void 0), Ly = /* @__PURE__ */ g(3, (t, e, {
+  onFailure: n,
+  onSuccess: r
 }) => {
-  switch (self._tag) {
-    case OP_FAILURE: {
-      switch (that._tag) {
-        case OP_SUCCESS:
-          return exitFailCause(self.effect_instruction_i0);
-        case OP_FAILURE: {
-          return exitFailCause(onFailure(self.effect_instruction_i0, that.effect_instruction_i0));
-        }
+  switch (t._tag) {
+    case je:
+      switch (e._tag) {
+        case Le:
+          return Z(t.effect_instruction_i0);
+        case je:
+          return Z(n(t.effect_instruction_i0, e.effect_instruction_i0));
       }
-    }
-    case OP_SUCCESS: {
-      switch (that._tag) {
-        case OP_SUCCESS:
-          return exitSucceed(onSuccess(self.effect_instruction_i0, that.effect_instruction_i0));
-        case OP_FAILURE:
-          return exitFailCause(that.effect_instruction_i0);
+    case Le:
+      switch (e._tag) {
+        case Le:
+          return Oe(r(t.effect_instruction_i0, e.effect_instruction_i0));
+        case je:
+          return Z(e.effect_instruction_i0);
       }
-    }
   }
-});
-const exitCollectAllInternal = (exits, combineCauses) => {
-  const list = fromIterable$5(exits);
-  if (!isNonEmpty(list)) {
-    return none$6();
-  }
-  return pipe(tailNonEmpty(list), reduce$6(pipe(headNonEmpty(list), exitMap(of$1)), (accumulator, current) => pipe(accumulator, exitZipWith(current, {
-    onSuccess: (list2, value) => pipe(list2, prepend$1(value)),
-    onFailure: combineCauses
-  }))), exitMap(reverse$1), exitMap((chunk) => toReadonlyArray(chunk)), some$2);
-};
-const deferredUnsafeMake = (fiberId2) => ({
-  [DeferredTypeId]: deferredVariance,
-  state: make$g(pending([])),
-  blockingOn: fiberId2,
+}), Dy = (t, e) => {
+  const n = ys(t);
+  return xt(n) ? m(yt(n), Wn(m(jt(n), to(Je)), (r, s) => m(r, Ly(s, {
+    onSuccess: (o, c) => m(o, Ye(c)),
+    onFailure: e
+  }))), to(fn), to((r) => Ft(r)), H) : M();
+}, Yl = (t) => ({
+  [B_]: V_,
+  state: ki(K_([])),
+  blockingOn: t,
   pipe() {
-    return pipeArguments(this, arguments);
+    return A(this, arguments);
   }
-});
-const deferredMake = () => flatMap$1(fiberId, (id) => deferredMakeAs(id));
-const deferredMakeAs = (fiberId2) => sync(() => deferredUnsafeMake(fiberId2));
-const deferredAwait = (self) => async$1((resume2) => {
-  const state = get$3(self.state);
-  switch (state._tag) {
-    case OP_STATE_DONE: {
-      return resume2(state.effect);
-    }
-    case OP_STATE_PENDING: {
-      state.joiners.push(resume2);
-      return deferredInterruptJoiner(self, resume2);
-    }
+}), Uy = () => T(Nl, (t) => qy(t)), qy = (t) => $(() => Yl(t)), Ql = (t) => lt((e) => {
+  const n = Ut(t.state);
+  switch (n._tag) {
+    case Ai:
+      return e(n.effect);
+    case fr:
+      return n.joiners.push(e), Ky(t, e);
   }
-}, self.blockingOn);
-const deferredCompleteWith = /* @__PURE__ */ dual(2, (self, effect) => sync(() => {
-  const state = get$3(self.state);
-  switch (state._tag) {
-    case OP_STATE_DONE: {
-      return false;
-    }
-    case OP_STATE_PENDING: {
-      set$2(self.state, done$2(effect));
-      for (let i = 0, len = state.joiners.length; i < len; i++) {
-        state.joiners[i](effect);
-      }
-      return true;
+}, t.blockingOn), Xl = /* @__PURE__ */ g(2, (t, e) => $(() => {
+  const n = Ut(t.state);
+  switch (n._tag) {
+    case Ai:
+      return !1;
+    case fr: {
+      Rs(t.state, El(e));
+      for (let r = 0, s = n.joiners.length; r < s; r++)
+        n.joiners[r](e);
+      return !0;
     }
   }
-}));
-const deferredFailCause = /* @__PURE__ */ dual(2, (self, cause) => deferredCompleteWith(self, failCause(cause)));
-const deferredSucceed = /* @__PURE__ */ dual(2, (self, value) => deferredCompleteWith(self, succeed(value)));
-const deferredUnsafeDone = (self, effect) => {
-  const state = get$3(self.state);
-  if (state._tag === OP_STATE_PENDING) {
-    set$2(self.state, done$2(effect));
-    for (let i = 0, len = state.joiners.length; i < len; i++) {
-      state.joiners[i](effect);
-    }
+})), By = /* @__PURE__ */ g(2, (t, e) => Xl(t, Qe(e))), Vy = /* @__PURE__ */ g(2, (t, e) => Xl(t, ie(e))), Zl = (t, e) => {
+  const n = Ut(t.state);
+  if (n._tag === fr) {
+    Rs(t.state, El(e));
+    for (let r = 0, s = n.joiners.length; r < s; r++)
+      n.joiners[r](e);
   }
-};
-const deferredInterruptJoiner = (self, joiner) => sync(() => {
-  const state = get$3(self.state);
-  if (state._tag === OP_STATE_PENDING) {
-    const index = state.joiners.indexOf(joiner);
-    if (index >= 0) {
-      state.joiners.splice(index, 1);
-    }
+}, Ky = (t, e) => $(() => {
+  const n = Ut(t.state);
+  if (n._tag === fr) {
+    const r = n.joiners.indexOf(e);
+    r >= 0 && n.joiners.splice(r, 1);
   }
-});
-const currentSpanFromFiber = (fiber) => {
-  const span2 = fiber.getFiberRef(currentContext).unsafeMap.get(spanTag.key);
-  return span2 !== void 0 && span2._tag === "Span" ? some$2(span2) : none$6();
-};
-const _await$1 = deferredAwait;
-const TypeId$3 = /* @__PURE__ */ Symbol.for("effect/Duration");
-const bigint0$1 = /* @__PURE__ */ BigInt(0);
-const bigint24 = /* @__PURE__ */ BigInt(24);
-const bigint60 = /* @__PURE__ */ BigInt(60);
-const bigint1e3 = /* @__PURE__ */ BigInt(1e3);
-const bigint1e6 = /* @__PURE__ */ BigInt(1e6);
-const bigint1e9 = /* @__PURE__ */ BigInt(1e9);
-const DURATION_REGEX = /^(-?\d+(?:\.\d+)?)\s+(nanos?|micros?|millis?|seconds?|minutes?|hours?|days?|weeks?)$/;
-const decode = (input) => {
-  if (isDuration(input)) {
-    return input;
-  } else if (isNumber(input)) {
-    return millis(input);
-  } else if (isBigInt(input)) {
-    return nanos(input);
-  } else if (Array.isArray(input)) {
-    if (input.length === 2 && isNumber(input[0]) && isNumber(input[1])) {
-      return nanos(BigInt(input[0]) * bigint1e9 + BigInt(input[1]));
-    }
-  } else if (isString(input)) {
-    DURATION_REGEX.lastIndex = 0;
-    const match2 = DURATION_REGEX.exec(input);
-    if (match2) {
-      const [_, valueStr, unit2] = match2;
-      const value = Number(valueStr);
-      switch (unit2) {
+}), ef = (t) => {
+  const e = t.getFiberRef(pr).unsafeMap.get(Ol.key);
+  return e !== void 0 && e._tag === "Span" ? H(e) : M();
+}, Hy = Ql, Mo = /* @__PURE__ */ Symbol.for("effect/Duration"), Zt = /* @__PURE__ */ BigInt(0), no = /* @__PURE__ */ BigInt(24), Qt = /* @__PURE__ */ BigInt(60), Vr = /* @__PURE__ */ BigInt(1e3), ro = /* @__PURE__ */ BigInt(1e6), Po = /* @__PURE__ */ BigInt(1e9), Oa = /^(-?\d+(?:\.\d+)?)\s+(nanos?|micros?|millis?|seconds?|minutes?|hours?|days?|weeks?)$/, wt = (t) => {
+  if (tf(t))
+    return t;
+  if (xr(t))
+    return No(t);
+  if (Od(t))
+    return so(t);
+  if (Array.isArray(t)) {
+    if (t.length === 2 && xr(t[0]) && xr(t[1]))
+      return so(BigInt(t[0]) * Po + BigInt(t[1]));
+  } else if (eu(t)) {
+    Oa.lastIndex = 0;
+    const e = Oa.exec(t);
+    if (e) {
+      const [n, r, s] = e, o = Number(r);
+      switch (s) {
         case "nano":
         case "nanos":
-          return nanos(BigInt(valueStr));
+          return so(BigInt(r));
         case "micro":
         case "micros":
-          return micros(BigInt(valueStr));
+          return zy(BigInt(r));
         case "milli":
         case "millis":
-          return millis(value);
+          return No(o);
         case "second":
         case "seconds":
-          return seconds(value);
+          return Yy(o);
         case "minute":
         case "minutes":
-          return minutes(value);
+          return Qy(o);
         case "hour":
         case "hours":
-          return hours(value);
+          return Xy(o);
         case "day":
         case "days":
-          return days(value);
+          return Zy(o);
         case "week":
         case "weeks":
-          return weeks(value);
+          return eb(o);
       }
     }
   }
   throw new Error("Invalid DurationInput");
-};
-const zeroValue = {
+}, Ra = {
   _tag: "Millis",
   millis: 0
-};
-const infinityValue = {
+}, Jy = {
   _tag: "Infinity"
-};
-const DurationProto = {
-  [TypeId$3]: TypeId$3,
-  [symbol$1]() {
-    return cached(this, structure(this.value));
+}, Wy = {
+  [Mo]: Mo,
+  [j]() {
+    return ue(this, su(this.value));
   },
-  [symbol](that) {
-    return isDuration(that) && equals(this, that);
+  [P](t) {
+    return tf(t) && ob(this, t);
   },
   toString() {
-    return `Duration(${format(this)})`;
+    return `Duration(${ib(this)})`;
   },
   toJSON() {
     switch (this.value._tag) {
@@ -4457,7 +3196,7 @@ const DurationProto = {
         return {
           _id: "Duration",
           _tag: "Nanos",
-          hrtime: toHrTime(this)
+          hrtime: nb(this)
         };
       case "Infinity":
         return {
@@ -4466,2578 +3205,1725 @@ const DurationProto = {
         };
     }
   },
-  [NodeInspectSymbol]() {
+  [he]() {
     return this.toJSON();
   },
   pipe() {
-    return pipeArguments(this, arguments);
+    return A(this, arguments);
   }
-};
-const make$b = (input) => {
-  const duration = Object.create(DurationProto);
-  if (isNumber(input)) {
-    if (isNaN(input) || input <= 0) {
-      duration.value = zeroValue;
-    } else if (!Number.isFinite(input)) {
-      duration.value = infinityValue;
-    } else if (!Number.isInteger(input)) {
-      duration.value = {
-        _tag: "Nanos",
-        nanos: BigInt(Math.round(input * 1e6))
-      };
-    } else {
-      duration.value = {
-        _tag: "Millis",
-        millis: input
-      };
-    }
-  } else if (input <= bigint0$1) {
-    duration.value = zeroValue;
-  } else {
-    duration.value = {
-      _tag: "Nanos",
-      nanos: input
-    };
-  }
-  return duration;
-};
-const isDuration = (u) => hasProperty(u, TypeId$3);
-const zero = /* @__PURE__ */ make$b(0);
-const nanos = (nanos2) => make$b(nanos2);
-const micros = (micros2) => make$b(micros2 * bigint1e3);
-const millis = (millis2) => make$b(millis2);
-const seconds = (seconds2) => make$b(seconds2 * 1e3);
-const minutes = (minutes2) => make$b(minutes2 * 6e4);
-const hours = (hours2) => make$b(hours2 * 36e5);
-const days = (days2) => make$b(days2 * 864e5);
-const weeks = (weeks2) => make$b(weeks2 * 6048e5);
-const toMillis = (self) => {
-  const _self = decode(self);
-  switch (_self.value._tag) {
+}, dt = (t) => {
+  const e = Object.create(Wy);
+  return xr(t) ? isNaN(t) || t <= 0 ? e.value = Ra : Number.isFinite(t) ? Number.isInteger(t) ? e.value = {
+    _tag: "Millis",
+    millis: t
+  } : e.value = {
+    _tag: "Nanos",
+    nanos: BigInt(Math.round(t * 1e6))
+  } : e.value = Jy : t <= Zt ? e.value = Ra : e.value = {
+    _tag: "Nanos",
+    nanos: t
+  }, e;
+}, tf = (t) => D(t, Mo), Gy = /* @__PURE__ */ dt(0), so = (t) => dt(t), zy = (t) => dt(t * Vr), No = (t) => dt(t), Yy = (t) => dt(t * 1e3), Qy = (t) => dt(t * 6e4), Xy = (t) => dt(t * 36e5), Zy = (t) => dt(t * 864e5), eb = (t) => dt(t * 6048e5), xo = (t) => {
+  const e = wt(t);
+  switch (e.value._tag) {
     case "Infinity":
-      return Infinity;
+      return 1 / 0;
     case "Nanos":
-      return Number(_self.value.nanos) / 1e6;
+      return Number(e.value.nanos) / 1e6;
     case "Millis":
-      return _self.value.millis;
+      return e.value.millis;
   }
-};
-const unsafeToNanos = (self) => {
-  const _self = decode(self);
-  switch (_self.value._tag) {
+}, tb = (t) => {
+  const e = wt(t);
+  switch (e.value._tag) {
     case "Infinity":
       throw new Error("Cannot convert infinite duration to nanos");
     case "Nanos":
-      return _self.value.nanos;
+      return e.value.nanos;
     case "Millis":
-      return BigInt(Math.round(_self.value.millis * 1e6));
+      return BigInt(Math.round(e.value.millis * 1e6));
   }
-};
-const toHrTime = (self) => {
-  const _self = decode(self);
-  switch (_self.value._tag) {
+}, nb = (t) => {
+  const e = wt(t);
+  switch (e.value._tag) {
     case "Infinity":
-      return [Infinity, 0];
+      return [1 / 0, 0];
     case "Nanos":
-      return [Number(_self.value.nanos / bigint1e9), Number(_self.value.nanos % bigint1e9)];
+      return [Number(e.value.nanos / Po), Number(e.value.nanos % Po)];
     case "Millis":
-      return [Math.floor(_self.value.millis / 1e3), Math.round(_self.value.millis % 1e3 * 1e6)];
+      return [Math.floor(e.value.millis / 1e3), Math.round(e.value.millis % 1e3 * 1e6)];
   }
-};
-const matchWith = /* @__PURE__ */ dual(3, (self, that, options) => {
-  const _self = decode(self);
-  const _that = decode(that);
-  if (_self.value._tag === "Infinity" || _that.value._tag === "Infinity") {
-    return options.onMillis(toMillis(_self), toMillis(_that));
-  } else if (_self.value._tag === "Nanos" || _that.value._tag === "Nanos") {
-    const selfNanos = _self.value._tag === "Nanos" ? _self.value.nanos : BigInt(Math.round(_self.value.millis * 1e6));
-    const thatNanos = _that.value._tag === "Nanos" ? _that.value.nanos : BigInt(Math.round(_that.value.millis * 1e6));
-    return options.onNanos(selfNanos, thatNanos);
+}, nf = /* @__PURE__ */ g(3, (t, e, n) => {
+  const r = wt(t), s = wt(e);
+  if (r.value._tag === "Infinity" || s.value._tag === "Infinity")
+    return n.onMillis(xo(r), xo(s));
+  if (r.value._tag === "Nanos" || s.value._tag === "Nanos") {
+    const o = r.value._tag === "Nanos" ? r.value.nanos : BigInt(Math.round(r.value.millis * 1e6)), c = s.value._tag === "Nanos" ? s.value.nanos : BigInt(Math.round(s.value.millis * 1e6));
+    return n.onNanos(o, c);
   }
-  return options.onMillis(_self.value.millis, _that.value.millis);
-});
-const Equivalence = (self, that) => matchWith(self, that, {
-  onMillis: (self2, that2) => self2 === that2,
-  onNanos: (self2, that2) => self2 === that2
-});
-const greaterThanOrEqualTo = /* @__PURE__ */ dual(2, (self, that) => matchWith(self, that, {
-  onMillis: (self2, that2) => self2 >= that2,
-  onNanos: (self2, that2) => self2 >= that2
-}));
-const equals = /* @__PURE__ */ dual(2, (self, that) => Equivalence(decode(self), decode(that)));
-const format = (self) => {
-  const duration = decode(self);
-  const parts = [];
-  if (duration.value._tag === "Infinity") {
+  return n.onMillis(r.value.millis, s.value.millis);
+}), rb = (t, e) => nf(t, e, {
+  onMillis: (n, r) => n === r,
+  onNanos: (n, r) => n === r
+}), sb = /* @__PURE__ */ g(2, (t, e) => nf(t, e, {
+  onMillis: (n, r) => n >= r,
+  onNanos: (n, r) => n >= r
+})), ob = /* @__PURE__ */ g(2, (t, e) => rb(wt(t), wt(e))), ib = (t) => {
+  const e = wt(t), n = [];
+  if (e.value._tag === "Infinity")
     return "Infinity";
-  }
-  const nanos2 = unsafeToNanos(duration);
-  if (nanos2 % bigint1e6) {
-    parts.push(`${nanos2 % bigint1e6}ns`);
-  }
-  const ms = nanos2 / bigint1e6;
-  if (ms % bigint1e3 !== bigint0$1) {
-    parts.push(`${ms % bigint1e3}ms`);
-  }
-  const sec = ms / bigint1e3;
-  if (sec % bigint60 !== bigint0$1) {
-    parts.push(`${sec % bigint60}s`);
-  }
-  const min = sec / bigint60;
-  if (min % bigint60 !== bigint0$1) {
-    parts.push(`${min % bigint60}m`);
-  }
-  const hr = min / bigint60;
-  if (hr % bigint24 !== bigint0$1) {
-    parts.push(`${hr % bigint24}h`);
-  }
-  const days2 = hr / bigint24;
-  if (days2 !== bigint0$1) {
-    parts.push(`${days2}d`);
-  }
-  return parts.reverse().join(" ");
-};
-const flatten = exitFlatten;
-const TypeId$2 = /* @__PURE__ */ Symbol.for("effect/MutableHashMap");
-const MutableHashMapProto = {
-  [TypeId$2]: TypeId$2,
+  const r = tb(e);
+  r % ro && n.push(`${r % ro}ns`);
+  const s = r / ro;
+  s % Vr !== Zt && n.push(`${s % Vr}ms`);
+  const o = s / Vr;
+  o % Qt !== Zt && n.push(`${o % Qt}s`);
+  const c = o / Qt;
+  c % Qt !== Zt && n.push(`${c % Qt}m`);
+  const a = c / Qt;
+  a % no !== Zt && n.push(`${a % no}h`);
+  const u = a / no;
+  return u !== Zt && n.push(`${u}d`), n.reverse().join(" ");
+}, cb = Ny, Ia = /* @__PURE__ */ Symbol.for("effect/MutableHashMap"), ab = {
+  [Ia]: Ia,
   [Symbol.iterator]() {
-    return new MutableHashMapIterator(this);
+    return new Gi(this);
   },
   toString() {
-    return format$1(this.toJSON());
+    return Ie(this.toJSON());
   },
   toJSON() {
     return {
       _id: "MutableHashMap",
-      values: Array.from(this).map(toJSON)
+      values: Array.from(this).map(ye)
     };
   },
-  [NodeInspectSymbol]() {
+  [he]() {
     return this.toJSON();
   },
   pipe() {
-    return pipeArguments(this, arguments);
+    return A(this, arguments);
   }
 };
-class MutableHashMapIterator {
-  constructor(self) {
-    __publicField(this, "self");
-    __publicField(this, "referentialIterator");
-    __publicField(this, "bucketIterator");
-    this.self = self;
-    this.referentialIterator = self.referential[Symbol.iterator]();
+class Gi {
+  constructor(e) {
+    f(this, "self");
+    f(this, "referentialIterator");
+    f(this, "bucketIterator");
+    this.self = e, this.referentialIterator = e.referential[Symbol.iterator]();
   }
   next() {
-    if (this.bucketIterator !== void 0) {
+    if (this.bucketIterator !== void 0)
       return this.bucketIterator.next();
-    }
-    const result = this.referentialIterator.next();
-    if (result.done) {
-      this.bucketIterator = new BucketIterator(this.self.buckets.values());
-      return this.next();
-    }
-    return result;
+    const e = this.referentialIterator.next();
+    return e.done ? (this.bucketIterator = new ub(this.self.buckets.values()), this.next()) : e;
   }
   [Symbol.iterator]() {
-    return new MutableHashMapIterator(this.self);
+    return new Gi(this.self);
   }
 }
-class BucketIterator {
-  constructor(backing) {
-    __publicField(this, "backing");
-    __publicField(this, "currentBucket");
-    this.backing = backing;
+class ub {
+  constructor(e) {
+    f(this, "backing");
+    f(this, "currentBucket");
+    this.backing = e;
   }
   next() {
     if (this.currentBucket === void 0) {
-      const result2 = this.backing.next();
-      if (result2.done) {
-        return result2;
-      }
-      this.currentBucket = result2.value[Symbol.iterator]();
+      const n = this.backing.next();
+      if (n.done)
+        return n;
+      this.currentBucket = n.value[Symbol.iterator]();
     }
-    const result = this.currentBucket.next();
-    if (result.done) {
-      this.currentBucket = void 0;
-      return this.next();
-    }
-    return result;
+    const e = this.currentBucket.next();
+    return e.done ? (this.currentBucket = void 0, this.next()) : e;
   }
 }
-const empty$5 = () => {
-  const self = Object.create(MutableHashMapProto);
-  self.referential = /* @__PURE__ */ new Map();
-  self.buckets = /* @__PURE__ */ new Map();
-  self.bucketsSize = 0;
-  return self;
-};
-const get$1 = /* @__PURE__ */ dual(2, (self, key) => {
-  if (isEqual(key) === false) {
-    return self.referential.has(key) ? some$2(self.referential.get(key)) : none$6();
-  }
-  const hash2 = key[symbol$1]();
-  const bucket = self.buckets.get(hash2);
-  if (bucket === void 0) {
-    return none$6();
-  }
-  return getFromBucket(self, bucket, key);
-});
-const getFromBucket = (self, bucket, key, remove2 = false) => {
-  for (let i = 0, len = bucket.length; i < len; i++) {
-    if (key[symbol](bucket[i][0])) {
-      const value = bucket[i][1];
-      if (remove2) {
-        bucket.splice(i, 1);
-        self.bucketsSize--;
-      }
-      return some$2(value);
+const lb = () => {
+  const t = Object.create(ab);
+  return t.referential = /* @__PURE__ */ new Map(), t.buckets = /* @__PURE__ */ new Map(), t.bucketsSize = 0, t;
+}, It = /* @__PURE__ */ g(2, (t, e) => {
+  if (Gr(e) === !1)
+    return t.referential.has(e) ? H(t.referential.get(e)) : M();
+  const n = e[j](), r = t.buckets.get(n);
+  return r === void 0 ? M() : fb(t, r, e);
+}), fb = (t, e, n, r = !1) => {
+  for (let s = 0, o = e.length; s < o; s++)
+    if (n[P](e[s][0])) {
+      const c = e[s][1];
+      return r && (e.splice(s, 1), t.bucketsSize--), H(c);
     }
-  }
-  return none$6();
-};
-const has = /* @__PURE__ */ dual(2, (self, key) => isSome(get$1(self, key)));
-const set = /* @__PURE__ */ dual(3, (self, key, value) => {
-  if (isEqual(key) === false) {
-    self.referential.set(key, value);
-    return self;
-  }
-  const hash2 = key[symbol$1]();
-  const bucket = self.buckets.get(hash2);
-  if (bucket === void 0) {
-    self.buckets.set(hash2, [[key, value]]);
-    self.bucketsSize++;
-    return self;
-  }
-  removeFromBucket(self, bucket, key);
-  bucket.push([key, value]);
-  self.bucketsSize++;
-  return self;
-});
-const removeFromBucket = (self, bucket, key) => {
-  for (let i = 0, len = bucket.length; i < len; i++) {
-    if (key[symbol](bucket[i][0])) {
-      bucket.splice(i, 1);
-      self.bucketsSize--;
+  return M();
+}, Nn = /* @__PURE__ */ g(2, (t, e) => nt(It(t, e))), xn = /* @__PURE__ */ g(3, (t, e, n) => {
+  if (Gr(e) === !1)
+    return t.referential.set(e, n), t;
+  const r = e[j](), s = t.buckets.get(r);
+  return s === void 0 ? (t.buckets.set(r, [[e, n]]), t.bucketsSize++, t) : (hb(t, s, e), s.push([e, n]), t.bucketsSize++, t);
+}), hb = (t, e, n) => {
+  for (let r = 0, s = e.length; r < s; r++)
+    if (n[P](e[r][0])) {
+      e.splice(r, 1), t.bucketsSize--;
       return;
     }
+}, db = "effect/Clock", Ca = /* @__PURE__ */ Symbol.for(db), zi = /* @__PURE__ */ wn("effect/Clock"), pb = 2 ** 31 - 1, Ta = {
+  unsafeSchedule(t, e) {
+    const n = xo(e);
+    if (n > pb)
+      return ho;
+    let r = !1;
+    const s = setTimeout(() => {
+      r = !0, t();
+    }, n);
+    return () => (clearTimeout(s), !r);
   }
-};
-const ClockSymbolKey = "effect/Clock";
-const ClockTypeId = /* @__PURE__ */ Symbol.for(ClockSymbolKey);
-const clockTag = /* @__PURE__ */ GenericTag("effect/Clock");
-const MAX_TIMER_MILLIS = 2 ** 31 - 1;
-const globalClockScheduler = {
-  unsafeSchedule(task, duration) {
-    const millis2 = toMillis(duration);
-    if (millis2 > MAX_TIMER_MILLIS) {
-      return constFalse;
-    }
-    let completed = false;
-    const handle = setTimeout(() => {
-      completed = true;
-      task();
-    }, millis2);
-    return () => {
-      clearTimeout(handle);
-      return !completed;
-    };
-  }
-};
-const performanceNowNanos = /* @__PURE__ */ function() {
-  const bigint1e62 = /* @__PURE__ */ BigInt(1e6);
-  if (typeof performance === "undefined") {
-    return () => BigInt(Date.now()) * bigint1e62;
-  }
-  const origin = "timeOrigin" in performance && typeof performance.timeOrigin === "number" ? /* @__PURE__ */ BigInt(/* @__PURE__ */ Math.round(performance.timeOrigin * 1e6)) : /* @__PURE__ */ BigInt(/* @__PURE__ */ Date.now()) * bigint1e62 - /* @__PURE__ */ BigInt(/* @__PURE__ */ Math.round(/* @__PURE__ */ performance.now() * 1e6));
-  return () => origin + BigInt(Math.round(performance.now() * 1e6));
+}, $a = /* @__PURE__ */ function() {
+  const t = /* @__PURE__ */ BigInt(1e6);
+  if (typeof performance > "u")
+    return () => BigInt(Date.now()) * t;
+  const e = "timeOrigin" in performance && typeof performance.timeOrigin == "number" ? /* @__PURE__ */ BigInt(/* @__PURE__ */ Math.round(performance.timeOrigin * 1e6)) : /* @__PURE__ */ BigInt(/* @__PURE__ */ Date.now()) * t - /* @__PURE__ */ BigInt(/* @__PURE__ */ Math.round(/* @__PURE__ */ performance.now() * 1e6));
+  return () => e + BigInt(Math.round(performance.now() * 1e6));
+}(), gb = /* @__PURE__ */ function() {
+  const t = typeof process == "object" && "hrtime" in process && typeof process.hrtime.bigint == "function" ? process.hrtime : void 0;
+  if (!t)
+    return $a;
+  const e = /* @__PURE__ */ $a() - /* @__PURE__ */ t.bigint();
+  return () => e + t.bigint();
 }();
-const processOrPerformanceNow = /* @__PURE__ */ function() {
-  const processHrtime = typeof process === "object" && "hrtime" in process && typeof process.hrtime.bigint === "function" ? process.hrtime : void 0;
-  if (!processHrtime) {
-    return performanceNowNanos;
-  }
-  const origin = /* @__PURE__ */ performanceNowNanos() - /* @__PURE__ */ processHrtime.bigint();
-  return () => origin + processHrtime.bigint();
-}();
-class ClockImpl {
+var Jw;
+class mb {
   constructor() {
-    __publicField(this, _h, ClockTypeId);
-    __publicField(this, "currentTimeMillis", sync(() => this.unsafeCurrentTimeMillis()));
-    __publicField(this, "currentTimeNanos", sync(() => this.unsafeCurrentTimeNanos()));
+    f(this, Jw, Ca);
+    f(this, "currentTimeMillis", $(() => this.unsafeCurrentTimeMillis()));
+    f(this, "currentTimeNanos", $(() => this.unsafeCurrentTimeNanos()));
   }
   unsafeCurrentTimeMillis() {
     return Date.now();
   }
   unsafeCurrentTimeNanos() {
-    return processOrPerformanceNow();
+    return gb();
   }
   scheduler() {
-    return succeed(globalClockScheduler);
+    return ie(Ta);
   }
-  sleep(duration) {
-    return async$1((resume2) => {
-      const canceler = globalClockScheduler.unsafeSchedule(() => resume2(void_), duration);
-      return asVoid(sync(canceler));
+  sleep(e) {
+    return lt((n) => {
+      const r = Ta.unsafeSchedule(() => n(Ue), e);
+      return Ht($(r));
     });
   }
 }
-_h = ClockTypeId;
-const make$a = () => new ClockImpl();
-const Order$1 = number;
-const escape = (string2) => string2.replace(/[/\\^$*+?.()|[\]{}]/g, "\\$&");
-const OP_AND = "And";
-const OP_OR = "Or";
-const OP_INVALID_DATA = "InvalidData";
-const OP_MISSING_DATA = "MissingData";
-const OP_SOURCE_UNAVAILABLE = "SourceUnavailable";
-const OP_UNSUPPORTED = "Unsupported";
-const ConfigErrorSymbolKey = "effect/ConfigError";
-const ConfigErrorTypeId = /* @__PURE__ */ Symbol.for(ConfigErrorSymbolKey);
-const proto = {
+Jw = Ca;
+const _b = () => new mb(), nr = rp, yb = (t) => t.replace(/[/\\^$*+?.()|[\]{}]/g, "\\$&"), rf = "And", sf = "Or", of = "InvalidData", cf = "MissingData", af = "SourceUnavailable", uf = "Unsupported", bb = "effect/ConfigError", Fa = /* @__PURE__ */ Symbol.for(bb), $n = {
   _tag: "ConfigError",
-  [ConfigErrorTypeId]: ConfigErrorTypeId
-};
-const And = (self, that) => {
-  const error = Object.create(proto);
-  error._op = OP_AND;
-  error.left = self;
-  error.right = that;
-  Object.defineProperty(error, "toString", {
-    enumerable: false,
+  [Fa]: Fa
+}, lf = (t, e) => {
+  const n = Object.create($n);
+  return n._op = rf, n.left = t, n.right = e, Object.defineProperty(n, "toString", {
+    enumerable: !1,
     value() {
       return `${this.left} and ${this.right}`;
     }
-  });
-  return error;
-};
-const Or = (self, that) => {
-  const error = Object.create(proto);
-  error._op = OP_OR;
-  error.left = self;
-  error.right = that;
-  Object.defineProperty(error, "toString", {
-    enumerable: false,
+  }), n;
+}, ff = (t, e) => {
+  const n = Object.create($n);
+  return n._op = sf, n.left = t, n.right = e, Object.defineProperty(n, "toString", {
+    enumerable: !1,
     value() {
       return `${this.left} or ${this.right}`;
     }
-  });
-  return error;
-};
-const InvalidData = (path, message, options = {
+  }), n;
+}, vb = (t, e, n = {
   pathDelim: "."
 }) => {
-  const error = Object.create(proto);
-  error._op = OP_INVALID_DATA;
-  error.path = path;
-  error.message = message;
-  Object.defineProperty(error, "toString", {
-    enumerable: false,
+  const r = Object.create($n);
+  return r._op = of, r.path = t, r.message = e, Object.defineProperty(r, "toString", {
+    enumerable: !1,
     value() {
-      const path2 = pipe(this.path, join$1(options.pathDelim));
-      return `(Invalid data at ${path2}: "${this.message}")`;
+      return `(Invalid data at ${m(this.path, Sn(n.pathDelim))}: "${this.message}")`;
     }
-  });
-  return error;
-};
-const MissingData = (path, message, options = {
+  }), r;
+}, Bt = (t, e, n = {
   pathDelim: "."
 }) => {
-  const error = Object.create(proto);
-  error._op = OP_MISSING_DATA;
-  error.path = path;
-  error.message = message;
-  Object.defineProperty(error, "toString", {
-    enumerable: false,
+  const r = Object.create($n);
+  return r._op = cf, r.path = t, r.message = e, Object.defineProperty(r, "toString", {
+    enumerable: !1,
     value() {
-      const path2 = pipe(this.path, join$1(options.pathDelim));
-      return `(Missing data at ${path2}: "${this.message}")`;
+      return `(Missing data at ${m(this.path, Sn(n.pathDelim))}: "${this.message}")`;
     }
-  });
-  return error;
-};
-const SourceUnavailable = (path, message, cause, options = {
+  }), r;
+}, Sb = (t, e, n, r = {
   pathDelim: "."
 }) => {
-  const error = Object.create(proto);
-  error._op = OP_SOURCE_UNAVAILABLE;
-  error.path = path;
-  error.message = message;
-  error.cause = cause;
-  Object.defineProperty(error, "toString", {
-    enumerable: false,
+  const s = Object.create($n);
+  return s._op = af, s.path = t, s.message = e, s.cause = n, Object.defineProperty(s, "toString", {
+    enumerable: !1,
     value() {
-      const path2 = pipe(this.path, join$1(options.pathDelim));
-      return `(Source unavailable at ${path2}: "${this.message}")`;
+      return `(Source unavailable at ${m(this.path, Sn(r.pathDelim))}: "${this.message}")`;
     }
-  });
-  return error;
-};
-const Unsupported = (path, message, options = {
+  }), s;
+}, wb = (t, e, n = {
   pathDelim: "."
 }) => {
-  const error = Object.create(proto);
-  error._op = OP_UNSUPPORTED;
-  error.path = path;
-  error.message = message;
-  Object.defineProperty(error, "toString", {
-    enumerable: false,
+  const r = Object.create($n);
+  return r._op = uf, r.path = t, r.message = e, Object.defineProperty(r, "toString", {
+    enumerable: !1,
     value() {
-      const path2 = pipe(this.path, join$1(options.pathDelim));
-      return `(Unsupported operation at ${path2}: "${this.message}")`;
+      return `(Unsupported operation at ${m(this.path, Sn(n.pathDelim))}: "${this.message}")`;
     }
-  });
-  return error;
-};
-const prefixed = /* @__PURE__ */ dual(2, (self, prefix) => {
-  switch (self._op) {
-    case OP_AND: {
-      return And(prefixed(self.left, prefix), prefixed(self.right, prefix));
-    }
-    case OP_OR: {
-      return Or(prefixed(self.left, prefix), prefixed(self.right, prefix));
-    }
-    case OP_INVALID_DATA: {
-      return InvalidData([...prefix, ...self.path], self.message);
-    }
-    case OP_MISSING_DATA: {
-      return MissingData([...prefix, ...self.path], self.message);
-    }
-    case OP_SOURCE_UNAVAILABLE: {
-      return SourceUnavailable([...prefix, ...self.path], self.message, self.cause);
-    }
-    case OP_UNSUPPORTED: {
-      return Unsupported([...prefix, ...self.path], self.message);
-    }
+  }), r;
+}, $t = /* @__PURE__ */ g(2, (t, e) => {
+  switch (t._op) {
+    case rf:
+      return lf($t(t.left, e), $t(t.right, e));
+    case sf:
+      return ff($t(t.left, e), $t(t.right, e));
+    case of:
+      return vb([...e, ...t.path], t.message);
+    case cf:
+      return Bt([...e, ...t.path], t.message);
+    case af:
+      return Sb([...e, ...t.path], t.message, t.cause);
+    case uf:
+      return wb([...e, ...t.path], t.message);
   }
-});
-const empty$4 = {
+}), kb = {
   _tag: "Empty"
-};
-const patch$3 = /* @__PURE__ */ dual(2, (path, patch2) => {
-  let input = of(patch2);
-  let output = path;
-  while (isCons(input)) {
-    const patch3 = input.head;
-    switch (patch3._tag) {
+}, oo = /* @__PURE__ */ g(2, (t, e) => {
+  let n = Ri(e), r = t;
+  for (; ol(n); ) {
+    const s = n.head;
+    switch (s._tag) {
       case "Empty": {
-        input = input.tail;
+        n = n.tail;
         break;
       }
       case "AndThen": {
-        input = cons(patch3.first, cons(patch3.second, input.tail));
+        n = qt(s.first, qt(s.second, n.tail));
         break;
       }
       case "MapName": {
-        output = map$3(output, patch3.f);
-        input = input.tail;
+        r = rn(r, s.f), n = n.tail;
         break;
       }
       case "Nested": {
-        output = prepend$2(output, patch3.name);
-        input = input.tail;
+        r = Xr(r, s.name), n = n.tail;
         break;
       }
       case "Unnested": {
-        const containsName = pipe(head(output), contains(patch3.name));
-        if (containsName) {
-          output = tailNonEmpty$1(output);
-          input = input.tail;
-        } else {
-          return left$2(MissingData(output, `Expected ${patch3.name} to be in path in ConfigProvider#unnested`));
-        }
+        if (m(Bn(r), fp(s.name)))
+          r = un(r), n = n.tail;
+        else
+          return Pt(Bt(r, `Expected ${s.name} to be in path in ConfigProvider#unnested`));
         break;
       }
     }
   }
-  return right$2(output);
-});
-const OP_CONSTANT = "Constant";
-const OP_FAIL = "Fail";
-const OP_FALLBACK = "Fallback";
-const OP_DESCRIBED = "Described";
-const OP_LAZY = "Lazy";
-const OP_MAP_OR_FAIL = "MapOrFail";
-const OP_NESTED = "Nested";
-const OP_PRIMITIVE = "Primitive";
-const OP_SEQUENCE = "Sequence";
-const OP_HASHMAP = "HashMap";
-const OP_ZIP_WITH = "ZipWith";
-const concat = (l, r) => [...l, ...r];
-const ConfigProviderSymbolKey = "effect/ConfigProvider";
-const ConfigProviderTypeId = /* @__PURE__ */ Symbol.for(ConfigProviderSymbolKey);
-const configProviderTag = /* @__PURE__ */ GenericTag("effect/ConfigProvider");
-const FlatConfigProviderSymbolKey = "effect/ConfigProviderFlat";
-const FlatConfigProviderTypeId = /* @__PURE__ */ Symbol.for(FlatConfigProviderSymbolKey);
-const make$9 = (options) => ({
-  [ConfigProviderTypeId]: ConfigProviderTypeId,
+  return at(r);
+}), Eb = "Constant", Ob = "Fail", Rb = "Fallback", Ib = "Described", Cb = "Lazy", Tb = "MapOrFail", $b = "Nested", Fb = "Primitive", Ab = "Sequence", Mb = "HashMap", Pb = "ZipWith", cs = (t, e) => [...t, ...e], Nb = "effect/ConfigProvider", Aa = /* @__PURE__ */ Symbol.for(Nb), xb = /* @__PURE__ */ wn("effect/ConfigProvider"), jb = "effect/ConfigProviderFlat", Ma = /* @__PURE__ */ Symbol.for(jb), Lb = (t) => ({
+  [Aa]: Aa,
   pipe() {
-    return pipeArguments(this, arguments);
+    return A(this, arguments);
   },
-  ...options
-});
-const makeFlat = (options) => ({
-  [FlatConfigProviderTypeId]: FlatConfigProviderTypeId,
-  patch: options.patch,
-  load: (path, config, split = true) => options.load(path, config, split),
-  enumerateChildren: options.enumerateChildren
-});
-const fromFlat = (flat) => make$9({
-  load: (config) => flatMap$1(fromFlatLoop(flat, empty$j(), config, false), (chunk) => match$2(head(chunk), {
-    onNone: () => fail(MissingData(empty$j(), `Expected a single value having structure: ${config}`)),
-    onSome: succeed
+  ...t
+}), Db = (t) => ({
+  [Ma]: Ma,
+  patch: t.patch,
+  load: (e, n, r = !0) => t.load(e, n, r),
+  enumerateChildren: t.enumerateChildren
+}), Ub = (t) => Lb({
+  load: (e) => T(ze(t, ln(), e, !1), (n) => ui(Bn(n), {
+    onNone: () => Be(Bt(ln(), `Expected a single value having structure: ${e}`)),
+    onSome: ie
   })),
-  flattened: flat
-});
-const fromEnv = (config) => {
+  flattened: t
+}), qb = (t) => {
   const {
-    pathDelim,
-    seqDelim
+    pathDelim: e,
+    seqDelim: n
   } = Object.assign({}, {
     pathDelim: "_",
     seqDelim: ","
-  }, config);
-  const makePathString = (path) => pipe(path, join$1(pathDelim));
-  const unmakePathString = (pathString) => pathString.split(pathDelim);
-  const getEnv = () => typeof process !== "undefined" && "env" in process && typeof process.env === "object" ? process.env : {};
-  const load = (path, primitive, split = true) => {
-    const pathString = makePathString(path);
-    const current = getEnv();
-    const valueOpt = pathString in current ? some$2(current[pathString]) : none$6();
-    return pipe(valueOpt, mapError(() => MissingData(path, `Expected ${pathString} to exist in the process context`)), flatMap$1((value) => parsePrimitive(value, path, primitive, seqDelim, split)));
-  };
-  const enumerateChildren = (path) => sync(() => {
-    const current = getEnv();
-    const keys2 = Object.keys(current);
-    const keyPaths = keys2.map((value) => unmakePathString(value.toUpperCase()));
-    const filteredKeyPaths = keyPaths.filter((keyPath) => {
-      for (let i = 0; i < path.length; i++) {
-        const pathComponent = pipe(path, unsafeGet$3(i));
-        const currentElement = keyPath[i];
-        if (currentElement === void 0 || pathComponent !== currentElement) {
-          return false;
+  }, t), r = (u) => m(u, Sn(e)), s = (u) => u.split(e), o = () => typeof process < "u" && "env" in process && typeof process.env == "object" ? process.env : {};
+  return Ub(Db({
+    load: (u, h, b = !0) => {
+      const y = r(u), k = o(), w = y in k ? H(k[y]) : M();
+      return m(w, xi(() => Bt(u, `Expected ${y} to exist in the process context`)), T((R) => Jb(R, u, h, n, b)));
+    },
+    enumerateChildren: (u) => $(() => {
+      const h = o(), k = Object.keys(h).map((w) => s(w.toUpperCase())).filter((w) => {
+        for (let R = 0; R < u.length; R++) {
+          const J = m(u, Iu(R)), B = w[R];
+          if (B === void 0 || J !== B)
+            return !1;
         }
-      }
-      return true;
-    }).flatMap((keyPath) => keyPath.slice(path.length, path.length + 1));
-    return fromIterable$2(filteredKeyPaths);
-  });
-  return fromFlat(makeFlat({
-    load,
-    enumerateChildren,
-    patch: empty$4
+        return !0;
+      }).flatMap((w) => w.slice(u.length, u.length + 1));
+      return Ng(k);
+    }),
+    patch: kb
   }));
-};
-const extend = (leftDef, rightDef, left2, right2) => {
-  const leftPad = unfold(left2.length, (index) => index >= right2.length ? none$6() : some$2([leftDef(index), index + 1]));
-  const rightPad = unfold(right2.length, (index) => index >= left2.length ? none$6() : some$2([rightDef(index), index + 1]));
-  const leftExtension = concat(left2, leftPad);
-  const rightExtension = concat(right2, rightPad);
-  return [leftExtension, rightExtension];
-};
-const appendConfigPath = (path, config) => {
-  let op = config;
-  if (op._tag === "Nested") {
-    const out = path.slice();
-    while (op._tag === "Nested") {
-      out.push(op.name);
-      op = op.config;
-    }
-    return out;
+}, Bb = (t, e, n, r) => {
+  const s = Zc(n.length, (u) => u >= r.length ? M() : H([t(u), u + 1])), o = Zc(r.length, (u) => u >= n.length ? M() : H([e(u), u + 1])), c = cs(n, s), a = cs(r, o);
+  return [c, a];
+}, Vb = (t, e) => {
+  let n = e;
+  if (n._tag === "Nested") {
+    const r = t.slice();
+    for (; n._tag === "Nested"; )
+      r.push(n.name), n = n.config;
+    return r;
   }
-  return path;
-};
-const fromFlatLoop = (flat, prefix, config, split) => {
-  const op = config;
-  switch (op._tag) {
-    case OP_CONSTANT: {
-      return succeed(of$2(op.value));
-    }
-    case OP_DESCRIBED: {
-      return suspend(() => fromFlatLoop(flat, prefix, op.config, split));
-    }
-    case OP_FAIL: {
-      return fail(MissingData(prefix, op.message));
-    }
-    case OP_FALLBACK: {
-      return pipe(suspend(() => fromFlatLoop(flat, prefix, op.first, split)), catchAll((error1) => {
-        if (op.condition(error1)) {
-          return pipe(fromFlatLoop(flat, prefix, op.second, split), catchAll((error2) => fail(Or(error1, error2))));
+  return t;
+}, ze = (t, e, n, r) => {
+  const s = n;
+  switch (s._tag) {
+    case Eb:
+      return ie(Xe(s.value));
+    case Ib:
+      return Ae(() => ze(t, e, s.config, r));
+    case Ob:
+      return Be(Bt(e, s.message));
+    case Rb:
+      return m(Ae(() => ze(t, e, s.first, r)), ma((o) => s.condition(o) ? m(ze(t, e, s.second, r), ma((c) => Be(ff(o, c)))) : Be(o)));
+    case Cb:
+      return Ae(() => ze(t, e, s.config(), r));
+    case Tb:
+      return Ae(() => m(ze(t, e, s.original, r), T(bt((o) => m(s.mapOrFail(o), xi($t(Vb(e, s.original))))))));
+    case $b:
+      return Ae(() => ze(t, cs(e, Xe(s.name)), s.config, r));
+    case Fb:
+      return m(oo(e, t.patch), T((o) => m(t.load(o, s, r), T((c) => {
+        if (c.length === 0) {
+          const a = m(vp(o), Nt(() => "<n/a>"));
+          return Be(Bt([], `Expected ${s.description} with name ${a}`));
         }
-        return fail(error1);
-      }));
-    }
-    case OP_LAZY: {
-      return suspend(() => fromFlatLoop(flat, prefix, op.config(), split));
-    }
-    case OP_MAP_OR_FAIL: {
-      return suspend(() => pipe(fromFlatLoop(flat, prefix, op.original, split), flatMap$1(forEachSequential((a) => pipe(op.mapOrFail(a), mapError(prefixed(appendConfigPath(prefix, op.original))))))));
-    }
-    case OP_NESTED: {
-      return suspend(() => fromFlatLoop(flat, concat(prefix, of$2(op.name)), op.config, split));
-    }
-    case OP_PRIMITIVE: {
-      return pipe(patch$3(prefix, flat.patch), flatMap$1((prefix2) => pipe(flat.load(prefix2, op, split), flatMap$1((values) => {
-        if (values.length === 0) {
-          const name = pipe(last(prefix2), getOrElse(() => "<n/a>"));
-          return fail(MissingData([], `Expected ${op.description} with name ${name}`));
-        }
-        return succeed(values);
+        return ie(c);
       }))));
-    }
-    case OP_SEQUENCE: {
-      return pipe(patch$3(prefix, flat.patch), flatMap$1((patchedPrefix) => pipe(flat.enumerateChildren(patchedPrefix), flatMap$1(indicesFrom), flatMap$1((indices) => {
-        if (indices.length === 0) {
-          return suspend(() => map(fromFlatLoop(flat, patchedPrefix, op.config, true), of$2));
-        }
-        return pipe(forEachSequential(indices, (index) => fromFlatLoop(flat, append$1(prefix, `[${index}]`), op.config, true)), map((chunkChunk) => {
-          const flattened = flatten$3(chunkChunk);
-          if (flattened.length === 0) {
-            return of$2(empty$j());
-          }
-          return of$2(flattened);
-        }));
-      }))));
-    }
-    case OP_HASHMAP: {
-      return suspend(() => pipe(patch$3(prefix, flat.patch), flatMap$1((prefix2) => pipe(flat.enumerateChildren(prefix2), flatMap$1((keys2) => {
-        return pipe(keys2, forEachSequential((key) => fromFlatLoop(flat, concat(prefix2, of$2(key)), op.valueConfig, split)), map((matrix) => {
-          if (matrix.length === 0) {
-            return of$2(empty$c());
-          }
-          return pipe(transpose(matrix), map$3((values) => fromIterable$1(zip$1(fromIterable$6(keys2), values))));
-        }));
-      })))));
-    }
-    case OP_ZIP_WITH: {
-      return suspend(() => pipe(fromFlatLoop(flat, prefix, op.left, split), either, flatMap$1((left2) => pipe(fromFlatLoop(flat, prefix, op.right, split), either, flatMap$1((right2) => {
-        if (isLeft(left2) && isLeft(right2)) {
-          return fail(And(left2.left, right2.left));
-        }
-        if (isLeft(left2) && isRight(right2)) {
-          return fail(left2.left);
-        }
-        if (isRight(left2) && isLeft(right2)) {
-          return fail(right2.left);
-        }
-        if (isRight(left2) && isRight(right2)) {
-          const path = pipe(prefix, join$1("."));
-          const fail2 = fromFlatLoopFail(prefix, path);
-          const [lefts, rights] = extend(fail2, fail2, pipe(left2.right, map$3(right$2)), pipe(right2.right, map$3(right$2)));
-          return pipe(lefts, zip$1(rights), forEachSequential(([left3, right3]) => pipe(zip(left3, right3), map(([left4, right4]) => op.zip(left4, right4)))));
+    case Ab:
+      return m(oo(e, t.patch), T((o) => m(t.enumerateChildren(o), T(Gb), T((c) => c.length === 0 ? Ae(() => Me(ze(t, o, s.config, !0), Xe)) : m(bt(c, (a) => ze(t, pp(e, `[${a}]`), s.config, !0)), Me((a) => {
+        const u = Fp(a);
+        return u.length === 0 ? Xe(ln()) : Xe(u);
+      }))))));
+    case Mb:
+      return Ae(() => m(oo(e, t.patch), T((o) => m(t.enumerateChildren(o), T((c) => m(c, bt((a) => ze(t, cs(o, Xe(a)), s.valueConfig, r)), Me((a) => a.length === 0 ? Xe(Oi()) : m(Wb(a), rn((u) => Hg(Xc(Se(c), u)))))))))));
+    case Pb:
+      return Ae(() => m(ze(t, e, s.left, r), $o, T((o) => m(ze(t, e, s.right, r), $o, T((c) => {
+        if (Dn(o) && Dn(c))
+          return Be(lf(o.left, c.left));
+        if (Dn(o) && $r(c))
+          return Be(o.left);
+        if ($r(o) && Dn(c))
+          return Be(c.left);
+        if ($r(o) && $r(c)) {
+          const a = m(e, Sn(".")), u = Kb(e, a), [h, b] = Bb(u, u, m(o.right, rn(at)), m(c.right, rn(at)));
+          return m(h, Xc(b), bt(([y, k]) => m(ql(y, k), Me(([w, R]) => s.zip(w, R)))));
         }
         throw new Error("BUG: ConfigProvider.fromFlatLoop - please report an issue at https://github.com/Effect-TS/effect/issues");
       })))));
-    }
   }
-};
-const fromFlatLoopFail = (prefix, path) => (index) => left$2(MissingData(prefix, `The element at index ${index} in a sequence at path "${path}" was missing`));
-const splitPathString = (text, delim) => {
-  const split = text.split(new RegExp(`\\s*${escape(delim)}\\s*`));
-  return split;
-};
-const parsePrimitive = (text, path, primitive, delimiter, split) => {
-  if (!split) {
-    return pipe(primitive.parse(text), mapBoth({
-      onFailure: prefixed(path),
-      onSuccess: of$2
-    }));
+}, Kb = (t, e) => (n) => Pt(Bt(t, `The element at index ${n} in a sequence at path "${e}" was missing`)), Hb = (t, e) => t.split(new RegExp(`\\s*${yb(e)}\\s*`)), Jb = (t, e, n, r, s) => s ? m(Hb(t, r), bt((o) => n.parse(o.trim())), xi($t(e))) : m(n.parse(t), jl({
+  onFailure: $t(e),
+  onSuccess: Xe
+})), Wb = (t) => Object.keys(t[0]).map((e) => t.map((n) => n[e])), Gb = (t) => m(bt(t, Yb), jl({
+  onFailure: () => ln(),
+  onSuccess: Zr(nr)
+}), $o, Me(np)), zb = /^(\[(\d+)\])$/, Yb = (t) => {
+  const e = t.match(zb);
+  if (e !== null) {
+    const n = e[2];
+    return m(n !== void 0 && n.length > 0 ? H(n) : M(), Eu(Qb));
   }
-  return pipe(splitPathString(text, delimiter), forEachSequential((char) => primitive.parse(char.trim())), mapError(prefixed(path)));
-};
-const transpose = (array2) => {
-  return Object.keys(array2[0]).map((column) => array2.map((row) => row[column]));
-};
-const indicesFrom = (quotedIndices) => pipe(forEachSequential(quotedIndices, parseQuotedIndex), mapBoth({
-  onFailure: () => empty$j(),
-  onSuccess: sort(Order$1)
-}), either, map(merge$1));
-const QUOTED_INDEX_REGEX = /^(\[(\d+)\])$/;
-const parseQuotedIndex = (str) => {
-  const match2 = str.match(QUOTED_INDEX_REGEX);
-  if (match2 !== null) {
-    const matchedIndex = match2[2];
-    return pipe(matchedIndex !== void 0 && matchedIndex.length > 0 ? some$2(matchedIndex) : none$6(), flatMap$3(parseInteger));
-  }
-  return none$6();
-};
-const parseInteger = (str) => {
-  const parsedIndex = Number.parseInt(str);
-  return Number.isNaN(parsedIndex) ? none$6() : some$2(parsedIndex);
-};
-const TypeId$1 = /* @__PURE__ */ Symbol.for("effect/Console");
-const consoleTag = /* @__PURE__ */ GenericTag("effect/Console");
-const defaultConsole = {
-  [TypeId$1]: TypeId$1,
-  assert(condition, ...args) {
-    return sync(() => {
-      console.assert(condition, ...args);
+  return M();
+}, Qb = (t) => {
+  const e = Number.parseInt(t);
+  return Number.isNaN(e) ? M() : H(e);
+}, Pa = /* @__PURE__ */ Symbol.for("effect/Console"), hf = /* @__PURE__ */ wn("effect/Console"), Xb = {
+  [Pa]: Pa,
+  assert(t, ...e) {
+    return $(() => {
+      console.assert(t, ...e);
     });
   },
-  clear: /* @__PURE__ */ sync(() => {
+  clear: /* @__PURE__ */ $(() => {
     console.clear();
   }),
-  count(label) {
-    return sync(() => {
-      console.count(label);
+  count(t) {
+    return $(() => {
+      console.count(t);
     });
   },
-  countReset(label) {
-    return sync(() => {
-      console.countReset(label);
+  countReset(t) {
+    return $(() => {
+      console.countReset(t);
     });
   },
-  debug(...args) {
-    return sync(() => {
-      console.debug(...args);
+  debug(...t) {
+    return $(() => {
+      console.debug(...t);
     });
   },
-  dir(item, options) {
-    return sync(() => {
-      console.dir(item, options);
+  dir(t, e) {
+    return $(() => {
+      console.dir(t, e);
     });
   },
-  dirxml(...args) {
-    return sync(() => {
-      console.dirxml(...args);
+  dirxml(...t) {
+    return $(() => {
+      console.dirxml(...t);
     });
   },
-  error(...args) {
-    return sync(() => {
-      console.error(...args);
+  error(...t) {
+    return $(() => {
+      console.error(...t);
     });
   },
-  group(options) {
-    return (options == null ? void 0 : options.collapsed) ? sync(() => console.groupCollapsed(options == null ? void 0 : options.label)) : sync(() => console.group(options == null ? void 0 : options.label));
+  group(t) {
+    return t != null && t.collapsed ? $(() => console.groupCollapsed(t == null ? void 0 : t.label)) : $(() => console.group(t == null ? void 0 : t.label));
   },
-  groupEnd: /* @__PURE__ */ sync(() => {
+  groupEnd: /* @__PURE__ */ $(() => {
     console.groupEnd();
   }),
-  info(...args) {
-    return sync(() => {
-      console.info(...args);
+  info(...t) {
+    return $(() => {
+      console.info(...t);
     });
   },
-  log(...args) {
-    return sync(() => {
-      console.log(...args);
+  log(...t) {
+    return $(() => {
+      console.log(...t);
     });
   },
-  table(tabularData, properties) {
-    return sync(() => {
-      console.table(tabularData, properties);
+  table(t, e) {
+    return $(() => {
+      console.table(t, e);
     });
   },
-  time(label) {
-    return sync(() => console.time(label));
+  time(t) {
+    return $(() => console.time(t));
   },
-  timeEnd(label) {
-    return sync(() => console.timeEnd(label));
+  timeEnd(t) {
+    return $(() => console.timeEnd(t));
   },
-  timeLog(label, ...args) {
-    return sync(() => {
-      console.timeLog(label, ...args);
+  timeLog(t, ...e) {
+    return $(() => {
+      console.timeLog(t, ...e);
     });
   },
-  trace(...args) {
-    return sync(() => {
-      console.trace(...args);
+  trace(...t) {
+    return $(() => {
+      console.trace(...t);
     });
   },
-  warn(...args) {
-    return sync(() => {
-      console.warn(...args);
+  warn(...t) {
+    return $(() => {
+      console.warn(...t);
     });
   },
   unsafe: console
-};
-const RandomSymbolKey = "effect/Random";
-const RandomTypeId = /* @__PURE__ */ Symbol.for(RandomSymbolKey);
-const randomTag = /* @__PURE__ */ GenericTag("effect/Random");
-class RandomImpl {
-  constructor(seed) {
-    __publicField(this, "seed");
-    __publicField(this, _i, RandomTypeId);
-    __publicField(this, "PRNG");
-    this.seed = seed;
-    this.PRNG = new PCGRandom(seed);
+}, Zb = "effect/Random", Na = /* @__PURE__ */ Symbol.for(Zb), ev = /* @__PURE__ */ wn("effect/Random");
+var Ww;
+class tv {
+  constructor(e) {
+    f(this, "seed");
+    f(this, Ww, Na);
+    f(this, "PRNG");
+    this.seed = e, this.PRNG = new ru(e);
   }
   get next() {
-    return sync(() => this.PRNG.number());
+    return $(() => this.PRNG.number());
   }
   get nextBoolean() {
-    return map(this.next, (n) => n > 0.5);
+    return Me(this.next, (e) => e > 0.5);
   }
   get nextInt() {
-    return sync(() => this.PRNG.integer(Number.MAX_SAFE_INTEGER));
+    return $(() => this.PRNG.integer(Number.MAX_SAFE_INTEGER));
   }
-  nextRange(min, max) {
-    return map(this.next, (n) => (max - min) * n + min);
+  nextRange(e, n) {
+    return Me(this.next, (r) => (n - e) * r + e);
   }
-  nextIntBetween(min, max) {
-    return sync(() => this.PRNG.integer(max - min) + min);
+  nextIntBetween(e, n) {
+    return $(() => this.PRNG.integer(n - e) + e);
   }
-  shuffle(elements) {
-    return shuffleWith(elements, (n) => this.nextIntBetween(0, n));
+  shuffle(e) {
+    return nv(e, (n) => this.nextIntBetween(0, n));
   }
 }
-_i = RandomTypeId;
-const shuffleWith = (elements, nextIntBounded) => {
-  return suspend(() => pipe(sync(() => Array.from(elements)), flatMap$1((buffer) => {
-    const numbers = [];
-    for (let i = buffer.length; i >= 2; i = i - 1) {
-      numbers.push(i);
-    }
-    return pipe(numbers, forEachSequentialDiscard((n) => pipe(nextIntBounded(n), map((k) => swap(buffer, n - 1, k)))), as(fromIterable$5(buffer)));
-  })));
-};
-const swap = (buffer, index1, index2) => {
-  const tmp = buffer[index1];
-  buffer[index1] = buffer[index2];
-  buffer[index2] = tmp;
-  return buffer;
-};
-const make$8 = (seed) => new RandomImpl(seed);
-const liveServices = /* @__PURE__ */ pipe(/* @__PURE__ */ empty$h(), /* @__PURE__ */ add$2(clockTag, /* @__PURE__ */ make$a()), /* @__PURE__ */ add$2(consoleTag, defaultConsole), /* @__PURE__ */ add$2(randomTag, /* @__PURE__ */ make$8(/* @__PURE__ */ Math.random() * 4294967296 >>> 0)), /* @__PURE__ */ add$2(configProviderTag, /* @__PURE__ */ fromEnv()), /* @__PURE__ */ add$2(tracerTag, nativeTracer));
-const currentServices = /* @__PURE__ */ globalValue(/* @__PURE__ */ Symbol.for("effect/DefaultServices/currentServices"), () => fiberRefUnsafeMakeContext(liveServices));
-function unsafeMake$3(fiberRefLocals) {
-  return new FiberRefsImpl(fiberRefLocals);
+Ww = Na;
+const nv = (t, e) => Ae(() => m($(() => Array.from(t)), T((n) => {
+  const r = [];
+  for (let s = n.length; s >= 2; s = s - 1)
+    r.push(s);
+  return m(r, Ni((s) => m(e(s), Me((o) => rv(n, s - 1, o)))), Cn(ys(n)));
+}))), rv = (t, e, n) => {
+  const r = t[e];
+  return t[e] = t[n], t[n] = r, t;
+}, sv = (t) => new tv(t), ov = /* @__PURE__ */ m(/* @__PURE__ */ di(), /* @__PURE__ */ Pn(zi, /* @__PURE__ */ _b()), /* @__PURE__ */ Pn(hf, Xb), /* @__PURE__ */ Pn(ev, /* @__PURE__ */ sv(/* @__PURE__ */ Math.random() * 4294967296 >>> 0)), /* @__PURE__ */ Pn(xb, /* @__PURE__ */ qb()), /* @__PURE__ */ Pn(To, W_)), Hn = /* @__PURE__ */ Q(/* @__PURE__ */ Symbol.for("effect/DefaultServices/currentServices"), () => Jl(ov));
+function iv(t) {
+  return new kt(t);
 }
-function empty$3() {
-  return unsafeMake$3(/* @__PURE__ */ new Map());
+function cv() {
+  return iv(/* @__PURE__ */ new Map());
 }
-const FiberRefsSym = /* @__PURE__ */ Symbol.for("effect/FiberRefs");
-class FiberRefsImpl {
-  constructor(locals) {
-    __publicField(this, "locals");
-    __publicField(this, _j, FiberRefsSym);
-    this.locals = locals;
+const xa = /* @__PURE__ */ Symbol.for("effect/FiberRefs");
+var Gw;
+class kt {
+  constructor(e) {
+    f(this, "locals");
+    f(this, Gw, xa);
+    this.locals = e;
   }
   pipe() {
-    return pipeArguments(this, arguments);
+    return A(this, arguments);
   }
 }
-_j = FiberRefsSym;
-const findAncestor = (_ref, _parentStack, _childStack, _childModified = false) => {
-  const ref = _ref;
-  let parentStack = _parentStack;
-  let childStack = _childStack;
-  let childModified = _childModified;
-  let ret = void 0;
-  while (ret === void 0) {
-    if (isNonEmptyReadonlyArray(parentStack) && isNonEmptyReadonlyArray(childStack)) {
-      const parentFiberId = headNonEmpty$1(parentStack)[0];
-      const parentAncestors = tailNonEmpty$1(parentStack);
-      const childFiberId = headNonEmpty$1(childStack)[0];
-      const childRefValue = headNonEmpty$1(childStack)[1];
-      const childAncestors = tailNonEmpty$1(childStack);
-      if (parentFiberId.startTimeMillis < childFiberId.startTimeMillis) {
-        childStack = childAncestors;
-        childModified = true;
-      } else if (parentFiberId.startTimeMillis > childFiberId.startTimeMillis) {
-        parentStack = parentAncestors;
-      } else {
-        if (parentFiberId.id < childFiberId.id) {
-          childStack = childAncestors;
-          childModified = true;
-        } else if (parentFiberId.id > childFiberId.id) {
-          parentStack = parentAncestors;
-        } else {
-          ret = [childRefValue, childModified];
-        }
-      }
-    } else {
-      ret = [ref.initial, true];
-    }
-  }
-  return ret;
-};
-const joinAs = /* @__PURE__ */ dual(3, (self, fiberId2, that) => {
-  const parentFiberRefs = new Map(self.locals);
-  that.locals.forEach((childStack, fiberRef) => {
-    const childValue = childStack[0][1];
-    if (!childStack[0][0][symbol](fiberId2)) {
-      if (!parentFiberRefs.has(fiberRef)) {
-        if (equals$1(childValue, fiberRef.initial)) {
+Gw = xa;
+const av = (t, e, n, r = !1) => {
+  const s = t;
+  let o = e, c = n, a = r, u;
+  for (; u === void 0; )
+    if (He(o) && He(c)) {
+      const h = Ke(o)[0], b = un(o), y = Ke(c)[0], k = Ke(c)[1], w = un(c);
+      h.startTimeMillis < y.startTimeMillis ? (c = w, a = !0) : h.startTimeMillis > y.startTimeMillis ? o = b : h.id < y.id ? (c = w, a = !0) : h.id > y.id ? o = b : u = [k, a];
+    } else
+      u = [s.initial, !0];
+  return u;
+}, uv = /* @__PURE__ */ g(3, (t, e, n) => {
+  const r = new Map(t.locals);
+  return n.locals.forEach((s, o) => {
+    const c = s[0][1];
+    if (!s[0][0][P](e)) {
+      if (!r.has(o)) {
+        if (N(c, o.initial))
           return;
-        }
-        parentFiberRefs.set(fiberRef, [[fiberId2, fiberRef.join(fiberRef.initial, childValue)]]);
+        r.set(o, [[e, o.join(o.initial, c)]]);
         return;
       }
-      const parentStack = parentFiberRefs.get(fiberRef);
-      const [ancestor, wasModified] = findAncestor(fiberRef, parentStack, childStack);
-      if (wasModified) {
-        const patch2 = fiberRef.diff(ancestor, childValue);
-        const oldValue = parentStack[0][1];
-        const newValue = fiberRef.join(oldValue, fiberRef.patch(patch2)(oldValue));
-        if (!equals$1(oldValue, newValue)) {
-          let newStack;
-          const parentFiberId = parentStack[0][0];
-          if (parentFiberId[symbol](fiberId2)) {
-            newStack = [[parentFiberId, newValue], ...parentStack.slice(1)];
-          } else {
-            newStack = [[fiberId2, newValue], ...parentStack];
-          }
-          parentFiberRefs.set(fiberRef, newStack);
+      const a = r.get(o), [u, h] = av(o, a, s);
+      if (h) {
+        const b = o.diff(u, c), y = a[0][1], k = o.join(y, o.patch(b)(y));
+        if (!N(y, k)) {
+          let w;
+          const R = a[0][0];
+          R[P](e) ? w = [[R, k], ...a.slice(1)] : w = [[e, k], ...a], r.set(o, w);
         }
       }
     }
+  }), new kt(r);
+}), lv = /* @__PURE__ */ g(2, (t, e) => {
+  const n = /* @__PURE__ */ new Map();
+  return df(t, n, e), new kt(n);
+}), df = (t, e, n) => {
+  t.locals.forEach((r, s) => {
+    const o = r[0][1], c = s.patch(s.fork)(o);
+    N(o, c) ? e.set(s, r) : e.set(s, [[n, c], ...r]);
   });
-  return new FiberRefsImpl(parentFiberRefs);
-});
-const forkAs = /* @__PURE__ */ dual(2, (self, childId) => {
-  const map2 = /* @__PURE__ */ new Map();
-  unsafeForkAs(self, map2, childId);
-  return new FiberRefsImpl(map2);
-});
-const unsafeForkAs = (self, map2, fiberId2) => {
-  self.locals.forEach((stack, fiberRef) => {
-    const oldValue = stack[0][1];
-    const newValue = fiberRef.patch(fiberRef.fork)(oldValue);
-    if (equals$1(oldValue, newValue)) {
-      map2.set(fiberRef, stack);
-    } else {
-      map2.set(fiberRef, [[fiberId2, newValue], ...stack]);
-    }
-  });
-};
-const delete_ = /* @__PURE__ */ dual(2, (self, fiberRef) => {
-  const locals = new Map(self.locals);
-  locals.delete(fiberRef);
-  return new FiberRefsImpl(locals);
-});
-const get = /* @__PURE__ */ dual(2, (self, fiberRef) => {
-  if (!self.locals.has(fiberRef)) {
-    return none$6();
-  }
-  return some$2(headNonEmpty$1(self.locals.get(fiberRef))[1]);
-});
-const getOrDefault$1 = /* @__PURE__ */ dual(2, (self, fiberRef) => pipe(get(self, fiberRef), getOrElse(() => fiberRef.initial)));
-const updateAs = /* @__PURE__ */ dual(2, (self, {
-  fiberId: fiberId2,
-  fiberRef,
-  value
+}, pf = /* @__PURE__ */ g(2, (t, e) => {
+  const n = new Map(t.locals);
+  return n.delete(e), new kt(n);
+}), jo = /* @__PURE__ */ g(2, (t, e) => t.locals.has(e) ? H(Ke(t.locals.get(e))[1]) : M()), Yi = /* @__PURE__ */ g(2, (t, e) => m(jo(t, e), Nt(() => e.initial))), Lo = /* @__PURE__ */ g(2, (t, {
+  fiberId: e,
+  fiberRef: n,
+  value: r
 }) => {
-  if (self.locals.size === 0) {
-    return new FiberRefsImpl(/* @__PURE__ */ new Map([[fiberRef, [[fiberId2, value]]]]));
-  }
-  const locals = new Map(self.locals);
-  unsafeUpdateAs(locals, fiberId2, fiberRef, value);
-  return new FiberRefsImpl(locals);
-});
-const unsafeUpdateAs = (locals, fiberId2, fiberRef, value) => {
-  const oldStack = locals.get(fiberRef) ?? [];
-  let newStack;
-  if (isNonEmptyReadonlyArray(oldStack)) {
-    const [currentId, currentValue] = headNonEmpty$1(oldStack);
-    if (currentId[symbol](fiberId2)) {
-      if (equals$1(currentValue, value)) {
+  if (t.locals.size === 0)
+    return new kt(/* @__PURE__ */ new Map([[n, [[e, r]]]]));
+  const s = new Map(t.locals);
+  return Do(s, e, n, r), new kt(s);
+}), Do = (t, e, n, r) => {
+  const s = t.get(n) ?? [];
+  let o;
+  if (He(s)) {
+    const [c, a] = Ke(s);
+    if (c[P](e)) {
+      if (N(a, r))
         return;
-      } else {
-        newStack = [[fiberId2, value], ...oldStack.slice(1)];
-      }
-    } else {
-      newStack = [[fiberId2, value], ...oldStack];
-    }
-  } else {
-    newStack = [[fiberId2, value]];
-  }
-  locals.set(fiberRef, newStack);
-};
-const updateManyAs$1 = /* @__PURE__ */ dual(2, (self, {
-  entries,
-  forkAs: forkAs2
+      o = [[e, r], ...s.slice(1)];
+    } else
+      o = [[e, r], ...s];
+  } else
+    o = [[e, r]];
+  t.set(n, o);
+}, fv = /* @__PURE__ */ g(2, (t, {
+  entries: e,
+  forkAs: n
 }) => {
-  if (self.locals.size === 0) {
-    return new FiberRefsImpl(new Map(entries));
-  }
-  const locals = new Map(self.locals);
-  if (forkAs2 !== void 0) {
-    unsafeForkAs(self, locals, forkAs2);
-  }
-  entries.forEach(([fiberRef, values]) => {
-    if (values.length === 1) {
-      unsafeUpdateAs(locals, values[0][0], fiberRef, values[0][1]);
-    } else {
-      values.forEach(([fiberId2, value]) => {
-        unsafeUpdateAs(locals, fiberId2, fiberRef, value);
-      });
-    }
-  });
-  return new FiberRefsImpl(locals);
-});
-const getOrDefault = getOrDefault$1;
-const updateManyAs = updateManyAs$1;
-const empty$2 = empty$3;
-const All = logLevelAll;
-const Fatal = logLevelFatal;
-const Error$1 = logLevelError;
-const Warning = logLevelWarning;
-const Info = logLevelInfo;
-const Debug = logLevelDebug;
-const Trace = logLevelTrace;
-const None2 = logLevelNone;
-const Order = /* @__PURE__ */ pipe(Order$1, /* @__PURE__ */ mapInput((level) => level.ordinal));
-const greaterThan = /* @__PURE__ */ greaterThan$1(Order);
-const fromLiteral = (literal) => {
-  switch (literal) {
+  if (t.locals.size === 0)
+    return new kt(new Map(e));
+  const r = new Map(t.locals);
+  return n !== void 0 && df(t, r, n), e.forEach(([s, o]) => {
+    o.length === 1 ? Do(r, o[0][0], s, o[0][1]) : o.forEach(([c, a]) => {
+      Do(r, c, s, a);
+    });
+  }), new kt(r);
+}), hv = Yi, dv = fv, pv = cv, gv = ay, mv = uy, _v = ly, yv = fy, bv = Bl, vv = Vl, Sv = hy, wv = dy, kv = /* @__PURE__ */ m(nr, /* @__PURE__ */ sp((t) => t.ordinal)), Ev = /* @__PURE__ */ op(kv), Ov = (t) => {
+  switch (t) {
     case "All":
-      return All;
+      return gv;
     case "Debug":
-      return Debug;
+      return vv;
     case "Error":
-      return Error$1;
+      return _v;
     case "Fatal":
-      return Fatal;
+      return mv;
     case "Info":
-      return Info;
+      return bv;
     case "Trace":
-      return Trace;
+      return Sv;
     case "None":
-      return None2;
+      return wv;
     case "Warning":
-      return Warning;
+      return yv;
   }
-};
-const render$1 = (now) => (self) => {
-  const label = self.label.replace(/[\s="]/g, "_");
-  return `${label}=${now - self.startTime}ms`;
-};
-const render = render$1;
-const TypeId = /* @__PURE__ */ Symbol.for("effect/Readable");
-const RefTypeId = /* @__PURE__ */ Symbol.for("effect/Ref");
-const refVariance = {
+}, Rv = (t) => (e) => `${e.label.replace(/[\s="]/g, "_")}=${t - e.startTime}ms`, Iv = Rv, io = /* @__PURE__ */ Symbol.for("effect/Readable"), Cv = /* @__PURE__ */ Symbol.for("effect/Ref"), Tv = {
   /* c8 ignore next */
-  _A: (_) => _
+  _A: (t) => t
 };
-class RefImpl {
-  constructor(ref) {
-    __publicField(this, "ref");
-    __publicField(this, _k, refVariance);
-    __publicField(this, _l);
-    __publicField(this, "get");
-    this.ref = ref;
-    this[TypeId] = TypeId;
-    this.get = sync(() => get$3(this.ref));
+var zw, Yw;
+class $v {
+  constructor(e) {
+    f(this, "ref");
+    f(this, zw, Tv);
+    f(this, Yw);
+    f(this, "get");
+    this.ref = e, this[io] = io, this.get = $(() => Ut(this.ref));
   }
-  modify(f) {
-    return sync(() => {
-      const current = get$3(this.ref);
-      const [b, a] = f(current);
-      if (current !== a) {
-        set$2(a)(this.ref);
-      }
-      return b;
+  modify(e) {
+    return $(() => {
+      const n = Ut(this.ref), [r, s] = e(n);
+      return n !== s && Rs(s)(this.ref), r;
     });
   }
   pipe() {
-    return pipeArguments(this, arguments);
+    return A(this, arguments);
   }
 }
-_k = RefTypeId, _l = TypeId;
-const unsafeMake$2 = (value) => new RefImpl(make$g(value));
-const make$7 = (value) => sync(() => unsafeMake$2(value));
-const modify$1 = /* @__PURE__ */ dual(2, (self, f) => self.modify(f));
-const make$6 = make$7;
-const modify = modify$1;
-const OP_EMPTY$1 = "Empty";
-const OP_ADD = "Add";
-const OP_REMOVE = "Remove";
-const OP_UPDATE = "Update";
-const OP_AND_THEN$1 = "AndThen";
-const empty$1 = {
-  _tag: OP_EMPTY$1
-};
-const diff$2 = (oldValue, newValue) => {
-  const missingLocals = new Map(oldValue.locals);
-  let patch2 = empty$1;
-  for (const [fiberRef, pairs] of newValue.locals.entries()) {
-    const newValue2 = headNonEmpty$1(pairs)[1];
-    const old = missingLocals.get(fiberRef);
-    if (old !== void 0) {
-      const oldValue2 = headNonEmpty$1(old)[1];
-      if (!equals$1(oldValue2, newValue2)) {
-        patch2 = combine$1({
-          _tag: OP_UPDATE,
-          fiberRef,
-          patch: fiberRef.diff(oldValue2, newValue2)
-        })(patch2);
-      }
-    } else {
-      patch2 = combine$1({
-        _tag: OP_ADD,
-        fiberRef,
-        value: newValue2
-      })(patch2);
-    }
-    missingLocals.delete(fiberRef);
+zw = Cv, Yw = io;
+const Fv = (t) => new $v(ki(t)), Av = (t) => $(() => Fv(t)), Mv = /* @__PURE__ */ g(2, (t, e) => t.modify(e)), Pv = Av, Nv = Mv, gf = "Empty", mf = "Add", _f = "Remove", yf = "Update", bf = "AndThen", xv = {
+  _tag: gf
+}, jv = (t, e) => {
+  const n = new Map(t.locals);
+  let r = xv;
+  for (const [s, o] of e.locals.entries()) {
+    const c = Ke(o)[1], a = n.get(s);
+    if (a !== void 0) {
+      const u = Ke(a)[1];
+      N(u, c) || (r = co({
+        _tag: yf,
+        fiberRef: s,
+        patch: s.diff(u, c)
+      })(r));
+    } else
+      r = co({
+        _tag: mf,
+        fiberRef: s,
+        value: c
+      })(r);
+    n.delete(s);
   }
-  for (const [fiberRef] of missingLocals.entries()) {
-    patch2 = combine$1({
-      _tag: OP_REMOVE,
-      fiberRef
-    })(patch2);
-  }
-  return patch2;
-};
-const combine$1 = /* @__PURE__ */ dual(2, (self, that) => ({
-  _tag: OP_AND_THEN$1,
-  first: self,
-  second: that
-}));
-const patch$2 = /* @__PURE__ */ dual(3, (self, fiberId2, oldValue) => {
-  let fiberRefs = oldValue;
-  let patches = of$2(self);
-  while (isNonEmptyReadonlyArray(patches)) {
-    const head2 = headNonEmpty$1(patches);
-    const tail = tailNonEmpty$1(patches);
-    switch (head2._tag) {
-      case OP_EMPTY$1: {
-        patches = tail;
+  for (const [s] of n.entries())
+    r = co({
+      _tag: _f,
+      fiberRef: s
+    })(r);
+  return r;
+}, co = /* @__PURE__ */ g(2, (t, e) => ({
+  _tag: bf,
+  first: t,
+  second: e
+})), Lv = /* @__PURE__ */ g(3, (t, e, n) => {
+  let r = n, s = Xe(t);
+  for (; He(s); ) {
+    const o = Ke(s), c = un(s);
+    switch (o._tag) {
+      case gf: {
+        s = c;
         break;
       }
-      case OP_ADD: {
-        fiberRefs = updateAs(fiberRefs, {
-          fiberId: fiberId2,
-          fiberRef: head2.fiberRef,
-          value: head2.value
-        });
-        patches = tail;
+      case mf: {
+        r = Lo(r, {
+          fiberId: e,
+          fiberRef: o.fiberRef,
+          value: o.value
+        }), s = c;
         break;
       }
-      case OP_REMOVE: {
-        fiberRefs = delete_(fiberRefs, head2.fiberRef);
-        patches = tail;
+      case _f: {
+        r = pf(r, o.fiberRef), s = c;
         break;
       }
-      case OP_UPDATE: {
-        const value = getOrDefault$1(fiberRefs, head2.fiberRef);
-        fiberRefs = updateAs(fiberRefs, {
-          fiberId: fiberId2,
-          fiberRef: head2.fiberRef,
-          value: head2.fiberRef.patch(head2.patch)(value)
-        });
-        patches = tail;
+      case yf: {
+        const a = Yi(r, o.fiberRef);
+        r = Lo(r, {
+          fiberId: e,
+          fiberRef: o.fiberRef,
+          value: o.fiberRef.patch(o.patch)(a)
+        }), s = c;
         break;
       }
-      case OP_AND_THEN$1: {
-        patches = prepend$2(head2.first)(prepend$2(head2.second)(tail));
+      case bf: {
+        s = Xr(o.first)(Xr(o.second)(c));
         break;
       }
     }
   }
-  return fiberRefs;
-});
-const MetricLabelSymbolKey = "effect/MetricLabel";
-const MetricLabelTypeId = /* @__PURE__ */ Symbol.for(MetricLabelSymbolKey);
-class MetricLabelImpl {
-  constructor(key, value) {
-    __publicField(this, "key");
-    __publicField(this, "value");
-    __publicField(this, _m, MetricLabelTypeId);
-    __publicField(this, "_hash");
-    this.key = key;
-    this.value = value;
-    this._hash = string(MetricLabelSymbolKey + this.key + this.value);
+  return r;
+}), vf = "effect/MetricLabel", Uo = /* @__PURE__ */ Symbol.for(vf);
+var Qw;
+class Dv {
+  constructor(e, n) {
+    f(this, "key");
+    f(this, "value");
+    f(this, Qw, Uo);
+    f(this, "_hash");
+    this.key = e, this.value = n, this._hash = me(vf + this.key + this.value);
   }
-  [(_m = MetricLabelTypeId, symbol$1)]() {
+  [(Qw = Uo, j)]() {
     return this._hash;
   }
-  [symbol](that) {
-    return isMetricLabel(that) && this.key === that.key && this.value === that.value;
+  [P](e) {
+    return qv(e) && this.key === e.key && this.value === e.value;
   }
   pipe() {
-    return pipeArguments(this, arguments);
+    return A(this, arguments);
   }
 }
-const make$5 = (key, value) => {
-  return new MetricLabelImpl(key, value);
-};
-const isMetricLabel = (u) => hasProperty(u, MetricLabelTypeId);
-const promise$1 = (evaluate) => evaluate.length >= 1 ? async$1((resolve2, signal) => {
-  evaluate(signal).then((a) => resolve2(exitSucceed(a)), (e) => resolve2(exitDie(e)));
-}) : async$1((resolve2) => {
-  evaluate().then((a) => resolve2(exitSucceed(a)), (e) => resolve2(exitDie(e)));
-});
-const EffectTypeId = EffectTypeId$2;
-const OP_SEQUENTIAL = "Sequential";
-const sequential = {
-  _tag: OP_SEQUENTIAL
-};
-const diff$1 = diff$2;
-const patch$1 = patch$2;
-const FiberStatusSymbolKey = "effect/FiberStatus";
-const FiberStatusTypeId = /* @__PURE__ */ Symbol.for(FiberStatusSymbolKey);
-const OP_DONE = "Done";
-const OP_RUNNING = "Running";
-const OP_SUSPENDED = "Suspended";
-const DoneHash = /* @__PURE__ */ string(`${FiberStatusSymbolKey}-${OP_DONE}`);
-class Done {
+const Uv = (t, e) => new Dv(t, e), qv = (t) => D(t, Uo), Bv = (t) => t.length >= 1 ? lt((e, n) => {
+  t(n).then((r) => e(Oe(r)), (r) => e(ka(r)));
+}) : lt((e) => {
+  t().then((n) => e(Oe(n)), (n) => e(ka(n)));
+}), ja = cu, Vv = "Sequential", Kv = {
+  _tag: Vv
+}, Hv = jv, Jv = Lv, As = "effect/FiberStatus", Vt = /* @__PURE__ */ Symbol.for(As), as = "Done", La = "Running", Da = "Suspended", Wv = /* @__PURE__ */ me(`${As}-${as}`);
+var Xw;
+class Gv {
   constructor() {
-    __publicField(this, _n, FiberStatusTypeId);
-    __publicField(this, "_tag", OP_DONE);
+    f(this, Xw, Vt);
+    f(this, "_tag", as);
   }
-  [(_n = FiberStatusTypeId, symbol$1)]() {
-    return DoneHash;
+  [(Xw = Vt, j)]() {
+    return Wv;
   }
-  [symbol](that) {
-    return isFiberStatus(that) && that._tag === OP_DONE;
-  }
-}
-class Running {
-  constructor(runtimeFlags) {
-    __publicField(this, "runtimeFlags");
-    __publicField(this, _o, FiberStatusTypeId);
-    __publicField(this, "_tag", OP_RUNNING);
-    this.runtimeFlags = runtimeFlags;
-  }
-  [(_o = FiberStatusTypeId, symbol$1)]() {
-    return pipe(hash(FiberStatusSymbolKey), combine$5(hash(this._tag)), combine$5(hash(this.runtimeFlags)), cached(this));
-  }
-  [symbol](that) {
-    return isFiberStatus(that) && that._tag === OP_RUNNING && this.runtimeFlags === that.runtimeFlags;
+  [P](e) {
+    return Qi(e) && e._tag === as;
   }
 }
-class Suspended {
-  constructor(runtimeFlags, blockingOn) {
-    __publicField(this, "runtimeFlags");
-    __publicField(this, "blockingOn");
-    __publicField(this, _p, FiberStatusTypeId);
-    __publicField(this, "_tag", OP_SUSPENDED);
-    this.runtimeFlags = runtimeFlags;
-    this.blockingOn = blockingOn;
+var Zw;
+class zv {
+  constructor(e) {
+    f(this, "runtimeFlags");
+    f(this, Zw, Vt);
+    f(this, "_tag", La);
+    this.runtimeFlags = e;
   }
-  [(_p = FiberStatusTypeId, symbol$1)]() {
-    return pipe(hash(FiberStatusSymbolKey), combine$5(hash(this._tag)), combine$5(hash(this.runtimeFlags)), combine$5(hash(this.blockingOn)), cached(this));
+  [(Zw = Vt, j)]() {
+    return m(I(As), K(I(this._tag)), K(I(this.runtimeFlags)), ue(this));
   }
-  [symbol](that) {
-    return isFiberStatus(that) && that._tag === OP_SUSPENDED && this.runtimeFlags === that.runtimeFlags && equals$1(this.blockingOn, that.blockingOn);
+  [P](e) {
+    return Qi(e) && e._tag === La && this.runtimeFlags === e.runtimeFlags;
   }
 }
-const done$1 = /* @__PURE__ */ new Done();
-const running$1 = (runtimeFlags) => new Running(runtimeFlags);
-const suspended$1 = (runtimeFlags, blockingOn) => new Suspended(runtimeFlags, blockingOn);
-const isFiberStatus = (u) => hasProperty(u, FiberStatusTypeId);
-const isDone$1 = (self) => self._tag === OP_DONE;
-const done = done$1;
-const running = running$1;
-const suspended = suspended$1;
-const isDone = isDone$1;
-class PriorityBuckets {
+var ek;
+class Yv {
+  constructor(e, n) {
+    f(this, "runtimeFlags");
+    f(this, "blockingOn");
+    f(this, ek, Vt);
+    f(this, "_tag", Da);
+    this.runtimeFlags = e, this.blockingOn = n;
+  }
+  [(ek = Vt, j)]() {
+    return m(I(As), K(I(this._tag)), K(I(this.runtimeFlags)), K(I(this.blockingOn)), ue(this));
+  }
+  [P](e) {
+    return Qi(e) && e._tag === Da && this.runtimeFlags === e.runtimeFlags && N(this.blockingOn, e.blockingOn);
+  }
+}
+const Qv = /* @__PURE__ */ new Gv(), Xv = (t) => new zv(t), Zv = (t, e) => new Yv(t, e), Qi = (t) => D(t, Vt), eS = (t) => t._tag === as, tS = Qv, Sf = Xv, nS = Zv, rS = eS;
+class sS {
   constructor() {
     /**
      * @since 2.0.0
      */
-    __publicField(this, "buckets", []);
+    f(this, "buckets", []);
   }
   /**
    * @since 2.0.0
    */
-  scheduleTask(task, priority) {
-    let bucket = void 0;
-    let index;
-    for (index = 0; index < this.buckets.length; index++) {
-      if (this.buckets[index][0] <= priority) {
-        bucket = this.buckets[index];
-      } else {
-        break;
-      }
-    }
-    if (bucket) {
-      bucket[1].push(task);
-    } else {
-      const newBuckets = [];
-      for (let i = 0; i < index; i++) {
-        newBuckets.push(this.buckets[i]);
-      }
-      newBuckets.push([priority, [task]]);
-      for (let i = index; i < this.buckets.length; i++) {
-        newBuckets.push(this.buckets[i]);
-      }
-      this.buckets = newBuckets;
+  scheduleTask(e, n) {
+    let r, s;
+    for (s = 0; s < this.buckets.length && this.buckets[s][0] <= n; s++)
+      r = this.buckets[s];
+    if (r)
+      r[1].push(e);
+    else {
+      const o = [];
+      for (let c = 0; c < s; c++)
+        o.push(this.buckets[c]);
+      o.push([n, [e]]);
+      for (let c = s; c < this.buckets.length; c++)
+        o.push(this.buckets[c]);
+      this.buckets = o;
     }
   }
 }
-class MixedScheduler {
-  constructor(maxNextTickBeforeTimer) {
-    __publicField(this, "maxNextTickBeforeTimer");
+class oS {
+  constructor(e) {
+    f(this, "maxNextTickBeforeTimer");
     /**
      * @since 2.0.0
      */
-    __publicField(this, "running", false);
+    f(this, "running", !1);
     /**
      * @since 2.0.0
      */
-    __publicField(this, "tasks", new PriorityBuckets());
-    this.maxNextTickBeforeTimer = maxNextTickBeforeTimer;
+    f(this, "tasks", new sS());
+    this.maxNextTickBeforeTimer = e;
   }
   /**
    * @since 2.0.0
    */
-  starveInternal(depth) {
-    const tasks = this.tasks.buckets;
+  starveInternal(e) {
+    const n = this.tasks.buckets;
     this.tasks.buckets = [];
-    for (const [_, toRun] of tasks) {
-      for (let i = 0; i < toRun.length; i++) {
-        toRun[i]();
-      }
-    }
-    if (this.tasks.buckets.length === 0) {
-      this.running = false;
-    } else {
-      this.starve(depth);
-    }
+    for (const [r, s] of n)
+      for (let o = 0; o < s.length; o++)
+        s[o]();
+    this.tasks.buckets.length === 0 ? this.running = !1 : this.starve(e);
   }
   /**
    * @since 2.0.0
    */
-  starve(depth = 0) {
-    if (depth >= this.maxNextTickBeforeTimer) {
-      setTimeout(() => this.starveInternal(0), 0);
-    } else {
-      Promise.resolve(void 0).then(() => this.starveInternal(depth + 1));
-    }
+  starve(e = 0) {
+    e >= this.maxNextTickBeforeTimer ? setTimeout(() => this.starveInternal(0), 0) : Promise.resolve(void 0).then(() => this.starveInternal(e + 1));
   }
   /**
    * @since 2.0.0
    */
-  shouldYield(fiber) {
-    return fiber.currentOpCount > fiber.getFiberRef(currentMaxOpsBeforeYield) ? fiber.getFiberRef(currentSchedulingPriority) : false;
+  shouldYield(e) {
+    return e.currentOpCount > e.getFiberRef(vy) ? e.getFiberRef(Hi) : !1;
   }
   /**
    * @since 2.0.0
    */
-  scheduleTask(task, priority) {
-    this.tasks.scheduleTask(task, priority);
-    if (!this.running) {
-      this.running = true;
-      this.starve();
-    }
+  scheduleTask(e, n) {
+    this.tasks.scheduleTask(e, n), this.running || (this.running = !0, this.starve());
   }
 }
-const defaultScheduler = /* @__PURE__ */ globalValue(/* @__PURE__ */ Symbol.for("effect/Scheduler/defaultScheduler"), () => new MixedScheduler(2048));
-const currentScheduler = /* @__PURE__ */ globalValue(/* @__PURE__ */ Symbol.for("effect/FiberRef/currentScheduler"), () => fiberRefUnsafeMake(defaultScheduler));
-const currentRequestMap = /* @__PURE__ */ globalValue(/* @__PURE__ */ Symbol.for("effect/FiberRef/currentRequestMap"), () => fiberRefUnsafeMake(/* @__PURE__ */ new Map()));
-const OP_INTERRUPT_SIGNAL = "InterruptSignal";
-const OP_STATEFUL = "Stateful";
-const OP_RESUME = "Resume";
-const OP_YIELD_NOW = "YieldNow";
-const interruptSignal = (cause) => ({
-  _tag: OP_INTERRUPT_SIGNAL,
-  cause
-});
-const stateful = (onFiber) => ({
-  _tag: OP_STATEFUL,
-  onFiber
-});
-const resume = (effect) => ({
-  _tag: OP_RESUME,
-  effect
-});
-const yieldNow = () => ({
-  _tag: OP_YIELD_NOW
-});
-const FiberScopeSymbolKey = "effect/FiberScope";
-const FiberScopeTypeId = /* @__PURE__ */ Symbol.for(FiberScopeSymbolKey);
-class Global {
+const iS = /* @__PURE__ */ Q(/* @__PURE__ */ Symbol.for("effect/Scheduler/defaultScheduler"), () => new oS(2048)), qo = /* @__PURE__ */ Q(/* @__PURE__ */ Symbol.for("effect/FiberRef/currentScheduler"), () => st(iS)), wf = /* @__PURE__ */ Q(/* @__PURE__ */ Symbol.for("effect/FiberRef/currentRequestMap"), () => st(/* @__PURE__ */ new Map())), Xi = "InterruptSignal", Zi = "Stateful", ec = "Resume", tc = "YieldNow", ao = (t) => ({
+  _tag: Xi,
+  cause: t
+}), Kr = (t) => ({
+  _tag: Zi,
+  onFiber: t
+}), Xt = (t) => ({
+  _tag: ec,
+  effect: t
+}), cS = () => ({
+  _tag: tc
+}), aS = "effect/FiberScope", us = /* @__PURE__ */ Symbol.for(aS);
+var tk;
+class uS {
   constructor() {
-    __publicField(this, _q, FiberScopeTypeId);
-    __publicField(this, "fiberId", none$4);
-    __publicField(this, "roots", /* @__PURE__ */ new Set());
+    f(this, tk, us);
+    f(this, "fiberId", Is);
+    f(this, "roots", /* @__PURE__ */ new Set());
   }
-  add(_runtimeFlags, child) {
-    this.roots.add(child);
-    child.addObserver(() => {
-      this.roots.delete(child);
+  add(e, n) {
+    this.roots.add(n), n.addObserver(() => {
+      this.roots.delete(n);
     });
   }
 }
-_q = FiberScopeTypeId;
-class Local {
-  constructor(fiberId2, parent) {
-    __publicField(this, "fiberId");
-    __publicField(this, "parent");
-    __publicField(this, _r, FiberScopeTypeId);
-    this.fiberId = fiberId2;
-    this.parent = parent;
+tk = us;
+var nk;
+class lS {
+  constructor(e, n) {
+    f(this, "fiberId");
+    f(this, "parent");
+    f(this, nk, us);
+    this.fiberId = e, this.parent = n;
   }
-  add(_runtimeFlags, child) {
-    this.parent.tell(stateful((parentFiber) => {
-      parentFiber.addChild(child);
-      child.addObserver(() => {
-        parentFiber.removeChild(child);
+  add(e, n) {
+    this.parent.tell(Kr((r) => {
+      r.addChild(n), n.addObserver(() => {
+        r.removeChild(n);
       });
     }));
   }
 }
-_r = FiberScopeTypeId;
-const unsafeMake$1 = (fiber) => {
-  return new Local(fiber.id(), fiber);
-};
-const globalScope = /* @__PURE__ */ globalValue(/* @__PURE__ */ Symbol.for("effect/FiberScope/Global"), () => new Global());
-const FiberSymbolKey = "effect/Fiber";
-const FiberTypeId = /* @__PURE__ */ Symbol.for(FiberSymbolKey);
-const fiberVariance = {
+nk = us;
+const fS = (t) => new lS(t.id(), t), nc = /* @__PURE__ */ Q(/* @__PURE__ */ Symbol.for("effect/FiberScope/Global"), () => new uS()), hS = "effect/Fiber", dS = /* @__PURE__ */ Symbol.for(hS), pS = {
   /* c8 ignore next */
-  _E: (_) => _,
+  _E: (t) => t,
   /* c8 ignore next */
-  _A: (_) => _
-};
-const RuntimeFiberSymbolKey = "effect/Fiber";
-const RuntimeFiberTypeId = /* @__PURE__ */ Symbol.for(RuntimeFiberSymbolKey);
-const _await = (self) => self.await;
-const inheritAll = (self) => self.inheritAll;
-const join = (self) => zipLeft(flatten$1(self.await), self.inheritAll);
-const currentFiberURI = "effect/FiberCurrent";
-const LoggerSymbolKey = "effect/Logger";
-const LoggerTypeId = /* @__PURE__ */ Symbol.for(LoggerSymbolKey);
-const loggerVariance = {
+  _A: (t) => t
+}, gS = "effect/Fiber", mS = /* @__PURE__ */ Symbol.for(gS), _S = (t) => t.await, yS = (t) => t.inheritAll, bS = (t) => Fs(Mi(t.await), t.inheritAll), Ot = "effect/FiberCurrent", vS = "effect/Logger", SS = /* @__PURE__ */ Symbol.for(vS), wS = {
   /* c8 ignore next */
-  _Message: (_) => _,
+  _Message: (t) => t,
   /* c8 ignore next */
-  _Output: (_) => _
-};
-const makeLogger = (log) => ({
-  [LoggerTypeId]: loggerVariance,
-  log,
+  _Output: (t) => t
+}, rc = (t) => ({
+  [SS]: wS,
+  log: t,
   pipe() {
-    return pipeArguments(this, arguments);
+    return A(this, arguments);
   }
-});
-const stringLogger = /* @__PURE__ */ makeLogger(({
-  annotations,
-  cause,
-  date,
-  fiberId: fiberId2,
-  logLevel,
-  message,
-  spans
+}), kS = /* @__PURE__ */ rc(({
+  annotations: t,
+  cause: e,
+  date: n,
+  fiberId: r,
+  logLevel: s,
+  message: o,
+  spans: c
 }) => {
-  const nowMillis = date.getTime();
-  const outputArray = [`timestamp=${date.toISOString()}`, `level=${logLevel.label}`, `fiber=${threadName$1(fiberId2)}`];
-  let output = outputArray.join(" ");
-  if (Array.isArray(message)) {
-    for (let i = 0; i < message.length; i++) {
-      const stringMessage = toStringUnknown(message[i]);
-      if (stringMessage.length > 0) {
-        output = output + " message=";
-        output = appendQuoted(stringMessage, output);
-      }
+  const a = n.getTime();
+  let h = [`timestamp=${n.toISOString()}`, `level=${s.label}`, `fiber=${Yu(r)}`].join(" ");
+  if (Array.isArray(o))
+    for (let b = 0; b < o.length; b++) {
+      const y = qn(o[b]);
+      y.length > 0 && (h = h + " message=", h = Mr(y, h));
     }
-  } else {
-    const stringMessage = toStringUnknown(message);
-    if (stringMessage.length > 0) {
-      output = output + " message=";
-      output = appendQuoted(stringMessage, output);
-    }
+  else {
+    const b = qn(o);
+    b.length > 0 && (h = h + " message=", h = Mr(b, h));
   }
-  if (cause != null && cause._tag !== "Empty") {
-    output = output + " cause=";
-    output = appendQuoted(pretty(cause), output);
+  if (e != null && e._tag !== "Empty" && (h = h + " cause=", h = Mr(Fi(e), h)), ol(c)) {
+    h = h + " ";
+    let b = !0;
+    for (const y of c)
+      b ? b = !1 : h = h + " ", h = h + m(y, Iv(a));
   }
-  if (isCons(spans)) {
-    output = output + " ";
-    let first = true;
-    for (const span2 of spans) {
-      if (first) {
-        first = false;
-      } else {
-        output = output + " ";
-      }
-      output = output + pipe(span2, render(nowMillis));
-    }
+  if (m(t, Wg) > 0) {
+    h = h + " ";
+    let b = !0;
+    for (const [y, k] of t)
+      b ? b = !1 : h = h + " ", h = h + RS(y), h = h + "=", h = Mr(qn(k), h);
   }
-  if (pipe(annotations, size) > 0) {
-    output = output + " ";
-    let first = true;
-    for (const [key, value] of annotations) {
-      if (first) {
-        first = false;
-      } else {
-        output = output + " ";
-      }
-      output = output + filterKeyName(key);
-      output = output + "=";
-      output = appendQuoted(toStringUnknown(value), output);
-    }
+  return h;
+}), ES = (t) => `"${t.replace(/\\([\s\S])|(")/g, "\\$1$2")}"`, OS = /^[^\s"=]+$/, Mr = (t, e) => e + (t.match(OS) ? t : ES(t)), RS = (t) => t.replace(/[\s="]/g, "_"), kf = "effect/MetricBoundaries", Bo = /* @__PURE__ */ Symbol.for(kf);
+var rk;
+class IS {
+  constructor(e) {
+    f(this, "values");
+    f(this, rk, Bo);
+    f(this, "_hash");
+    this.values = e, this._hash = m(me(kf), K(sr(this.values)));
   }
-  return output;
-});
-const escapeDoubleQuotes = (str) => `"${str.replace(/\\([\s\S])|(")/g, "\\$1$2")}"`;
-const textOnly = /^[^\s"=]+$/;
-const appendQuoted = (label, output) => output + (label.match(textOnly) ? label : escapeDoubleQuotes(label));
-const filterKeyName = (key) => key.replace(/[\s="]/g, "_");
-const MetricBoundariesSymbolKey = "effect/MetricBoundaries";
-const MetricBoundariesTypeId = /* @__PURE__ */ Symbol.for(MetricBoundariesSymbolKey);
-class MetricBoundariesImpl {
-  constructor(values) {
-    __publicField(this, "values");
-    __publicField(this, _s, MetricBoundariesTypeId);
-    __publicField(this, "_hash");
-    this.values = values;
-    this._hash = pipe(string(MetricBoundariesSymbolKey), combine$5(array(this.values)));
-  }
-  [(_s = MetricBoundariesTypeId, symbol$1)]() {
+  [(rk = Bo, j)]() {
     return this._hash;
   }
-  [symbol](u) {
-    return isMetricBoundaries(u) && equals$1(this.values, u.values);
+  [P](e) {
+    return CS(e) && N(this.values, e.values);
   }
   pipe() {
-    return pipeArguments(this, arguments);
+    return A(this, arguments);
   }
 }
-const isMetricBoundaries = (u) => hasProperty(u, MetricBoundariesTypeId);
-const fromIterable = (iterable) => {
-  const values = pipe(iterable, appendAll$2(of$1(Number.POSITIVE_INFINITY)), dedupe);
-  return new MetricBoundariesImpl(values);
-};
-const exponential = (options) => pipe(makeBy(options.count - 1, (i) => options.start * Math.pow(options.factor, i)), unsafeFromArray, fromIterable);
-const MetricKeyTypeSymbolKey = "effect/MetricKeyType";
-const MetricKeyTypeTypeId = /* @__PURE__ */ Symbol.for(MetricKeyTypeSymbolKey);
-const CounterKeyTypeSymbolKey = "effect/MetricKeyType/Counter";
-const CounterKeyTypeTypeId = /* @__PURE__ */ Symbol.for(CounterKeyTypeSymbolKey);
-const FrequencyKeyTypeSymbolKey = "effect/MetricKeyType/Frequency";
-const FrequencyKeyTypeTypeId = /* @__PURE__ */ Symbol.for(FrequencyKeyTypeSymbolKey);
-const GaugeKeyTypeSymbolKey = "effect/MetricKeyType/Gauge";
-const GaugeKeyTypeTypeId = /* @__PURE__ */ Symbol.for(GaugeKeyTypeSymbolKey);
-const HistogramKeyTypeSymbolKey = "effect/MetricKeyType/Histogram";
-const HistogramKeyTypeTypeId = /* @__PURE__ */ Symbol.for(HistogramKeyTypeSymbolKey);
-const SummaryKeyTypeSymbolKey = "effect/MetricKeyType/Summary";
-const SummaryKeyTypeTypeId = /* @__PURE__ */ Symbol.for(SummaryKeyTypeSymbolKey);
-const metricKeyTypeVariance = {
+const CS = (t) => D(t, Bo), TS = (t) => {
+  const e = m(t, Ou(Je(Number.POSITIVE_INFINITY)), Ap);
+  return new IS(e);
+}, $S = (t) => m(dp(t.count - 1, (e) => t.start * Math.pow(t.factor, e)), bs, TS), FS = "effect/MetricKeyType", Ef = /* @__PURE__ */ Symbol.for(FS), Of = "effect/MetricKeyType/Counter", Vo = /* @__PURE__ */ Symbol.for(Of), AS = "effect/MetricKeyType/Frequency", MS = /* @__PURE__ */ Symbol.for(AS), PS = "effect/MetricKeyType/Gauge", NS = /* @__PURE__ */ Symbol.for(PS), Rf = "effect/MetricKeyType/Histogram", Ko = /* @__PURE__ */ Symbol.for(Rf), xS = "effect/MetricKeyType/Summary", jS = /* @__PURE__ */ Symbol.for(xS), If = {
   /* c8 ignore next */
-  _In: (_) => _,
+  _In: (t) => t,
   /* c8 ignore next */
-  _Out: (_) => _
+  _Out: (t) => t
 };
-class CounterKeyType {
-  constructor(incremental, bigint) {
-    __publicField(this, "incremental");
-    __publicField(this, "bigint");
-    __publicField(this, _t, metricKeyTypeVariance);
-    __publicField(this, _u, CounterKeyTypeTypeId);
-    __publicField(this, "_hash");
-    this.incremental = incremental;
-    this.bigint = bigint;
-    this._hash = string(CounterKeyTypeSymbolKey);
+var sk, ok;
+class LS {
+  constructor(e, n) {
+    f(this, "incremental");
+    f(this, "bigint");
+    f(this, sk, If);
+    f(this, ok, Vo);
+    f(this, "_hash");
+    this.incremental = e, this.bigint = n, this._hash = me(Of);
   }
-  [(_t = MetricKeyTypeTypeId, _u = CounterKeyTypeTypeId, symbol$1)]() {
+  [(sk = Ef, ok = Vo, j)]() {
     return this._hash;
   }
-  [symbol](that) {
-    return isCounterKey(that);
+  [P](e) {
+    return Cf(e);
   }
   pipe() {
-    return pipeArguments(this, arguments);
+    return A(this, arguments);
   }
 }
-class HistogramKeyType {
-  constructor(boundaries) {
-    __publicField(this, "boundaries");
-    __publicField(this, _v, metricKeyTypeVariance);
-    __publicField(this, _w, HistogramKeyTypeTypeId);
-    __publicField(this, "_hash");
-    this.boundaries = boundaries;
-    this._hash = pipe(string(HistogramKeyTypeSymbolKey), combine$5(hash(this.boundaries)));
+var ik, ck;
+class DS {
+  constructor(e) {
+    f(this, "boundaries");
+    f(this, ik, If);
+    f(this, ck, Ko);
+    f(this, "_hash");
+    this.boundaries = e, this._hash = m(me(Rf), K(I(this.boundaries)));
   }
-  [(_v = MetricKeyTypeTypeId, _w = HistogramKeyTypeTypeId, symbol$1)]() {
+  [(ik = Ef, ck = Ko, j)]() {
     return this._hash;
   }
-  [symbol](that) {
-    return isHistogramKey(that) && equals$1(this.boundaries, that.boundaries);
+  [P](e) {
+    return Tf(e) && N(this.boundaries, e.boundaries);
   }
   pipe() {
-    return pipeArguments(this, arguments);
+    return A(this, arguments);
   }
 }
-const counter$4 = (options) => new CounterKeyType((options == null ? void 0 : options.incremental) ?? false, (options == null ? void 0 : options.bigint) ?? false);
-const histogram$4 = (boundaries) => {
-  return new HistogramKeyType(boundaries);
-};
-const isCounterKey = (u) => hasProperty(u, CounterKeyTypeTypeId);
-const isFrequencyKey = (u) => hasProperty(u, FrequencyKeyTypeTypeId);
-const isGaugeKey = (u) => hasProperty(u, GaugeKeyTypeTypeId);
-const isHistogramKey = (u) => hasProperty(u, HistogramKeyTypeTypeId);
-const isSummaryKey = (u) => hasProperty(u, SummaryKeyTypeTypeId);
-const MetricKeySymbolKey = "effect/MetricKey";
-const MetricKeyTypeId = /* @__PURE__ */ Symbol.for(MetricKeySymbolKey);
-const metricKeyVariance = {
+const US = (t) => new LS((t == null ? void 0 : t.incremental) ?? !1, (t == null ? void 0 : t.bigint) ?? !1), qS = (t) => new DS(t), Cf = (t) => D(t, Vo), BS = (t) => D(t, MS), VS = (t) => D(t, NS), Tf = (t) => D(t, Ko), KS = (t) => D(t, jS), HS = "effect/MetricKey", $f = /* @__PURE__ */ Symbol.for(HS), JS = {
   /* c8 ignore next */
-  _Type: (_) => _
-};
-const arrayEquivilence = /* @__PURE__ */ getEquivalence$2(equals$1);
-class MetricKeyImpl {
-  constructor(name, keyType, description, tags = []) {
-    __publicField(this, "name");
-    __publicField(this, "keyType");
-    __publicField(this, "description");
-    __publicField(this, "tags");
-    __publicField(this, _x, metricKeyVariance);
-    __publicField(this, "_hash");
-    this.name = name;
-    this.keyType = keyType;
-    this.description = description;
-    this.tags = tags;
-    this._hash = pipe(string(this.name + this.description), combine$5(hash(this.keyType)), combine$5(array(this.tags)));
+  _Type: (t) => t
+}, WS = /* @__PURE__ */ hi(N);
+var ak;
+class sc {
+  constructor(e, n, r, s = []) {
+    f(this, "name");
+    f(this, "keyType");
+    f(this, "description");
+    f(this, "tags");
+    f(this, ak, JS);
+    f(this, "_hash");
+    this.name = e, this.keyType = n, this.description = r, this.tags = s, this._hash = m(me(this.name + this.description), K(I(this.keyType)), K(sr(this.tags)));
   }
-  [(_x = MetricKeyTypeId, symbol$1)]() {
+  [(ak = $f, j)]() {
     return this._hash;
   }
-  [symbol](u) {
-    return isMetricKey(u) && this.name === u.name && equals$1(this.keyType, u.keyType) && equals$1(this.description, u.description) && arrayEquivilence(this.tags, u.tags);
+  [P](e) {
+    return GS(e) && this.name === e.name && N(this.keyType, e.keyType) && N(this.description, e.description) && WS(this.tags, e.tags);
   }
   pipe() {
-    return pipeArguments(this, arguments);
+    return A(this, arguments);
   }
 }
-const isMetricKey = (u) => hasProperty(u, MetricKeyTypeId);
-const counter$3 = (name, options) => new MetricKeyImpl(name, counter$4(options), fromNullable(options == null ? void 0 : options.description));
-const histogram$3 = (name, boundaries, description) => new MetricKeyImpl(name, histogram$4(boundaries), fromNullable(description));
-const taggedWithLabels$1 = /* @__PURE__ */ dual(2, (self, extraTags) => extraTags.length === 0 ? self : new MetricKeyImpl(self.name, self.keyType, self.description, union$2(self.tags, extraTags)));
-const MetricStateSymbolKey = "effect/MetricState";
-const MetricStateTypeId = /* @__PURE__ */ Symbol.for(MetricStateSymbolKey);
-const CounterStateSymbolKey = "effect/MetricState/Counter";
-const CounterStateTypeId = /* @__PURE__ */ Symbol.for(CounterStateSymbolKey);
-const FrequencyStateSymbolKey = "effect/MetricState/Frequency";
-const FrequencyStateTypeId = /* @__PURE__ */ Symbol.for(FrequencyStateSymbolKey);
-const GaugeStateSymbolKey = "effect/MetricState/Gauge";
-const GaugeStateTypeId = /* @__PURE__ */ Symbol.for(GaugeStateSymbolKey);
-const HistogramStateSymbolKey = "effect/MetricState/Histogram";
-const HistogramStateTypeId = /* @__PURE__ */ Symbol.for(HistogramStateSymbolKey);
-const SummaryStateSymbolKey = "effect/MetricState/Summary";
-const SummaryStateTypeId = /* @__PURE__ */ Symbol.for(SummaryStateSymbolKey);
-const metricStateVariance = {
+const GS = (t) => D(t, $f), zS = (t, e) => new sc(t, US(e), li(e == null ? void 0 : e.description)), YS = (t, e, n) => new sc(t, qS(e), li(n)), QS = /* @__PURE__ */ g(2, (t, e) => e.length === 0 ? t : new sc(t.name, t.keyType, t.description, go(t.tags, e))), XS = "effect/MetricState", gr = /* @__PURE__ */ Symbol.for(XS), Ff = "effect/MetricState/Counter", Ho = /* @__PURE__ */ Symbol.for(Ff), Af = "effect/MetricState/Frequency", Jo = /* @__PURE__ */ Symbol.for(Af), Mf = "effect/MetricState/Gauge", Wo = /* @__PURE__ */ Symbol.for(Mf), Pf = "effect/MetricState/Histogram", Go = /* @__PURE__ */ Symbol.for(Pf), Nf = "effect/MetricState/Summary", zo = /* @__PURE__ */ Symbol.for(Nf), mr = {
   /* c8 ignore next */
-  _A: (_) => _
+  _A: (t) => t
 };
-class CounterState {
-  constructor(count) {
-    __publicField(this, "count");
-    __publicField(this, _y, metricStateVariance);
-    __publicField(this, _z, CounterStateTypeId);
-    this.count = count;
+var uk, lk;
+class ZS {
+  constructor(e) {
+    f(this, "count");
+    f(this, uk, mr);
+    f(this, lk, Ho);
+    this.count = e;
   }
-  [(_y = MetricStateTypeId, _z = CounterStateTypeId, symbol$1)]() {
-    return pipe(hash(CounterStateSymbolKey), combine$5(hash(this.count)), cached(this));
+  [(uk = gr, lk = Ho, j)]() {
+    return m(I(Ff), K(I(this.count)), ue(this));
   }
-  [symbol](that) {
-    return isCounterState(that) && this.count === that.count;
-  }
-  pipe() {
-    return pipeArguments(this, arguments);
-  }
-}
-const arrayEquals = /* @__PURE__ */ getEquivalence$2(equals$1);
-class FrequencyState {
-  constructor(occurrences) {
-    __publicField(this, "occurrences");
-    __publicField(this, _A, metricStateVariance);
-    __publicField(this, _B, FrequencyStateTypeId);
-    __publicField(this, "_hash");
-    this.occurrences = occurrences;
-  }
-  [(_A = MetricStateTypeId, _B = FrequencyStateTypeId, symbol$1)]() {
-    return pipe(string(FrequencyStateSymbolKey), combine$5(array(fromIterable$6(this.occurrences.entries()))), cached(this));
-  }
-  [symbol](that) {
-    return isFrequencyState(that) && arrayEquals(fromIterable$6(this.occurrences.entries()), fromIterable$6(that.occurrences.entries()));
+  [P](e) {
+    return l0(e) && this.count === e.count;
   }
   pipe() {
-    return pipeArguments(this, arguments);
+    return A(this, arguments);
   }
 }
-class GaugeState {
-  constructor(value) {
-    __publicField(this, "value");
-    __publicField(this, _C, metricStateVariance);
-    __publicField(this, _D, GaugeStateTypeId);
-    this.value = value;
+const e0 = /* @__PURE__ */ hi(N);
+var fk, hk;
+class t0 {
+  constructor(e) {
+    f(this, "occurrences");
+    f(this, fk, mr);
+    f(this, hk, Jo);
+    f(this, "_hash");
+    this.occurrences = e;
   }
-  [(_C = MetricStateTypeId, _D = GaugeStateTypeId, symbol$1)]() {
-    return pipe(hash(GaugeStateSymbolKey), combine$5(hash(this.value)), cached(this));
+  [(fk = gr, hk = Jo, j)]() {
+    return m(me(Af), K(sr(Se(this.occurrences.entries()))), ue(this));
   }
-  [symbol](u) {
-    return isGaugeState(u) && this.value === u.value;
+  [P](e) {
+    return f0(e) && e0(Se(this.occurrences.entries()), Se(e.occurrences.entries()));
   }
   pipe() {
-    return pipeArguments(this, arguments);
+    return A(this, arguments);
   }
 }
-class HistogramState {
-  constructor(buckets, count, min, max, sum) {
-    __publicField(this, "buckets");
-    __publicField(this, "count");
-    __publicField(this, "min");
-    __publicField(this, "max");
-    __publicField(this, "sum");
-    __publicField(this, _E, metricStateVariance);
-    __publicField(this, _F, HistogramStateTypeId);
-    this.buckets = buckets;
-    this.count = count;
-    this.min = min;
-    this.max = max;
-    this.sum = sum;
+var dk, pk;
+class n0 {
+  constructor(e) {
+    f(this, "value");
+    f(this, dk, mr);
+    f(this, pk, Wo);
+    this.value = e;
   }
-  [(_E = MetricStateTypeId, _F = HistogramStateTypeId, symbol$1)]() {
-    return pipe(hash(HistogramStateSymbolKey), combine$5(hash(this.buckets)), combine$5(hash(this.count)), combine$5(hash(this.min)), combine$5(hash(this.max)), combine$5(hash(this.sum)), cached(this));
+  [(dk = gr, pk = Wo, j)]() {
+    return m(I(Mf), K(I(this.value)), ue(this));
   }
-  [symbol](that) {
-    return isHistogramState(that) && equals$1(this.buckets, that.buckets) && this.count === that.count && this.min === that.min && this.max === that.max && this.sum === that.sum;
+  [P](e) {
+    return h0(e) && this.value === e.value;
   }
   pipe() {
-    return pipeArguments(this, arguments);
+    return A(this, arguments);
   }
 }
-class SummaryState {
-  constructor(error, quantiles, count, min, max, sum) {
-    __publicField(this, "error");
-    __publicField(this, "quantiles");
-    __publicField(this, "count");
-    __publicField(this, "min");
-    __publicField(this, "max");
-    __publicField(this, "sum");
-    __publicField(this, _G, metricStateVariance);
-    __publicField(this, _H, SummaryStateTypeId);
-    this.error = error;
-    this.quantiles = quantiles;
-    this.count = count;
-    this.min = min;
-    this.max = max;
-    this.sum = sum;
+var gk, mk;
+class r0 {
+  constructor(e, n, r, s, o) {
+    f(this, "buckets");
+    f(this, "count");
+    f(this, "min");
+    f(this, "max");
+    f(this, "sum");
+    f(this, gk, mr);
+    f(this, mk, Go);
+    this.buckets = e, this.count = n, this.min = r, this.max = s, this.sum = o;
   }
-  [(_G = MetricStateTypeId, _H = SummaryStateTypeId, symbol$1)]() {
-    return pipe(hash(SummaryStateSymbolKey), combine$5(hash(this.error)), combine$5(hash(this.quantiles)), combine$5(hash(this.count)), combine$5(hash(this.min)), combine$5(hash(this.max)), combine$5(hash(this.sum)), cached(this));
+  [(gk = gr, mk = Go, j)]() {
+    return m(I(Pf), K(I(this.buckets)), K(I(this.count)), K(I(this.min)), K(I(this.max)), K(I(this.sum)), ue(this));
   }
-  [symbol](that) {
-    return isSummaryState(that) && this.error === that.error && equals$1(this.quantiles, that.quantiles) && this.count === that.count && this.min === that.min && this.max === that.max && this.sum === that.sum;
+  [P](e) {
+    return d0(e) && N(this.buckets, e.buckets) && this.count === e.count && this.min === e.min && this.max === e.max && this.sum === e.sum;
   }
   pipe() {
-    return pipeArguments(this, arguments);
+    return A(this, arguments);
   }
 }
-const counter$2 = (count) => new CounterState(count);
-const frequency$1 = (occurrences) => {
-  return new FrequencyState(occurrences);
-};
-const gauge$1 = (count) => new GaugeState(count);
-const histogram$2 = (options) => new HistogramState(options.buckets, options.count, options.min, options.max, options.sum);
-const summary$1 = (options) => new SummaryState(options.error, options.quantiles, options.count, options.min, options.max, options.sum);
-const isCounterState = (u) => hasProperty(u, CounterStateTypeId);
-const isFrequencyState = (u) => hasProperty(u, FrequencyStateTypeId);
-const isGaugeState = (u) => hasProperty(u, GaugeStateTypeId);
-const isHistogramState = (u) => hasProperty(u, HistogramStateTypeId);
-const isSummaryState = (u) => hasProperty(u, SummaryStateTypeId);
-const MetricHookSymbolKey = "effect/MetricHook";
-const MetricHookTypeId = /* @__PURE__ */ Symbol.for(MetricHookSymbolKey);
-const metricHookVariance = {
+var _k, yk;
+class s0 {
+  constructor(e, n, r, s, o, c) {
+    f(this, "error");
+    f(this, "quantiles");
+    f(this, "count");
+    f(this, "min");
+    f(this, "max");
+    f(this, "sum");
+    f(this, _k, mr);
+    f(this, yk, zo);
+    this.error = e, this.quantiles = n, this.count = r, this.min = s, this.max = o, this.sum = c;
+  }
+  [(_k = gr, yk = zo, j)]() {
+    return m(I(Nf), K(I(this.error)), K(I(this.quantiles)), K(I(this.count)), K(I(this.min)), K(I(this.max)), K(I(this.sum)), ue(this));
+  }
+  [P](e) {
+    return p0(e) && this.error === e.error && N(this.quantiles, e.quantiles) && this.count === e.count && this.min === e.min && this.max === e.max && this.sum === e.sum;
+  }
+  pipe() {
+    return A(this, arguments);
+  }
+}
+const o0 = (t) => new ZS(t), i0 = (t) => new t0(t), c0 = (t) => new n0(t), a0 = (t) => new r0(t.buckets, t.count, t.min, t.max, t.sum), u0 = (t) => new s0(t.error, t.quantiles, t.count, t.min, t.max, t.sum), l0 = (t) => D(t, Ho), f0 = (t) => D(t, Jo), h0 = (t) => D(t, Wo), d0 = (t) => D(t, Go), p0 = (t) => D(t, zo), g0 = "effect/MetricHook", m0 = /* @__PURE__ */ Symbol.for(g0), _0 = {
   /* c8 ignore next */
-  _In: (_) => _,
+  _In: (t) => t,
   /* c8 ignore next */
-  _Out: (_) => _
-};
-const make$4 = (options) => ({
-  [MetricHookTypeId]: metricHookVariance,
+  _Out: (t) => t
+}, _r = (t) => ({
+  [m0]: _0,
   pipe() {
-    return pipeArguments(this, arguments);
+    return A(this, arguments);
   },
-  ...options
-});
-const bigint0 = /* @__PURE__ */ BigInt(0);
-const counter$1 = (key) => {
-  let sum = key.keyType.bigint ? bigint0 : 0;
-  const canUpdate = key.keyType.incremental ? key.keyType.bigint ? (value) => value >= bigint0 : (value) => value >= 0 : (_value2) => true;
-  return make$4({
-    get: () => counter$2(sum),
-    update: (value) => {
-      if (canUpdate(value)) {
-        sum = sum + value;
-      }
+  ...t
+}), Ua = /* @__PURE__ */ BigInt(0), y0 = (t) => {
+  let e = t.keyType.bigint ? Ua : 0;
+  const n = t.keyType.incremental ? t.keyType.bigint ? (r) => r >= Ua : (r) => r >= 0 : (r) => !0;
+  return _r({
+    get: () => o0(e),
+    update: (r) => {
+      n(r) && (e = e + r);
     }
   });
-};
-const frequency = (key) => {
-  const values = /* @__PURE__ */ new Map();
-  for (const word of key.keyType.preregisteredWords) {
-    values.set(word, 0);
-  }
-  const update2 = (word) => {
-    const slotCount = values.get(word) ?? 0;
-    values.set(word, slotCount + 1);
-  };
-  return make$4({
-    get: () => frequency$1(values),
-    update: update2
-  });
-};
-const gauge = (_key, startAt) => {
-  let value = startAt;
-  return make$4({
-    get: () => gauge$1(value),
-    update: (v) => {
-      value = v;
+}, b0 = (t) => {
+  const e = /* @__PURE__ */ new Map();
+  for (const r of t.keyType.preregisteredWords)
+    e.set(r, 0);
+  return _r({
+    get: () => i0(e),
+    update: (r) => {
+      const s = e.get(r) ?? 0;
+      e.set(r, s + 1);
     }
   });
-};
-const histogram$1 = (key) => {
-  const bounds = key.keyType.boundaries.values;
-  const size2 = bounds.length;
-  const values = new Uint32Array(size2 + 1);
-  const boundaries = new Float32Array(size2);
-  let count = 0;
-  let sum = 0;
-  let min = Number.MAX_VALUE;
-  let max = Number.MIN_VALUE;
-  pipe(bounds, sort(Order$1), map$3((n, i) => {
-    boundaries[i] = n;
+}, v0 = (t, e) => {
+  let n = e;
+  return _r({
+    get: () => c0(n),
+    update: (r) => {
+      n = r;
+    }
+  });
+}, S0 = (t) => {
+  const e = t.keyType.boundaries.values, n = e.length, r = new Uint32Array(n + 1), s = new Float32Array(n);
+  let o = 0, c = 0, a = Number.MAX_VALUE, u = Number.MIN_VALUE;
+  m(e, Zr(nr), rn((y, k) => {
+    s[k] = y;
   }));
-  const update2 = (value) => {
-    let from = 0;
-    let to = size2;
-    while (from !== to) {
-      const mid = Math.floor(from + (to - from) / 2);
-      const boundary = boundaries[mid];
-      if (value <= boundary) {
-        to = mid;
-      } else {
-        from = mid;
-      }
-      if (to === from + 1) {
-        if (value <= boundaries[from]) {
-          to = from;
-        } else {
-          from = to;
-        }
-      }
+  const h = (y) => {
+    let k = 0, w = n;
+    for (; k !== w; ) {
+      const R = Math.floor(k + (w - k) / 2), J = s[R];
+      y <= J ? w = R : k = R, w === k + 1 && (y <= s[k] ? w = k : k = w);
     }
-    values[from] = values[from] + 1;
-    count = count + 1;
-    sum = sum + value;
-    if (value < min) {
-      min = value;
+    r[k] = r[k] + 1, o = o + 1, c = c + y, y < a && (a = y), y > u && (u = y);
+  }, b = () => {
+    const y = fi(n);
+    let k = 0;
+    for (let w = 0; w < n; w++) {
+      const R = s[w], J = r[w];
+      k = k + J, y[w] = [R, k];
     }
-    if (value > max) {
-      max = value;
-    }
+    return y;
   };
-  const getBuckets = () => {
-    const builder = allocate(size2);
-    let cumulated = 0;
-    for (let i = 0; i < size2; i++) {
-      const boundary = boundaries[i];
-      const value = values[i];
-      cumulated = cumulated + value;
-      builder[i] = [boundary, cumulated];
-    }
-    return builder;
-  };
-  return make$4({
-    get: () => histogram$2({
-      buckets: getBuckets(),
-      count,
-      min,
-      max,
-      sum
+  return _r({
+    get: () => a0({
+      buckets: b(),
+      count: o,
+      min: a,
+      max: u,
+      sum: c
     }),
-    update: update2
+    update: h
   });
-};
-const summary = (key) => {
+}, w0 = (t) => {
   const {
-    error,
-    maxAge,
-    maxSize,
-    quantiles
-  } = key.keyType;
-  const sortedQuantiles = pipe(quantiles, sort(Order$1));
-  const values = allocate(maxSize);
-  let head2 = 0;
-  let count = 0;
-  let sum = 0;
-  let min = Number.MAX_VALUE;
-  let max = Number.MIN_VALUE;
-  const snapshot = (now) => {
-    const builder = [];
-    let i = 0;
-    while (i !== maxSize - 1) {
-      const item = values[i];
-      if (item != null) {
-        const [t, v] = item;
-        const age = millis(now - t);
-        if (greaterThanOrEqualTo(age, zero) && age <= maxAge) {
-          builder.push(v);
-        }
+    error: e,
+    maxAge: n,
+    maxSize: r,
+    quantiles: s
+  } = t.keyType, o = m(s, Zr(nr)), c = fi(r);
+  let a = 0, u = 0, h = 0, b = Number.MAX_VALUE, y = Number.MIN_VALUE;
+  const k = (R) => {
+    const J = [];
+    let B = 0;
+    for (; B !== r - 1; ) {
+      const ce = c[B];
+      if (ce != null) {
+        const [Y, we] = ce, de = No(R - Y);
+        sb(de, Gy) && de <= n && J.push(we);
       }
-      i = i + 1;
+      B = B + 1;
     }
-    return calculateQuantiles(error, sortedQuantiles, sort(builder, Order$1));
+    return k0(e, o, Zr(J, nr));
+  }, w = (R, J) => {
+    if (r > 0) {
+      a = a + 1;
+      const B = a % r;
+      c[B] = [J, R];
+    }
+    u = u + 1, h = h + R, R < b && (b = R), R > y && (y = R);
   };
-  const observe = (value, timestamp) => {
-    if (maxSize > 0) {
-      head2 = head2 + 1;
-      const target = head2 % maxSize;
-      values[target] = [timestamp, value];
-    }
-    count = count + 1;
-    sum = sum + value;
-    if (value < min) {
-      min = value;
-    }
-    if (value > max) {
-      max = value;
-    }
-  };
-  return make$4({
-    get: () => summary$1({
-      error,
-      quantiles: snapshot(Date.now()),
-      count,
-      min,
-      max,
-      sum
+  return _r({
+    get: () => u0({
+      error: e,
+      quantiles: k(Date.now()),
+      count: u,
+      min: b,
+      max: y,
+      sum: h
     }),
-    update: ([value, timestamp]) => observe(value, timestamp)
+    update: ([R, J]) => w(R, J)
   });
-};
-const calculateQuantiles = (error, sortedQuantiles, sortedSamples) => {
-  const sampleCount = sortedSamples.length;
-  if (!isNonEmptyReadonlyArray(sortedQuantiles)) {
-    return empty$j();
-  }
-  const head2 = sortedQuantiles[0];
-  const tail = sortedQuantiles.slice(1);
-  const resolvedHead = resolveQuantile(error, sampleCount, none$6(), 0, head2, sortedSamples);
-  const resolved = of$2(resolvedHead);
-  tail.forEach((quantile) => {
-    resolved.push(resolveQuantile(error, sampleCount, resolvedHead.value, resolvedHead.consumed, quantile, resolvedHead.rest));
-  });
-  return map$3(resolved, (rq) => [rq.quantile, rq.value]);
-};
-const resolveQuantile = (error, sampleCount, current, consumed, quantile, rest) => {
-  let error_1 = error;
-  let sampleCount_1 = sampleCount;
-  let current_1 = current;
-  let consumed_1 = consumed;
-  let quantile_1 = quantile;
-  let rest_1 = rest;
-  let error_2 = error;
-  let sampleCount_2 = sampleCount;
-  let current_2 = current;
-  let consumed_2 = consumed;
-  let quantile_2 = quantile;
-  let rest_2 = rest;
-  while (1) {
-    if (!isNonEmptyReadonlyArray(rest_1)) {
+}, k0 = (t, e, n) => {
+  const r = n.length;
+  if (!He(e))
+    return ln();
+  const s = e[0], o = e.slice(1), c = qa(t, r, M(), 0, s, n), a = Xe(c);
+  return o.forEach((u) => {
+    a.push(qa(t, r, c.value, c.consumed, u, c.rest));
+  }), rn(a, (u) => [u.quantile, u.value]);
+}, qa = (t, e, n, r, s, o) => {
+  let c = t, a = e, u = n, h = r, b = s, y = o, k = t, w = e, R = n, J = r, B = s, ce = o;
+  for (; ; ) {
+    if (!He(y))
       return {
-        quantile: quantile_1,
-        value: none$6(),
-        consumed: consumed_1,
+        quantile: b,
+        value: M(),
+        consumed: h,
         rest: []
       };
-    }
-    if (quantile_1 === 1) {
+    if (b === 1)
       return {
-        quantile: quantile_1,
-        value: some$2(lastNonEmpty(rest_1)),
-        consumed: consumed_1 + rest_1.length,
+        quantile: b,
+        value: H(Cu(y)),
+        consumed: h + y.length,
         rest: []
       };
-    }
-    const sameHead = span(rest_1, (n) => n <= rest_1[0]);
-    const desired = quantile_1 * sampleCount_1;
-    const allowedError = error_1 / 2 * desired;
-    const candConsumed = consumed_1 + sameHead[0].length;
-    const candError = Math.abs(candConsumed - desired);
-    if (candConsumed < desired - allowedError) {
-      error_2 = error_1;
-      sampleCount_2 = sampleCount_1;
-      current_2 = head(rest_1);
-      consumed_2 = candConsumed;
-      quantile_2 = quantile_1;
-      rest_2 = sameHead[1];
-      error_1 = error_2;
-      sampleCount_1 = sampleCount_2;
-      current_1 = current_2;
-      consumed_1 = consumed_2;
-      quantile_1 = quantile_2;
-      rest_1 = rest_2;
+    const Y = wp(y, (Ce) => Ce <= y[0]), we = b * a, de = c / 2 * we, G = h + Y[0].length, be = Math.abs(G - we);
+    if (G < we - de) {
+      k = c, w = a, R = Bn(y), J = G, B = b, ce = Y[1], c = k, a = w, u = R, h = J, b = B, y = ce;
       continue;
     }
-    if (candConsumed > desired + allowedError) {
+    if (G > we + de)
       return {
-        quantile: quantile_1,
-        value: current_1,
-        consumed: consumed_1,
-        rest: rest_1
+        quantile: b,
+        value: u,
+        consumed: h,
+        rest: y
       };
-    }
-    switch (current_1._tag) {
+    switch (u._tag) {
       case "None": {
-        error_2 = error_1;
-        sampleCount_2 = sampleCount_1;
-        current_2 = head(rest_1);
-        consumed_2 = candConsumed;
-        quantile_2 = quantile_1;
-        rest_2 = sameHead[1];
-        error_1 = error_2;
-        sampleCount_1 = sampleCount_2;
-        current_1 = current_2;
-        consumed_1 = consumed_2;
-        quantile_1 = quantile_2;
-        rest_1 = rest_2;
+        k = c, w = a, R = Bn(y), J = G, B = b, ce = Y[1], c = k, a = w, u = R, h = J, b = B, y = ce;
         continue;
       }
       case "Some": {
-        const prevError = Math.abs(desired - current_1.value);
-        if (candError < prevError) {
-          error_2 = error_1;
-          sampleCount_2 = sampleCount_1;
-          current_2 = head(rest_1);
-          consumed_2 = candConsumed;
-          quantile_2 = quantile_1;
-          rest_2 = sameHead[1];
-          error_1 = error_2;
-          sampleCount_1 = sampleCount_2;
-          current_1 = current_2;
-          consumed_1 = consumed_2;
-          quantile_1 = quantile_2;
-          rest_1 = rest_2;
+        const Ce = Math.abs(we - u.value);
+        if (be < Ce) {
+          k = c, w = a, R = Bn(y), J = G, B = b, ce = Y[1], c = k, a = w, u = R, h = J, b = B, y = ce;
           continue;
         }
         return {
-          quantile: quantile_1,
-          value: some$2(current_1.value),
-          consumed: consumed_1,
-          rest: rest_1
+          quantile: b,
+          value: H(u.value),
+          consumed: h,
+          rest: y
         };
       }
     }
   }
   throw new Error("BUG: MetricHook.resolveQuantiles - please report an issue at https://github.com/Effect-TS/effect/issues");
-};
-const MetricPairSymbolKey = "effect/MetricPair";
-const MetricPairTypeId = /* @__PURE__ */ Symbol.for(MetricPairSymbolKey);
-const metricPairVariance = {
+}, E0 = "effect/MetricPair", O0 = /* @__PURE__ */ Symbol.for(E0), R0 = {
   /* c8 ignore next */
-  _Type: (_) => _
-};
-const unsafeMake = (metricKey, metricState) => {
-  return {
-    [MetricPairTypeId]: metricPairVariance,
-    metricKey,
-    metricState,
-    pipe() {
-      return pipeArguments(this, arguments);
-    }
-  };
-};
-const MetricRegistrySymbolKey = "effect/MetricRegistry";
-const MetricRegistryTypeId = /* @__PURE__ */ Symbol.for(MetricRegistrySymbolKey);
-class MetricRegistryImpl {
+  _Type: (t) => t
+}, I0 = (t, e) => ({
+  [O0]: R0,
+  metricKey: t,
+  metricState: e,
+  pipe() {
+    return A(this, arguments);
+  }
+}), C0 = "effect/MetricRegistry", Ba = /* @__PURE__ */ Symbol.for(C0);
+var bk;
+class T0 {
   constructor() {
-    __publicField(this, _I, MetricRegistryTypeId);
-    __publicField(this, "map", empty$5());
+    f(this, bk, Ba);
+    f(this, "map", lb());
   }
   snapshot() {
-    const result = [];
-    for (const [key, hook] of this.map) {
-      result.push(unsafeMake(key, hook.get()));
-    }
-    return result;
+    const e = [];
+    for (const [n, r] of this.map)
+      e.push(I0(n, r.get()));
+    return e;
   }
-  get(key) {
-    const hook = pipe(this.map, get$1(key), getOrUndefined);
-    if (hook == null) {
-      if (isCounterKey(key.keyType)) {
-        return this.getCounter(key);
-      }
-      if (isGaugeKey(key.keyType)) {
-        return this.getGauge(key);
-      }
-      if (isFrequencyKey(key.keyType)) {
-        return this.getFrequency(key);
-      }
-      if (isHistogramKey(key.keyType)) {
-        return this.getHistogram(key);
-      }
-      if (isSummaryKey(key.keyType)) {
-        return this.getSummary(key);
-      }
+  get(e) {
+    const n = m(this.map, It(e), Rt);
+    if (n == null) {
+      if (Cf(e.keyType))
+        return this.getCounter(e);
+      if (VS(e.keyType))
+        return this.getGauge(e);
+      if (BS(e.keyType))
+        return this.getFrequency(e);
+      if (Tf(e.keyType))
+        return this.getHistogram(e);
+      if (KS(e.keyType))
+        return this.getSummary(e);
       throw new Error("BUG: MetricRegistry.get - unknown MetricKeyType - please report an issue at https://github.com/Effect-TS/effect/issues");
-    } else {
-      return hook;
-    }
+    } else
+      return n;
   }
-  getCounter(key) {
-    let value = pipe(this.map, get$1(key), getOrUndefined);
-    if (value == null) {
-      const counter2 = counter$1(key);
-      if (!pipe(this.map, has(key))) {
-        pipe(this.map, set(key, counter2));
-      }
-      value = counter2;
+  getCounter(e) {
+    let n = m(this.map, It(e), Rt);
+    if (n == null) {
+      const r = y0(e);
+      m(this.map, Nn(e)) || m(this.map, xn(e, r)), n = r;
     }
-    return value;
+    return n;
   }
-  getFrequency(key) {
-    let value = pipe(this.map, get$1(key), getOrUndefined);
-    if (value == null) {
-      const frequency$12 = frequency(key);
-      if (!pipe(this.map, has(key))) {
-        pipe(this.map, set(key, frequency$12));
-      }
-      value = frequency$12;
+  getFrequency(e) {
+    let n = m(this.map, It(e), Rt);
+    if (n == null) {
+      const r = b0(e);
+      m(this.map, Nn(e)) || m(this.map, xn(e, r)), n = r;
     }
-    return value;
+    return n;
   }
-  getGauge(key) {
-    let value = pipe(this.map, get$1(key), getOrUndefined);
-    if (value == null) {
-      const gauge$12 = gauge(key, key.keyType.bigint ? BigInt(0) : 0);
-      if (!pipe(this.map, has(key))) {
-        pipe(this.map, set(key, gauge$12));
-      }
-      value = gauge$12;
+  getGauge(e) {
+    let n = m(this.map, It(e), Rt);
+    if (n == null) {
+      const r = v0(e, e.keyType.bigint ? BigInt(0) : 0);
+      m(this.map, Nn(e)) || m(this.map, xn(e, r)), n = r;
     }
-    return value;
+    return n;
   }
-  getHistogram(key) {
-    let value = pipe(this.map, get$1(key), getOrUndefined);
-    if (value == null) {
-      const histogram2 = histogram$1(key);
-      if (!pipe(this.map, has(key))) {
-        pipe(this.map, set(key, histogram2));
-      }
-      value = histogram2;
+  getHistogram(e) {
+    let n = m(this.map, It(e), Rt);
+    if (n == null) {
+      const r = S0(e);
+      m(this.map, Nn(e)) || m(this.map, xn(e, r)), n = r;
     }
-    return value;
+    return n;
   }
-  getSummary(key) {
-    let value = pipe(this.map, get$1(key), getOrUndefined);
-    if (value == null) {
-      const summary$12 = summary(key);
-      if (!pipe(this.map, has(key))) {
-        pipe(this.map, set(key, summary$12));
-      }
-      value = summary$12;
+  getSummary(e) {
+    let n = m(this.map, It(e), Rt);
+    if (n == null) {
+      const r = w0(e);
+      m(this.map, Nn(e)) || m(this.map, xn(e, r)), n = r;
     }
-    return value;
+    return n;
   }
 }
-_I = MetricRegistryTypeId;
-const make$3 = () => {
-  return new MetricRegistryImpl();
-};
-const MetricSymbolKey = "effect/Metric";
-const MetricTypeId = /* @__PURE__ */ Symbol.for(MetricSymbolKey);
-const metricVariance = {
+bk = Ba;
+const $0 = () => new T0(), F0 = "effect/Metric", A0 = /* @__PURE__ */ Symbol.for(F0), M0 = {
   /* c8 ignore next */
-  _Type: (_) => _,
+  _Type: (t) => t,
   /* c8 ignore next */
-  _In: (_) => _,
+  _In: (t) => t,
   /* c8 ignore next */
-  _Out: (_) => _
-};
-const globalMetricRegistry = /* @__PURE__ */ globalValue(/* @__PURE__ */ Symbol.for("effect/Metric/globalMetricRegistry"), () => make$3());
-const make$2 = function(keyType, unsafeUpdate, unsafeValue) {
-  const metric = Object.assign((effect) => tap(effect, (a) => update(metric, a)), {
-    [MetricTypeId]: metricVariance,
-    keyType,
-    unsafeUpdate,
-    unsafeValue,
+  _Out: (t) => t
+}, Va = /* @__PURE__ */ Q(/* @__PURE__ */ Symbol.for("effect/Metric/globalMetricRegistry"), () => $0()), xf = function(t, e, n) {
+  const r = Object.assign((s) => Dl(s, (o) => j0(r, o)), {
+    [A0]: M0,
+    keyType: t,
+    unsafeUpdate: e,
+    unsafeValue: n,
     register() {
-      this.unsafeValue([]);
-      return this;
+      return this.unsafeValue([]), this;
     },
     pipe() {
-      return pipeArguments(this, arguments);
+      return A(this, arguments);
     }
   });
-  return metric;
-};
-const counter = (name, options) => fromMetricKey(counter$3(name, options));
-const fromMetricKey = (key) => {
-  let untaggedHook;
-  const hookCache = /* @__PURE__ */ new WeakMap();
-  const hook = (extraTags) => {
-    if (extraTags.length === 0) {
-      if (untaggedHook !== void 0) {
-        return untaggedHook;
-      }
-      untaggedHook = globalMetricRegistry.get(key);
-      return untaggedHook;
-    }
-    let hook2 = hookCache.get(extraTags);
-    if (hook2 !== void 0) {
-      return hook2;
-    }
-    hook2 = globalMetricRegistry.get(taggedWithLabels$1(key, extraTags));
-    hookCache.set(extraTags, hook2);
-    return hook2;
+  return r;
+}, Ms = (t, e) => jf(zS(t, e)), jf = (t) => {
+  let e;
+  const n = /* @__PURE__ */ new WeakMap(), r = (s) => {
+    if (s.length === 0)
+      return e !== void 0 || (e = Va.get(t)), e;
+    let o = n.get(s);
+    return o !== void 0 || (o = Va.get(QS(t, s)), n.set(s, o)), o;
   };
-  return make$2(key.keyType, (input, extraTags) => hook(extraTags).update(input), (extraTags) => hook(extraTags).get());
-};
-const histogram = (name, boundaries, description) => fromMetricKey(histogram$3(name, boundaries, description));
-const tagged = /* @__PURE__ */ dual(3, (self, key, value) => taggedWithLabels(self, [make$5(key, value)]));
-const taggedWithLabels = /* @__PURE__ */ dual(2, (self, extraTags) => {
-  return make$2(self.keyType, (input, extraTags1) => self.unsafeUpdate(input, union$2(extraTags, extraTags1)), (extraTags1) => self.unsafeValue(union$2(extraTags, extraTags1)));
-});
-const update = /* @__PURE__ */ dual(2, (self, input) => fiberRefGetWith(currentMetricLabels, (tags) => sync(() => self.unsafeUpdate(input, tags))));
-const RequestSymbolKey = "effect/Request";
-const RequestTypeId = /* @__PURE__ */ Symbol.for(RequestSymbolKey);
-const requestVariance = {
+  return xf(t.keyType, (s, o) => r(o).update(s), (s) => r(s).get());
+}, P0 = (t, e, n) => jf(YS(t, e, n)), N0 = /* @__PURE__ */ g(3, (t, e, n) => x0(t, [Uv(e, n)])), x0 = /* @__PURE__ */ g(2, (t, e) => xf(t.keyType, (n, r) => t.unsafeUpdate(n, go(e, r)), (n) => t.unsafeValue(go(e, n)))), j0 = /* @__PURE__ */ g(2, (t, e) => Kl(Fo, (n) => $(() => t.unsafeUpdate(e, n)))), L0 = "effect/Request", D0 = /* @__PURE__ */ Symbol.for(L0), U0 = {
   /* c8 ignore next */
-  _E: (_) => _,
+  _E: (t) => t,
   /* c8 ignore next */
-  _A: (_) => _
+  _A: (t) => t
 };
 ({
-  ...StructuralPrototype,
-  [RequestTypeId]: requestVariance
+  ...ai,
+  [D0]: 0
 });
-const complete = /* @__PURE__ */ dual(2, (self, result) => fiberRefGetWith(currentRequestMap, (map2) => sync(() => {
-  if (map2.has(self)) {
-    const entry = map2.get(self);
-    if (!entry.state.completed) {
-      entry.state.completed = true;
-      deferredUnsafeDone(entry.result, result);
-    }
+const q0 = /* @__PURE__ */ g(2, (t, e) => Kl(wf, (n) => $(() => {
+  if (n.has(t)) {
+    const r = n.get(t);
+    r.state.completed || (r.state.completed = !0, Zl(r.result, e));
   }
-})));
-const SupervisorSymbolKey = "effect/Supervisor";
-const SupervisorTypeId = /* @__PURE__ */ Symbol.for(SupervisorSymbolKey);
-const supervisorVariance = {
+}))), B0 = "effect/Supervisor", Ps = /* @__PURE__ */ Symbol.for(B0), oc = {
   /* c8 ignore next */
-  _T: (_) => _
+  _T: (t) => t
 };
-const _ProxySupervisor = class _ProxySupervisor {
-  constructor(underlying, value0) {
-    __publicField(this, "underlying");
-    __publicField(this, "value0");
-    __publicField(this, _J, supervisorVariance);
-    this.underlying = underlying;
-    this.value0 = value0;
+var vk;
+const ic = class ic {
+  constructor(e, n) {
+    f(this, "underlying");
+    f(this, "value0");
+    f(this, vk, oc);
+    this.underlying = e, this.value0 = n;
   }
   get value() {
     return this.value0;
   }
-  onStart(context, effect, parent, fiber) {
-    this.underlying.onStart(context, effect, parent, fiber);
+  onStart(e, n, r, s) {
+    this.underlying.onStart(e, n, r, s);
   }
-  onEnd(value, fiber) {
-    this.underlying.onEnd(value, fiber);
+  onEnd(e, n) {
+    this.underlying.onEnd(e, n);
   }
-  onEffect(fiber, effect) {
-    this.underlying.onEffect(fiber, effect);
+  onEffect(e, n) {
+    this.underlying.onEffect(e, n);
   }
-  onSuspend(fiber) {
-    this.underlying.onSuspend(fiber);
+  onSuspend(e) {
+    this.underlying.onSuspend(e);
   }
-  onResume(fiber) {
-    this.underlying.onResume(fiber);
+  onResume(e) {
+    this.underlying.onResume(e);
   }
-  map(f) {
-    return new _ProxySupervisor(this, pipe(this.value, map(f)));
+  map(e) {
+    return new ic(this, m(this.value, Me(e)));
   }
-  zip(right2) {
-    return new Zip(this, right2);
+  zip(e) {
+    return new fs(this, e);
   }
 };
-_J = SupervisorTypeId;
-let ProxySupervisor = _ProxySupervisor;
-const _Zip = class _Zip {
-  constructor(left2, right2) {
-    __publicField(this, "left");
-    __publicField(this, "right");
-    __publicField(this, "_tag", "Zip");
-    __publicField(this, _K, supervisorVariance);
-    this.left = left2;
-    this.right = right2;
+vk = Ps;
+let ls = ic;
+var Sk;
+const cc = class cc {
+  constructor(e, n) {
+    f(this, "left");
+    f(this, "right");
+    f(this, "_tag", "Zip");
+    f(this, Sk, oc);
+    this.left = e, this.right = n;
   }
   get value() {
-    return zip(this.left.value, this.right.value);
+    return ql(this.left.value, this.right.value);
   }
-  onStart(context, effect, parent, fiber) {
-    this.left.onStart(context, effect, parent, fiber);
-    this.right.onStart(context, effect, parent, fiber);
+  onStart(e, n, r, s) {
+    this.left.onStart(e, n, r, s), this.right.onStart(e, n, r, s);
   }
-  onEnd(value, fiber) {
-    this.left.onEnd(value, fiber);
-    this.right.onEnd(value, fiber);
+  onEnd(e, n) {
+    this.left.onEnd(e, n), this.right.onEnd(e, n);
   }
-  onEffect(fiber, effect) {
-    this.left.onEffect(fiber, effect);
-    this.right.onEffect(fiber, effect);
+  onEffect(e, n) {
+    this.left.onEffect(e, n), this.right.onEffect(e, n);
   }
-  onSuspend(fiber) {
-    this.left.onSuspend(fiber);
-    this.right.onSuspend(fiber);
+  onSuspend(e) {
+    this.left.onSuspend(e), this.right.onSuspend(e);
   }
-  onResume(fiber) {
-    this.left.onResume(fiber);
-    this.right.onResume(fiber);
+  onResume(e) {
+    this.left.onResume(e), this.right.onResume(e);
   }
-  map(f) {
-    return new ProxySupervisor(this, pipe(this.value, map(f)));
+  map(e) {
+    return new ls(this, m(this.value, Me(e)));
   }
-  zip(right2) {
-    return new _Zip(this, right2);
+  zip(e) {
+    return new cc(this, e);
   }
 };
-_K = SupervisorTypeId;
-let Zip = _Zip;
-const isZip = (self) => hasProperty(self, SupervisorTypeId) && isTagged(self, "Zip");
-class Const {
-  constructor(effect) {
-    __publicField(this, "effect");
-    __publicField(this, _L, supervisorVariance);
-    this.effect = effect;
+Sk = Ps;
+let fs = cc;
+const Lf = (t) => D(t, Ps) && tu(t, "Zip");
+var wk;
+class V0 {
+  constructor(e) {
+    f(this, "effect");
+    f(this, wk, oc);
+    this.effect = e;
   }
   get value() {
     return this.effect;
   }
-  onStart(_context, _effect, _parent, _fiber) {
+  onStart(e, n, r, s) {
   }
-  onEnd(_value2, _fiber) {
+  onEnd(e, n) {
   }
-  onEffect(_fiber, _effect) {
+  onEffect(e, n) {
   }
-  onSuspend(_fiber) {
+  onSuspend(e) {
   }
-  onResume(_fiber) {
+  onResume(e) {
   }
-  map(f) {
-    return new ProxySupervisor(this, pipe(this.value, map(f)));
+  map(e) {
+    return new ls(this, m(this.value, Me(e)));
   }
-  zip(right2) {
-    return new Zip(this, right2);
+  zip(e) {
+    return new fs(this, e);
   }
-  onRun(execution, _fiber) {
-    return execution();
+  onRun(e, n) {
+    return e();
   }
 }
-_L = SupervisorTypeId;
-const fromEffect = (effect) => {
-  return new Const(effect);
-};
-const none$2 = /* @__PURE__ */ globalValue("effect/Supervisor/none", () => fromEffect(void_));
-const make$1 = make$f;
-const OP_EMPTY = "Empty";
-const OP_ADD_SUPERVISOR = "AddSupervisor";
-const OP_REMOVE_SUPERVISOR = "RemoveSupervisor";
-const OP_AND_THEN = "AndThen";
-const empty = {
-  _tag: OP_EMPTY
-};
-const combine = (self, that) => {
-  return {
-    _tag: OP_AND_THEN,
-    first: self,
-    second: that
-  };
-};
-const patch = (self, supervisor) => {
-  return patchLoop(supervisor, of$1(self));
-};
-const patchLoop = (_supervisor, _patches) => {
-  let supervisor = _supervisor;
-  let patches = _patches;
-  while (isNonEmpty(patches)) {
-    const head2 = headNonEmpty(patches);
-    switch (head2._tag) {
-      case OP_EMPTY: {
-        patches = tailNonEmpty(patches);
+wk = Ps;
+const K0 = (t) => new V0(t), Ns = /* @__PURE__ */ Q("effect/Supervisor/none", () => K0(Ue)), H0 = kn, Df = "Empty", Uf = "AddSupervisor", qf = "RemoveSupervisor", Bf = "AndThen", Jn = {
+  _tag: Df
+}, Hr = (t, e) => ({
+  _tag: Bf,
+  first: t,
+  second: e
+}), J0 = (t, e) => W0(e, Je(t)), W0 = (t, e) => {
+  let n = t, r = e;
+  for (; xt(r); ) {
+    const s = jt(r);
+    switch (s._tag) {
+      case Df: {
+        r = yt(r);
         break;
       }
-      case OP_ADD_SUPERVISOR: {
-        supervisor = supervisor.zip(head2.supervisor);
-        patches = tailNonEmpty(patches);
+      case Uf: {
+        n = n.zip(s.supervisor), r = yt(r);
         break;
       }
-      case OP_REMOVE_SUPERVISOR: {
-        supervisor = removeSupervisor(supervisor, head2.supervisor);
-        patches = tailNonEmpty(patches);
+      case qf: {
+        n = Yo(n, s.supervisor), r = yt(r);
         break;
       }
-      case OP_AND_THEN: {
-        patches = prepend$1(head2.first)(prepend$1(head2.second)(tailNonEmpty(patches)));
+      case Bf: {
+        r = Ye(s.first)(Ye(s.second)(yt(r)));
         break;
       }
     }
   }
-  return supervisor;
-};
-const removeSupervisor = (self, that) => {
-  if (equals$1(self, that)) {
-    return none$2;
-  } else {
-    if (isZip(self)) {
-      return removeSupervisor(self.left, that).zip(removeSupervisor(self.right, that));
-    } else {
-      return self;
-    }
-  }
-};
-const toSet = (self) => {
-  if (equals$1(self, none$2)) {
-    return empty$d();
-  } else {
-    if (isZip(self)) {
-      return pipe(toSet(self.left), union(toSet(self.right)));
-    } else {
-      return make$h(self);
-    }
-  }
-};
-const diff = (oldValue, newValue) => {
-  if (equals$1(oldValue, newValue)) {
-    return empty;
-  }
-  const oldSupervisors = toSet(oldValue);
-  const newSupervisors = toSet(newValue);
-  const added = pipe(newSupervisors, difference(oldSupervisors), reduce$3(empty, (patch2, supervisor) => combine(patch2, {
-    _tag: OP_ADD_SUPERVISOR,
-    supervisor
+  return n;
+}, Yo = (t, e) => N(t, e) ? Ns : Lf(t) ? Yo(t.left, e).zip(Yo(t.right, e)) : t, hs = (t) => N(t, Ns) ? Dt() : Lf(t) ? m(hs(t.left), Qn(hs(t.right))) : wi(t), G0 = (t, e) => {
+  if (N(t, e))
+    return Jn;
+  const n = hs(t), r = hs(e), s = m(r, ta(n), ns(Jn, (c, a) => Hr(c, {
+    _tag: Uf,
+    supervisor: a
+  }))), o = m(n, ta(r), ns(Jn, (c, a) => Hr(c, {
+    _tag: qf,
+    supervisor: a
   })));
-  const removed = pipe(oldSupervisors, difference(newSupervisors), reduce$3(empty, (patch2, supervisor) => combine(patch2, {
-    _tag: OP_REMOVE_SUPERVISOR,
-    supervisor
-  })));
-  return combine(added, removed);
-};
-const differ = /* @__PURE__ */ make$1({
-  empty,
-  patch,
-  combine,
-  diff
-});
-const fiberStarted = /* @__PURE__ */ counter("effect_fiber_started", {
-  incremental: true
-});
-const fiberActive = /* @__PURE__ */ counter("effect_fiber_active");
-const fiberSuccesses = /* @__PURE__ */ counter("effect_fiber_successes", {
-  incremental: true
-});
-const fiberFailures = /* @__PURE__ */ counter("effect_fiber_failures", {
-  incremental: true
-});
-const fiberLifetimes = /* @__PURE__ */ tagged(/* @__PURE__ */ histogram("effect_fiber_lifetimes", /* @__PURE__ */ exponential({
+  return Hr(s, o);
+}, z0 = /* @__PURE__ */ H0({
+  empty: Jn,
+  patch: J0,
+  combine: Hr,
+  diff: G0
+}), Y0 = /* @__PURE__ */ Ms("effect_fiber_started", {
+  incremental: !0
+}), Ka = /* @__PURE__ */ Ms("effect_fiber_active"), Q0 = /* @__PURE__ */ Ms("effect_fiber_successes", {
+  incremental: !0
+}), X0 = /* @__PURE__ */ Ms("effect_fiber_failures", {
+  incremental: !0
+}), Z0 = /* @__PURE__ */ N0(/* @__PURE__ */ P0("effect_fiber_lifetimes", /* @__PURE__ */ $S({
   start: 0.5,
   factor: 2,
   count: 35
-})), "time_unit", "milliseconds");
-const EvaluationSignalContinue = "Continue";
-const EvaluationSignalDone = "Done";
-const EvaluationSignalYieldNow = "Yield";
-const runtimeFiberVariance = {
+})), "time_unit", "milliseconds"), jn = "Continue", ew = "Done", Ha = "Yield", tw = {
   /* c8 ignore next */
-  _E: (_) => _,
+  _E: (t) => t,
   /* c8 ignore next */
-  _A: (_) => _
-};
-const absurd = (_) => {
-  throw new Error(`BUG: FiberRuntime - ${toStringUnknown(_)} - please report an issue at https://github.com/Effect-TS/effect/issues`);
-};
-const YieldedOp = /* @__PURE__ */ Symbol.for("effect/internal/fiberRuntime/YieldedOp");
-const yieldedOpChannel = /* @__PURE__ */ globalValue("effect/internal/fiberRuntime/yieldedOpChannel", () => ({
+  _A: (t) => t
+}, Ln = (t) => {
+  throw new Error(`BUG: FiberRuntime - ${qn(t)} - please report an issue at https://github.com/Effect-TS/effect/issues`);
+}, mt = /* @__PURE__ */ Symbol.for("effect/internal/fiberRuntime/YieldedOp"), ft = /* @__PURE__ */ Q("effect/internal/fiberRuntime/yieldedOpChannel", () => ({
   currentOp: null
-}));
-const contOpSuccess = {
-  [OP_ON_SUCCESS]: (_, cont, value) => {
-    return cont.effect_instruction_i1(value);
-  },
-  ["OnStep"]: (_, _cont, value) => {
-    return exitSucceed(exitSucceed(value));
-  },
-  [OP_ON_SUCCESS_AND_FAILURE]: (_, cont, value) => {
-    return cont.effect_instruction_i2(value);
-  },
-  [OP_REVERT_FLAGS]: (self, cont, value) => {
-    self.patchRuntimeFlags(self._runtimeFlags, cont.patch);
-    if (interruptible$1(self._runtimeFlags) && self.isInterrupted()) {
-      return exitFailCause(self.getInterruptedCause());
-    } else {
-      return exitSucceed(value);
-    }
-  },
-  [OP_WHILE]: (self, cont, value) => {
-    cont.effect_instruction_i2(value);
-    if (cont.effect_instruction_i0()) {
-      self.pushStack(cont);
-      return cont.effect_instruction_i1();
-    } else {
-      return void_;
-    }
-  }
-};
-const drainQueueWhileRunningTable = {
-  [OP_INTERRUPT_SIGNAL]: (self, runtimeFlags, cur, message) => {
-    self.processNewInterruptSignal(message.cause);
-    return interruptible$1(runtimeFlags) ? exitFailCause(message.cause) : cur;
-  },
-  [OP_RESUME]: (_self, _runtimeFlags, _cur, _message) => {
+})), Pr = {
+  [zr]: (t, e, n) => e.effect_instruction_i1(n),
+  OnStep: (t, e, n) => Oe(Oe(n)),
+  [Yr]: (t, e, n) => e.effect_instruction_i2(n),
+  [ci]: (t, e, n) => (t.patchRuntimeFlags(t._runtimeFlags, e.patch), _t(t._runtimeFlags) && t.isInterrupted() ? Z(t.getInterruptedCause()) : Oe(n)),
+  [Qr]: (t, e, n) => (e.effect_instruction_i2(n), e.effect_instruction_i0() ? (t.pushStack(e), e.effect_instruction_i1()) : Ue)
+}, nw = {
+  [Xi]: (t, e, n, r) => (t.processNewInterruptSignal(r.cause), _t(e) ? Z(r.cause) : n),
+  [ec]: (t, e, n, r) => {
     throw new Error("It is illegal to have multiple concurrent run loops in a single fiber");
   },
-  [OP_STATEFUL]: (self, runtimeFlags, cur, message) => {
-    message.onFiber(self, running(runtimeFlags));
-    return cur;
-  },
-  [OP_YIELD_NOW]: (_self, _runtimeFlags, cur, _message) => {
-    return flatMap$1(yieldNow$1(), () => cur);
+  [Zi]: (t, e, n, r) => (r.onFiber(t, Sf(e)), n),
+  [tc]: (t, e, n, r) => T(Di(), () => n)
+}, rw = (t) => Ni(a_(t), (e) => Kf(w_(e), ([n, r]) => {
+  const s = /* @__PURE__ */ new Map(), o = [];
+  for (const a of r) {
+    o.push(Ft(a));
+    for (const u of a)
+      s.set(u.request, u);
   }
-};
-const runBlockedRequests = (self) => forEachSequentialDiscard(flatten$2(self), (requestsByRequestResolver) => forEachConcurrentDiscard(sequentialCollectionToChunk(requestsByRequestResolver), ([dataSource, sequential2]) => {
-  const map2 = /* @__PURE__ */ new Map();
-  const arr = [];
-  for (const block of sequential2) {
-    arr.push(toReadonlyArray(block));
-    for (const entry of block) {
-      map2.set(entry.request, entry);
-    }
-  }
-  const flat = arr.flat();
-  return fiberRefLocally(invokeWithInterrupt(dataSource.runAll(arr), flat, () => flat.forEach((entry) => {
-    entry.listeners.interrupted = true;
-  })), currentRequestMap, map2);
-}, false, false));
-class FiberRuntime {
-  constructor(fiberId2, fiberRefs0, runtimeFlags0) {
-    __publicField(this, _M, fiberVariance);
-    __publicField(this, _N, runtimeFiberVariance);
-    __publicField(this, "_fiberRefs");
-    __publicField(this, "_fiberId");
-    __publicField(this, "_runtimeFlags");
-    __publicField(this, "_queue", new Array());
-    __publicField(this, "_children", null);
-    __publicField(this, "_observers", new Array());
-    __publicField(this, "_running", false);
-    __publicField(this, "_stack", []);
-    __publicField(this, "_asyncInterruptor", null);
-    __publicField(this, "_asyncBlockingOn", null);
-    __publicField(this, "_exitValue", null);
-    __publicField(this, "_steps", []);
-    __publicField(this, "_supervisor");
-    __publicField(this, "_scheduler");
-    __publicField(this, "_tracer");
-    __publicField(this, "currentOpCount", 0);
-    __publicField(this, "isYielding", false);
-    __publicField(this, "run", () => {
+  const c = o.flat();
+  return Ki(pw(n.runAll(o), c, () => c.forEach((a) => {
+    a.listeners.interrupted = !0;
+  })), wf, s);
+}, !1, !1));
+var kk, Ek;
+class Vf {
+  constructor(e, n, r) {
+    f(this, kk, pS);
+    f(this, Ek, tw);
+    f(this, "_fiberRefs");
+    f(this, "_fiberId");
+    f(this, "_runtimeFlags");
+    f(this, "_queue", new Array());
+    f(this, "_children", null);
+    f(this, "_observers", new Array());
+    f(this, "_running", !1);
+    f(this, "_stack", []);
+    f(this, "_asyncInterruptor", null);
+    f(this, "_asyncBlockingOn", null);
+    f(this, "_exitValue", null);
+    f(this, "_steps", []);
+    f(this, "_supervisor");
+    f(this, "_scheduler");
+    f(this, "_tracer");
+    f(this, "currentOpCount", 0);
+    f(this, "isYielding", !1);
+    f(this, "run", () => {
       this.drainQueueOnCurrentThread();
     });
-    this._runtimeFlags = runtimeFlags0;
-    this._fiberId = fiberId2;
-    this._fiberRefs = fiberRefs0;
-    this._supervisor = this.getFiberRef(currentSupervisor);
-    this._scheduler = this.getFiberRef(currentScheduler);
-    if (runtimeMetrics(runtimeFlags0)) {
-      const tags = this.getFiberRef(currentMetricLabels);
-      fiberStarted.unsafeUpdate(1, tags);
-      fiberActive.unsafeUpdate(1, tags);
+    if (this._runtimeFlags = r, this._fiberId = e, this._fiberRefs = n, this._supervisor = this.getFiberRef(Wa), this._scheduler = this.getFiberRef(qo), ia(r)) {
+      const s = this.getFiberRef(Fo);
+      Y0.unsafeUpdate(1, s), Ka.unsafeUpdate(1, s);
     }
-    this._tracer = get$5(this.getFiberRef(currentServices), tracerTag);
+    this._tracer = Vn(this.getFiberRef(Hn), To);
   }
   pipe() {
-    return pipeArguments(this, arguments);
+    return A(this, arguments);
   }
   /**
    * The identity of the fiber.
@@ -7050,46 +4936,38 @@ class FiberRuntime {
    * background. This can be called to "kick off" execution of a fiber after
    * it has been created.
    */
-  resume(effect) {
-    this.tell(resume(effect));
+  resume(e) {
+    this.tell(Xt(e));
   }
   /**
    * The status of the fiber.
    */
   get status() {
-    return this.ask((_, status) => status);
+    return this.ask((e, n) => n);
   }
   /**
    * Gets the fiber runtime flags.
    */
   get runtimeFlags() {
-    return this.ask((state, status) => {
-      if (isDone(status)) {
-        return state._runtimeFlags;
-      }
-      return status.runtimeFlags;
-    });
+    return this.ask((e, n) => rS(n) ? e._runtimeFlags : n.runtimeFlags);
   }
   /**
    * Returns the current `FiberScope` for the fiber.
    */
   scope() {
-    return unsafeMake$1(this);
+    return fS(this);
   }
   /**
    * Retrieves the immediate children of the fiber.
    */
   get children() {
-    return this.ask((fiber) => Array.from(fiber.getChildren()));
+    return this.ask((e) => Array.from(e.getChildren()));
   }
   /**
    * Gets the fiber's set of children.
    */
   getChildren() {
-    if (this._children === null) {
-      this._children = /* @__PURE__ */ new Set();
-    }
-    return this._children;
+    return this._children === null && (this._children = /* @__PURE__ */ new Set()), this._children;
   }
   /**
    * Retrieves the interrupted cause of the fiber, which will be `Cause.empty`
@@ -7100,13 +4978,13 @@ class FiberRuntime {
    * log annotations and log level) may not be up-to-date.
    */
   getInterruptedCause() {
-    return this.getFiberRef(currentInterruptedCause);
+    return this.getFiberRef(Ar);
   }
   /**
    * Retrieves the whole set of fiber refs.
    */
   fiberRefs() {
-    return this.ask((fiber) => fiber.getFiberRefs());
+    return this.ask((e) => e.getFiberRefs());
   }
   /**
    * Returns an effect that will contain information computed from the fiber
@@ -7115,56 +4993,41 @@ class FiberRuntime {
    * This allows the outside world to interact safely with mutable fiber state
    * without locks or immutable data.
    */
-  ask(f) {
-    return suspend(() => {
-      const deferred = deferredUnsafeMake(this._fiberId);
-      this.tell(stateful((fiber, status) => {
-        deferredUnsafeDone(deferred, sync(() => f(fiber, status)));
-      }));
-      return deferredAwait(deferred);
+  ask(e) {
+    return Ae(() => {
+      const n = Yl(this._fiberId);
+      return this.tell(Kr((r, s) => {
+        Zl(n, $(() => e(r, s)));
+      })), Ql(n);
     });
   }
   /**
    * Adds a message to be processed by the fiber on the fiber.
    */
-  tell(message) {
-    this._queue.push(message);
-    if (!this._running) {
-      this._running = true;
-      this.drainQueueLaterOnExecutor();
-    }
+  tell(e) {
+    this._queue.push(e), this._running || (this._running = !0, this.drainQueueLaterOnExecutor());
   }
   get await() {
-    return async$1((resume2) => {
-      const cb = (exit2) => resume2(succeed(exit2));
-      this.tell(stateful((fiber, _) => {
-        if (fiber._exitValue !== null) {
-          cb(this._exitValue);
-        } else {
-          fiber.addObserver(cb);
-        }
-      }));
-      return sync(() => this.tell(stateful((fiber, _) => {
-        fiber.removeObserver(cb);
+    return lt((e) => {
+      const n = (r) => e(ie(r));
+      return this.tell(Kr((r, s) => {
+        r._exitValue !== null ? n(this._exitValue) : r.addObserver(n);
+      })), $(() => this.tell(Kr((r, s) => {
+        r.removeObserver(n);
       })));
     }, this.id());
   }
   get inheritAll() {
-    return withFiberRuntime((parentFiber, parentStatus) => {
-      const parentFiberId = parentFiber.id();
-      const parentFiberRefs = parentFiber.getFiberRefs();
-      const parentRuntimeFlags = parentStatus.runtimeFlags;
-      const childFiberRefs = this.getFiberRefs();
-      const updatedFiberRefs = joinAs(parentFiberRefs, parentFiberId, childFiberRefs);
-      parentFiber.setFiberRefs(updatedFiberRefs);
-      const updatedRuntimeFlags = parentFiber.getFiberRef(currentRuntimeFlags);
-      const patch2 = pipe(
-        diff$3(parentRuntimeFlags, updatedRuntimeFlags),
+    return rt((e, n) => {
+      const r = e.id(), s = e.getFiberRefs(), o = n.runtimeFlags, c = this.getFiberRefs(), a = uv(s, r, c);
+      e.setFiberRefs(a);
+      const u = e.getFiberRef(Ja), h = m(
+        qr(o, u),
         // Do not inherit WindDown or Interruption!
-        exclude(Interruption),
-        exclude(WindDown)
+        aa(En),
+        aa(Ro)
       );
-      return updateRuntimeFlags(patch2);
+      return cy(h);
     });
   }
   /**
@@ -7172,7 +5035,7 @@ class FiberRuntime {
    * already done.
    */
   get poll() {
-    return sync(() => fromNullable(this._exitValue));
+    return $(() => li(this._exitValue));
   }
   /**
    * Unsafely observes the fiber, but returns immediately if it is not
@@ -7184,26 +5047,22 @@ class FiberRuntime {
   /**
    * In the background, interrupts the fiber as if interrupted from the specified fiber.
    */
-  interruptAsFork(fiberId2) {
-    return sync(() => this.tell(interruptSignal(interrupt(fiberId2))));
+  interruptAsFork(e) {
+    return $(() => this.tell(ao(Ct(e))));
   }
   /**
    * In the background, interrupts the fiber as if interrupted from the specified fiber.
    */
-  unsafeInterruptAsFork(fiberId2) {
-    this.tell(interruptSignal(interrupt(fiberId2)));
+  unsafeInterruptAsFork(e) {
+    this.tell(ao(Ct(e)));
   }
   /**
    * Adds an observer to the list of observers.
    *
    * **NOTE**: This method must be invoked by the fiber itself.
    */
-  addObserver(observer) {
-    if (this._exitValue !== null) {
-      observer(this._exitValue);
-    } else {
-      this._observers.push(observer);
-    }
+  addObserver(e) {
+    this._exitValue !== null ? e(this._exitValue) : this._observers.push(e);
   }
   /**
    * Removes the specified observer from the list of observers that will be
@@ -7211,8 +5070,8 @@ class FiberRuntime {
    *
    * **NOTE**: This method must be invoked by the fiber itself.
    */
-  removeObserver(observer) {
-    this._observers = this._observers.filter((o) => o !== observer);
+  removeObserver(e) {
+    this._observers = this._observers.filter((n) => n !== e);
   }
   /**
    * Retrieves all fiber refs of the fiber.
@@ -7222,16 +5081,15 @@ class FiberRuntime {
    * log annotations and log level) may not be up-to-date.
    */
   getFiberRefs() {
-    this.setFiberRef(currentRuntimeFlags, this._runtimeFlags);
-    return this._fiberRefs;
+    return this.setFiberRef(Ja, this._runtimeFlags), this._fiberRefs;
   }
   /**
    * Deletes the specified fiber ref.
    *
    * **NOTE**: This method must be invoked by the fiber itself.
    */
-  unsafeDeleteFiberRef(fiberRef) {
-    this._fiberRefs = delete_(this._fiberRefs, fiberRef);
+  unsafeDeleteFiberRef(e) {
+    this._fiberRefs = pf(this._fiberRefs, e);
   }
   /**
    * Retrieves the state of the fiber ref, or else its initial value.
@@ -7240,54 +5098,47 @@ class FiberRuntime {
    * on this fiber, then values derived from the fiber's state (including the
    * log annotations and log level) may not be up-to-date.
    */
-  getFiberRef(fiberRef) {
-    if (this._fiberRefs.locals.has(fiberRef)) {
-      return this._fiberRefs.locals.get(fiberRef)[0][1];
-    }
-    return fiberRef.initial;
+  getFiberRef(e) {
+    return this._fiberRefs.locals.has(e) ? this._fiberRefs.locals.get(e)[0][1] : e.initial;
   }
   /**
    * Sets the fiber ref to the specified value.
    *
    * **NOTE**: This method must be invoked by the fiber itself.
    */
-  setFiberRef(fiberRef, value) {
-    this._fiberRefs = updateAs(this._fiberRefs, {
+  setFiberRef(e, n) {
+    this._fiberRefs = Lo(this._fiberRefs, {
       fiberId: this._fiberId,
-      fiberRef,
-      value
-    });
-    this.refreshRefCache();
+      fiberRef: e,
+      value: n
+    }), this.refreshRefCache();
   }
   refreshRefCache() {
-    this._tracer = get$5(this.getFiberRef(currentServices), tracerTag);
-    this._supervisor = this.getFiberRef(currentSupervisor);
-    this._scheduler = this.getFiberRef(currentScheduler);
+    this._tracer = Vn(this.getFiberRef(Hn), To), this._supervisor = this.getFiberRef(Wa), this._scheduler = this.getFiberRef(qo);
   }
   /**
    * Wholesale replaces all fiber refs of this fiber.
    *
    * **NOTE**: This method must be invoked by the fiber itself.
    */
-  setFiberRefs(fiberRefs) {
-    this._fiberRefs = fiberRefs;
-    this.refreshRefCache();
+  setFiberRefs(e) {
+    this._fiberRefs = e, this.refreshRefCache();
   }
   /**
    * Adds a reference to the specified fiber inside the children set.
    *
    * **NOTE**: This method must be invoked by the fiber itself.
    */
-  addChild(child) {
-    this.getChildren().add(child);
+  addChild(e) {
+    this.getChildren().add(e);
   }
   /**
    * Removes a reference to the specified fiber inside the children set.
    *
    * **NOTE**: This method must be invoked by the fiber itself.
    */
-  removeChild(child) {
-    this.getChildren().delete(child);
+  removeChild(e) {
+    this.getChildren().delete(e);
   }
   /**
    * On the current thread, executes all messages in the fiber's inbox. This
@@ -7297,30 +5148,18 @@ class FiberRuntime {
    * **NOTE**: This method must be invoked by the fiber itself.
    */
   drainQueueOnCurrentThread() {
-    let recurse = true;
-    while (recurse) {
-      let evaluationSignal = EvaluationSignalContinue;
-      const prev = globalThis[currentFiberURI];
-      globalThis[currentFiberURI] = this;
+    let e = !0;
+    for (; e; ) {
+      let n = jn;
+      const r = globalThis[Ot];
+      globalThis[Ot] = this;
       try {
-        while (evaluationSignal === EvaluationSignalContinue) {
-          evaluationSignal = this._queue.length === 0 ? EvaluationSignalDone : this.evaluateMessageWhileSuspended(this._queue.splice(0, 1)[0]);
-        }
+        for (; n === jn; )
+          n = this._queue.length === 0 ? ew : this.evaluateMessageWhileSuspended(this._queue.splice(0, 1)[0]);
       } finally {
-        this._running = false;
-        globalThis[currentFiberURI] = prev;
+        this._running = !1, globalThis[Ot] = r;
       }
-      if (this._queue.length > 0 && !this._running) {
-        this._running = true;
-        if (evaluationSignal === EvaluationSignalYieldNow) {
-          this.drainQueueLaterOnExecutor();
-          recurse = false;
-        } else {
-          recurse = true;
-        }
-      } else {
-        recurse = false;
-      }
+      this._queue.length > 0 && !this._running ? (this._running = !0, n === Ha ? (this.drainQueueLaterOnExecutor(), e = !1) : e = !0) : e = !1;
     }
   }
   /**
@@ -7333,7 +5172,7 @@ class FiberRuntime {
    * **NOTE**: This method must be invoked by the fiber itself.
    */
   drainQueueLaterOnExecutor() {
-    this._scheduler.scheduleTask(this.run, this.getFiberRef(currentSchedulingPriority));
+    this._scheduler.scheduleTask(this.run, this.getFiberRef(Hi));
   }
   /**
    * Drains the fiber's message queue while the fiber is actively running,
@@ -7342,13 +5181,13 @@ class FiberRuntime {
    *
    * **NOTE**: This method must be invoked by the fiber itself.
    */
-  drainQueueWhileRunning(runtimeFlags, cur0) {
-    let cur = cur0;
-    while (this._queue.length > 0) {
-      const message = this._queue.splice(0, 1)[0];
-      cur = drainQueueWhileRunningTable[message._tag](this, runtimeFlags, cur, message);
+  drainQueueWhileRunning(e, n) {
+    let r = n;
+    for (; this._queue.length > 0; ) {
+      const s = this._queue.splice(0, 1)[0];
+      r = nw[s._tag](this, e, r, s);
     }
-    return cur;
+    return r;
   }
   /**
    * Determines if the fiber is interrupted.
@@ -7358,7 +5197,7 @@ class FiberRuntime {
    * log annotations and log level) may not be up-to-date.
    */
   isInterrupted() {
-    return !isEmpty(this.getFiberRef(currentInterruptedCause));
+    return !O_(this.getFiberRef(Ar));
   }
   /**
    * Adds an interruptor to the set of interruptors that are interrupting this
@@ -7366,18 +5205,17 @@ class FiberRuntime {
    *
    * **NOTE**: This method must be invoked by the fiber itself.
    */
-  addInterruptedCause(cause) {
-    const oldSC = this.getFiberRef(currentInterruptedCause);
-    this.setFiberRef(currentInterruptedCause, sequential$1(oldSC, cause));
+  addInterruptedCause(e) {
+    const n = this.getFiberRef(Ar);
+    this.setFiberRef(Ar, tt(n, e));
   }
   /**
    * Processes a new incoming interrupt signal.
    *
    * **NOTE**: This method must be invoked by the fiber itself.
    */
-  processNewInterruptSignal(cause) {
-    this.addInterruptedCause(cause);
-    this.sendInterruptSignalToAllChildren();
+  processNewInterruptSignal(e) {
+    this.addInterruptedCause(e), this.sendInterruptSignalToAllChildren();
   }
   /**
    * Interrupts all children of the current fiber, returning an effect that will
@@ -7387,15 +5225,12 @@ class FiberRuntime {
    * **NOTE**: This method must be invoked by the fiber itself.
    */
   sendInterruptSignalToAllChildren() {
-    if (this._children === null || this._children.size === 0) {
-      return false;
-    }
-    let told = false;
-    for (const child of this._children) {
-      child.tell(interruptSignal(interrupt(this.id())));
-      told = true;
-    }
-    return told;
+    if (this._children === null || this._children.size === 0)
+      return !1;
+    let e = !1;
+    for (const n of this._children)
+      n.tell(ao(Ct(this.id()))), e = !0;
+    return e;
   }
   /**
    * Interrupts all children of the current fiber, returning an effect that will
@@ -7406,88 +5241,68 @@ class FiberRuntime {
    */
   interruptAllChildren() {
     if (this.sendInterruptSignalToAllChildren()) {
-      const it = this._children.values();
+      const e = this._children.values();
       this._children = null;
-      let isDone2 = false;
-      const body = () => {
-        const next = it.next();
-        if (!next.done) {
-          return asVoid(next.value.await);
-        } else {
-          return sync(() => {
-            isDone2 = true;
-          });
-        }
-      };
-      return whileLoop({
-        while: () => !isDone2,
-        body,
+      let n = !1;
+      return Li({
+        while: () => !n,
+        body: () => {
+          const s = e.next();
+          return s.done ? $(() => {
+            n = !0;
+          }) : Ht(s.value.await);
+        },
         step: () => {
         }
       });
     }
     return null;
   }
-  reportExitValue(exit2) {
-    if (runtimeMetrics(this._runtimeFlags)) {
-      const tags = this.getFiberRef(currentMetricLabels);
-      const startTimeMillis = this.id().startTimeMillis;
-      const endTimeMillis = Date.now();
-      fiberLifetimes.unsafeUpdate(endTimeMillis - startTimeMillis, tags);
-      fiberActive.unsafeUpdate(-1, tags);
-      switch (exit2._tag) {
-        case OP_SUCCESS: {
-          fiberSuccesses.unsafeUpdate(1, tags);
+  reportExitValue(e) {
+    if (ia(this._runtimeFlags)) {
+      const n = this.getFiberRef(Fo), r = this.id().startTimeMillis, s = Date.now();
+      switch (Z0.unsafeUpdate(s - r, n), Ka.unsafeUpdate(-1, n), e._tag) {
+        case Le: {
+          Q0.unsafeUpdate(1, n);
           break;
         }
-        case OP_FAILURE: {
-          fiberFailures.unsafeUpdate(1, tags);
+        case je: {
+          X0.unsafeUpdate(1, n);
           break;
         }
       }
     }
-    if (exit2._tag === "Failure") {
-      const level = this.getFiberRef(currentUnhandledErrorLogLevel);
-      if (!isInterruptedOnly(exit2.cause) && level._tag === "Some") {
-        this.log("Fiber terminated with an unhandled error", exit2.cause, level);
-      }
+    if (e._tag === "Failure") {
+      const n = this.getFiberRef(Oy);
+      !Ti(e.cause) && n._tag === "Some" && this.log("Fiber terminated with an unhandled error", e.cause, n);
     }
   }
-  setExitValue(exit2) {
-    this._exitValue = exit2;
-    this.reportExitValue(exit2);
-    for (let i = this._observers.length - 1; i >= 0; i--) {
-      this._observers[i](exit2);
-    }
+  setExitValue(e) {
+    this._exitValue = e, this.reportExitValue(e);
+    for (let n = this._observers.length - 1; n >= 0; n--)
+      this._observers[n](e);
   }
   getLoggers() {
-    return this.getFiberRef(currentLoggers);
+    return this.getFiberRef(aw);
   }
-  log(message, cause, overrideLogLevel) {
-    const logLevel = isSome(overrideLogLevel) ? overrideLogLevel.value : this.getFiberRef(currentLogLevel);
-    const minimumLogLevel = this.getFiberRef(currentMinimumLogLevel);
-    if (greaterThan(minimumLogLevel, logLevel)) {
+  log(e, n, r) {
+    const s = nt(r) ? r.value : this.getFiberRef(wy), o = this.getFiberRef(sw);
+    if (Ev(o, s))
       return;
-    }
-    const spans = this.getFiberRef(currentLogSpan);
-    const annotations = this.getFiberRef(currentLogAnnotations);
-    const loggers = this.getLoggers();
-    const contextMap = this.getFiberRefs();
-    if (size$1(loggers) > 0) {
-      const clockService = get$5(this.getFiberRef(currentServices), clockTag);
-      const date = new Date(clockService.unsafeCurrentTimeMillis());
-      for (const logger of loggers) {
-        logger.log({
+    const c = this.getFiberRef(ky), a = this.getFiberRef(Sy), u = this.getLoggers(), h = this.getFiberRefs();
+    if (Wu(u) > 0) {
+      const b = Vn(this.getFiberRef(Hn), zi), y = new Date(b.unsafeCurrentTimeMillis());
+      for (const k of u)
+        k.log({
           fiberId: this.id(),
-          logLevel,
-          message,
-          cause,
-          context: contextMap,
-          spans,
-          annotations,
-          date
+          logLevel: s,
+          message: e,
+          cause: n,
+          context: h,
+          spans: c,
+          annotations: a,
+          date: y
         });
-      }
     }
   }
   /**
@@ -7497,32 +5312,18 @@ class FiberRuntime {
    *
    * **NOTE**: This method must be invoked by the fiber itself.
    */
-  evaluateMessageWhileSuspended(message) {
-    switch (message._tag) {
-      case OP_YIELD_NOW: {
-        return EvaluationSignalYieldNow;
-      }
-      case OP_INTERRUPT_SIGNAL: {
-        this.processNewInterruptSignal(message.cause);
-        if (this._asyncInterruptor !== null) {
-          this._asyncInterruptor(exitFailCause(message.cause));
-          this._asyncInterruptor = null;
-        }
-        return EvaluationSignalContinue;
-      }
-      case OP_RESUME: {
-        this._asyncInterruptor = null;
-        this._asyncBlockingOn = null;
-        this.evaluateEffect(message.effect);
-        return EvaluationSignalContinue;
-      }
-      case OP_STATEFUL: {
-        message.onFiber(this, this._exitValue !== null ? done : suspended(this._runtimeFlags, this._asyncBlockingOn));
-        return EvaluationSignalContinue;
-      }
-      default: {
-        return absurd(message);
-      }
+  evaluateMessageWhileSuspended(e) {
+    switch (e._tag) {
+      case tc:
+        return Ha;
+      case Xi:
+        return this.processNewInterruptSignal(e.cause), this._asyncInterruptor !== null && (this._asyncInterruptor(Z(e.cause)), this._asyncInterruptor = null), jn;
+      case ec:
+        return this._asyncInterruptor = null, this._asyncBlockingOn = null, this.evaluateEffect(e.effect), jn;
+      case Zi:
+        return e.onFiber(this, this._exitValue !== null ? tS : nS(this._runtimeFlags, this._asyncBlockingOn)), jn;
+      default:
+        return Ln(e);
     }
   }
   /**
@@ -7530,40 +5331,19 @@ class FiberRuntime {
    *
    * **NOTE**: This method must be invoked by the fiber itself.
    */
-  evaluateEffect(effect0) {
+  evaluateEffect(e) {
     this._supervisor.onResume(this);
     try {
-      let effect = interruptible$1(this._runtimeFlags) && this.isInterrupted() ? exitFailCause(this.getInterruptedCause()) : effect0;
-      while (effect !== null) {
-        const eff = effect;
-        const exit2 = this.runLoop(eff);
-        if (exit2 === YieldedOp) {
-          const op = yieldedOpChannel.currentOp;
-          yieldedOpChannel.currentOp = null;
-          if (op._op === OP_YIELD) {
-            if (cooperativeYielding(this._runtimeFlags)) {
-              this.tell(yieldNow());
-              this.tell(resume(exitVoid));
-              effect = null;
-            } else {
-              effect = exitVoid;
-            }
-          } else if (op._op === OP_ASYNC) {
-            effect = null;
-          }
+      let n = _t(this._runtimeFlags) && this.isInterrupted() ? Z(this.getInterruptedCause()) : e;
+      for (; n !== null; ) {
+        const r = n, s = this.runLoop(r);
+        if (s === mt) {
+          const o = ft.currentOp;
+          ft.currentOp = null, o._op === Lr ? r_(this._runtimeFlags) ? (this.tell(cS()), this.tell(Xt(Tt)), n = null) : n = Tt : o._op === jr && (n = null);
         } else {
-          this._runtimeFlags = pipe(this._runtimeFlags, enable$1(WindDown));
-          const interruption2 = this.interruptAllChildren();
-          if (interruption2 !== null) {
-            effect = flatMap$1(interruption2, () => exit2);
-          } else {
-            if (this._queue.length === 0) {
-              this.setExitValue(exit2);
-            } else {
-              this.tell(resume(exit2));
-            }
-            effect = null;
-          }
+          this._runtimeFlags = m(this._runtimeFlags, s_(Ro));
+          const o = this.interruptAllChildren();
+          o !== null ? n = T(o, () => s) : (this._queue.length === 0 ? this.setExitValue(s) : this.tell(Xt(s)), n = null);
         }
       }
     } finally {
@@ -7578,22 +5358,18 @@ class FiberRuntime {
    * This is not the normal way of starting a fiber, but it is useful when the
    * express goal of executing the fiber is to synchronously produce its exit.
    */
-  start(effect) {
-    if (!this._running) {
-      this._running = true;
-      const prev = globalThis[currentFiberURI];
-      globalThis[currentFiberURI] = this;
+  start(e) {
+    if (this._running)
+      this.tell(Xt(e));
+    else {
+      this._running = !0;
+      const n = globalThis[Ot];
+      globalThis[Ot] = this;
       try {
-        this.evaluateEffect(effect);
+        this.evaluateEffect(e);
       } finally {
-        this._running = false;
-        globalThis[currentFiberURI] = prev;
-        if (this._queue.length > 0) {
-          this.drainQueueLaterOnExecutor();
-        }
+        this._running = !1, globalThis[Ot] = n, this._queue.length > 0 && this.drainQueueLaterOnExecutor();
       }
-    } else {
-      this.tell(resume(effect));
     }
   }
   /**
@@ -7602,8 +5378,8 @@ class FiberRuntime {
    * off" execution of a fiber after it has been created, in hopes that the
    * effect can be executed synchronously.
    */
-  startFork(effect) {
-    this.tell(resume(effect));
+  startFork(e) {
+    this.tell(Xt(e));
   }
   /**
    * Takes the current runtime flags, patches them to return the new runtime
@@ -7612,11 +5388,9 @@ class FiberRuntime {
    *
    * **NOTE**: This method must be invoked by the fiber itself.
    */
-  patchRuntimeFlags(oldRuntimeFlags, patch2) {
-    const newRuntimeFlags = patch$4(oldRuntimeFlags, patch2);
-    globalThis[currentFiberURI] = this;
-    this._runtimeFlags = newRuntimeFlags;
-    return newRuntimeFlags;
+  patchRuntimeFlags(e, n) {
+    const r = Br(e, n);
+    return globalThis[Ot] = this, this._runtimeFlags = r, r;
   }
   /**
    * Initiates an asynchronous operation, by building a callback that will
@@ -7625,1345 +5399,2399 @@ class FiberRuntime {
    *
    * **NOTE**: This method must be invoked by the fiber itself.
    */
-  initiateAsync(runtimeFlags, asyncRegister) {
-    let alreadyCalled = false;
-    const callback = (effect) => {
-      if (!alreadyCalled) {
-        alreadyCalled = true;
-        this.tell(resume(effect));
-      }
+  initiateAsync(e, n) {
+    let r = !1;
+    const s = (o) => {
+      r || (r = !0, this.tell(Xt(o)));
     };
-    if (interruptible$1(runtimeFlags)) {
-      this._asyncInterruptor = callback;
-    }
+    _t(e) && (this._asyncInterruptor = s);
     try {
-      asyncRegister(callback);
-    } catch (e) {
-      callback(failCause(die$1(e)));
+      n(s);
+    } catch (o) {
+      s(Qe(ut(o)));
     }
   }
-  pushStack(cont) {
-    this._stack.push(cont);
-    if (cont._op === "OnStep") {
-      this._steps.push({
-        refs: this.getFiberRefs(),
-        flags: this._runtimeFlags
-      });
-    }
+  pushStack(e) {
+    this._stack.push(e), e._op === "OnStep" && this._steps.push({
+      refs: this.getFiberRefs(),
+      flags: this._runtimeFlags
+    });
   }
   popStack() {
-    const item = this._stack.pop();
-    if (item) {
-      if (item._op === "OnStep") {
-        this._steps.pop();
-      }
-      return item;
-    }
-    return;
+    const e = this._stack.pop();
+    if (e)
+      return e._op === "OnStep" && this._steps.pop(), e;
   }
   getNextSuccessCont() {
-    let frame = this.popStack();
-    while (frame) {
-      if (frame._op !== OP_ON_FAILURE) {
-        return frame;
-      }
-      frame = this.popStack();
+    let e = this.popStack();
+    for (; e; ) {
+      if (e._op !== Ys)
+        return e;
+      e = this.popStack();
     }
   }
   getNextFailCont() {
-    let frame = this.popStack();
-    while (frame) {
-      if (frame._op !== OP_ON_SUCCESS && frame._op !== OP_WHILE) {
-        return frame;
-      }
-      frame = this.popStack();
+    let e = this.popStack();
+    for (; e; ) {
+      if (e._op !== zr && e._op !== Qr)
+        return e;
+      e = this.popStack();
     }
   }
-  [(_M = FiberTypeId, _N = RuntimeFiberTypeId, OP_TAG)](op) {
-    return map(fiberRefGet(currentContext), (context) => unsafeGet$1(context, op));
+  [(kk = dS, Ek = mS, qd)](e) {
+    return Me(Vi(pr), (n) => Wp(n, e));
   }
-  ["Left"](op) {
-    return fail(op.left);
+  Left(e) {
+    return Be(e.left);
   }
-  ["None"](_) {
-    return fail(new NoSuchElementException());
+  None(e) {
+    return Be(new Gl());
   }
-  ["Right"](op) {
-    return exitSucceed(op.right);
+  Right(e) {
+    return Oe(e.right);
   }
-  ["Some"](op) {
-    return exitSucceed(op.value);
+  Some(e) {
+    return Oe(e.value);
   }
-  [OP_SYNC](op) {
-    const value = op.effect_instruction_i0();
-    const cont = this.getNextSuccessCont();
-    if (cont !== void 0) {
-      if (!(cont._op in contOpSuccess)) {
-        absurd(cont);
+  [ou](e) {
+    const n = e.effect_instruction_i0(), r = this.getNextSuccessCont();
+    return r !== void 0 ? (r._op in Pr || Ln(r), Pr[r._op](this, r, n)) : (ft.currentOp = Oe(n), mt);
+  }
+  [Le](e) {
+    const n = e, r = this.getNextSuccessCont();
+    return r !== void 0 ? (r._op in Pr || Ln(r), Pr[r._op](this, r, n.effect_instruction_i0)) : (ft.currentOp = n, mt);
+  }
+  [je](e) {
+    const n = e.effect_instruction_i0, r = this.getNextFailCont();
+    if (r !== void 0)
+      switch (r._op) {
+        case Ys:
+        case Yr:
+          return _t(this._runtimeFlags) && this.isInterrupted() ? Z(ua(n)) : r.effect_instruction_i1(n);
+        case "OnStep":
+          return _t(this._runtimeFlags) && this.isInterrupted() ? Z(ua(n)) : Oe(Z(n));
+        case ci:
+          return this.patchRuntimeFlags(this._runtimeFlags, r.patch), _t(this._runtimeFlags) && this.isInterrupted() ? Z(tt(n, this.getInterruptedCause())) : Z(n);
+        default:
+          Ln(r);
       }
-      return contOpSuccess[cont._op](this, cont, value);
-    } else {
-      yieldedOpChannel.currentOp = exitSucceed(value);
-      return YieldedOp;
-    }
+    else
+      return ft.currentOp = Z(n), mt;
   }
-  [OP_SUCCESS](op) {
-    const oldCur = op;
-    const cont = this.getNextSuccessCont();
-    if (cont !== void 0) {
-      if (!(cont._op in contOpSuccess)) {
-        absurd(cont);
-      }
-      return contOpSuccess[cont._op](this, cont, oldCur.effect_instruction_i0);
-    } else {
-      yieldedOpChannel.currentOp = oldCur;
-      return YieldedOp;
-    }
+  [iu](e) {
+    return e.effect_instruction_i0(this, Sf(this._runtimeFlags));
   }
-  [OP_FAILURE](op) {
-    const cause = op.effect_instruction_i0;
-    const cont = this.getNextFailCont();
-    if (cont !== void 0) {
-      switch (cont._op) {
-        case OP_ON_FAILURE:
-        case OP_ON_SUCCESS_AND_FAILURE: {
-          if (!(interruptible$1(this._runtimeFlags) && this.isInterrupted())) {
-            return cont.effect_instruction_i1(cause);
-          } else {
-            return exitFailCause(stripFailures(cause));
-          }
-        }
-        case "OnStep": {
-          if (!(interruptible$1(this._runtimeFlags) && this.isInterrupted())) {
-            return exitSucceed(exitFailCause(cause));
-          } else {
-            return exitFailCause(stripFailures(cause));
-          }
-        }
-        case OP_REVERT_FLAGS: {
-          this.patchRuntimeFlags(this._runtimeFlags, cont.patch);
-          if (interruptible$1(this._runtimeFlags) && this.isInterrupted()) {
-            return exitFailCause(sequential$1(cause, this.getInterruptedCause()));
-          } else {
-            return exitFailCause(cause);
-          }
-        }
-        default: {
-          absurd(cont);
-        }
-      }
-    } else {
-      yieldedOpChannel.currentOp = exitFailCause(cause);
-      return YieldedOp;
-    }
-  }
-  [OP_WITH_RUNTIME](op) {
-    return op.effect_instruction_i0(this, running(this._runtimeFlags));
-  }
-  ["Blocked"](op) {
-    const refs = this.getFiberRefs();
-    const flags = this._runtimeFlags;
+  Blocked(e) {
+    const n = this.getFiberRefs(), r = this._runtimeFlags;
     if (this._steps.length > 0) {
-      const frames = [];
-      const snap = this._steps[this._steps.length - 1];
-      let frame = this.popStack();
-      while (frame && frame._op !== "OnStep") {
-        frames.push(frame);
-        frame = this.popStack();
-      }
-      this.setFiberRefs(snap.refs);
-      this._runtimeFlags = snap.flags;
-      const patchRefs = diff$1(snap.refs, refs);
-      const patchFlags = diff$3(snap.flags, flags);
-      return exitSucceed(blocked(op.effect_instruction_i0, withFiberRuntime((newFiber) => {
-        while (frames.length > 0) {
-          newFiber.pushStack(frames.pop());
-        }
-        newFiber.setFiberRefs(patch$1(newFiber.id(), newFiber.getFiberRefs())(patchRefs));
-        newFiber._runtimeFlags = patch$4(patchFlags)(newFiber._runtimeFlags);
-        return op.effect_instruction_i1;
+      const s = [], o = this._steps[this._steps.length - 1];
+      let c = this.popStack();
+      for (; c && c._op !== "OnStep"; )
+        s.push(c), c = this.popStack();
+      this.setFiberRefs(o.refs), this._runtimeFlags = o.flags;
+      const a = Hv(o.refs, n), u = qr(o.flags, r);
+      return Oe(Rl(e.effect_instruction_i0, rt((h) => {
+        for (; s.length > 0; )
+          h.pushStack(s.pop());
+        return h.setFiberRefs(Jv(h.id(), h.getFiberRefs())(a)), h._runtimeFlags = Br(u)(h._runtimeFlags), e.effect_instruction_i1;
       })));
     }
-    return uninterruptibleMask((restore) => flatMap$1(forkDaemon(runRequestBlock(op.effect_instruction_i0)), () => restore(op.effect_instruction_i1)));
+    return dr((s) => T(Hf(Q_(e.effect_instruction_i0)), () => s(e.effect_instruction_i1)));
   }
-  ["RunBlocked"](op) {
-    return runBlockedRequests(op.effect_instruction_i0);
+  RunBlocked(e) {
+    return rw(e.effect_instruction_i0);
   }
-  [OP_UPDATE_RUNTIME_FLAGS](op) {
-    const updateFlags = op.effect_instruction_i0;
-    const oldRuntimeFlags = this._runtimeFlags;
-    const newRuntimeFlags = patch$4(oldRuntimeFlags, updateFlags);
-    if (interruptible$1(newRuntimeFlags) && this.isInterrupted()) {
-      return exitFailCause(this.getInterruptedCause());
-    } else {
-      this.patchRuntimeFlags(this._runtimeFlags, updateFlags);
-      if (op.effect_instruction_i1) {
-        const revertFlags = diff$3(newRuntimeFlags, oldRuntimeFlags);
-        this.pushStack(new RevertFlags(revertFlags, op));
-        return op.effect_instruction_i1(oldRuntimeFlags);
-      } else {
-        return exitVoid;
-      }
-    }
+  [or](e) {
+    const n = e.effect_instruction_i0, r = this._runtimeFlags, s = Br(r, n);
+    if (_t(s) && this.isInterrupted())
+      return Z(this.getInterruptedCause());
+    if (this.patchRuntimeFlags(this._runtimeFlags, n), e.effect_instruction_i1) {
+      const o = qr(s, r);
+      return this.pushStack(new X_(o, e)), e.effect_instruction_i1(r);
+    } else
+      return Tt;
   }
-  [OP_ON_SUCCESS](op) {
-    this.pushStack(op);
-    return op.effect_instruction_i0;
+  [zr](e) {
+    return this.pushStack(e), e.effect_instruction_i0;
   }
-  ["OnStep"](op) {
-    this.pushStack(op);
-    return op.effect_instruction_i0;
+  OnStep(e) {
+    return this.pushStack(e), e.effect_instruction_i0;
   }
-  [OP_ON_FAILURE](op) {
-    this.pushStack(op);
-    return op.effect_instruction_i0;
+  [Ys](e) {
+    return this.pushStack(e), e.effect_instruction_i0;
   }
-  [OP_ON_SUCCESS_AND_FAILURE](op) {
-    this.pushStack(op);
-    return op.effect_instruction_i0;
+  [Yr](e) {
+    return this.pushStack(e), e.effect_instruction_i0;
   }
-  [OP_ASYNC](op) {
-    this._asyncBlockingOn = op.effect_instruction_i1;
-    this.initiateAsync(this._runtimeFlags, op.effect_instruction_i0);
-    yieldedOpChannel.currentOp = op;
-    return YieldedOp;
+  [jr](e) {
+    return this._asyncBlockingOn = e.effect_instruction_i1, this.initiateAsync(this._runtimeFlags, e.effect_instruction_i0), ft.currentOp = e, mt;
   }
-  [OP_YIELD](op) {
-    this.isYielding = false;
-    yieldedOpChannel.currentOp = op;
-    return YieldedOp;
+  [Lr](e) {
+    return this.isYielding = !1, ft.currentOp = e, mt;
   }
-  [OP_WHILE](op) {
-    const check = op.effect_instruction_i0;
-    const body = op.effect_instruction_i1;
-    if (check()) {
-      this.pushStack(op);
-      return body();
-    } else {
-      return exitVoid;
-    }
+  [Qr](e) {
+    const n = e.effect_instruction_i0, r = e.effect_instruction_i1;
+    return n() ? (this.pushStack(e), r()) : Tt;
   }
-  [OP_COMMIT](op) {
-    return op.commit();
+  [ii](e) {
+    return e.commit();
   }
   /**
    * The main run-loop for evaluating effects.
    *
    * **NOTE**: This method must be invoked by the fiber itself.
    */
-  runLoop(effect0) {
-    let cur = effect0;
-    this.currentOpCount = 0;
-    while (true) {
-      if ((this._runtimeFlags & OpSupervision) !== 0) {
-        this._supervisor.onEffect(this, cur);
-      }
-      if (this._queue.length > 0) {
-        cur = this.drainQueueWhileRunning(this._runtimeFlags, cur);
-      }
-      if (!this.isYielding) {
+  runLoop(e) {
+    let n = e;
+    for (this.currentOpCount = 0; ; ) {
+      if (this._runtimeFlags & n_ && this._supervisor.onEffect(this, n), this._queue.length > 0 && (n = this.drainQueueWhileRunning(this._runtimeFlags, n)), !this.isYielding) {
         this.currentOpCount += 1;
-        const shouldYield = this._scheduler.shouldYield(this);
-        if (shouldYield !== false) {
-          this.isYielding = true;
-          this.currentOpCount = 0;
-          const oldCur = cur;
-          cur = flatMap$1(yieldNow$1({
-            priority: shouldYield
-          }), () => oldCur);
+        const r = this._scheduler.shouldYield(this);
+        if (r !== !1) {
+          this.isYielding = !0, this.currentOpCount = 0;
+          const s = n;
+          n = T(Di({
+            priority: r
+          }), () => s);
         }
       }
       try {
-        if (!("_op" in cur) || !(cur._op in this)) {
-          absurd(cur);
+        if ((!("_op" in n) || !(n._op in this)) && Ln(n), n = this._tracer.context(() => Jr() !== n[ja]._V ? ty(`Cannot execute an Effect versioned ${n[ja]._V} with a Runtime of version ${Jr()}`) : this[n._op](n), this), n === mt) {
+          const r = ft.currentOp;
+          return r._op === Lr || r._op === jr ? mt : (ft.currentOp = null, r._op === Le || r._op === je ? r : Z(ut(r)));
         }
-        cur = this._tracer.context(() => {
-          if (getCurrentVersion() !== cur[EffectTypeId]._V) {
-            return dieMessage(`Cannot execute an Effect versioned ${cur[EffectTypeId]._V} with a Runtime of version ${getCurrentVersion()}`);
-          }
-          return this[cur._op](cur);
-        }, this);
-        if (cur === YieldedOp) {
-          const op = yieldedOpChannel.currentOp;
-          if (op._op === OP_YIELD || op._op === OP_ASYNC) {
-            return YieldedOp;
-          }
-          yieldedOpChannel.currentOp = null;
-          return op._op === OP_SUCCESS || op._op === OP_FAILURE ? op : exitFailCause(die$1(op));
-        }
-      } catch (e) {
-        if (isEffectError(e)) {
-          cur = exitFailCause(e.cause);
-        } else if (isInterruptedException(e)) {
-          cur = exitFailCause(sequential$1(die$1(e), interrupt(none$4)));
-        } else {
-          cur = die(e);
-        }
+      } catch (r) {
+        Y_(r) ? n = Z(r.cause) : Fy(r) ? n = Z(tt(ut(r), Ct(Is))) : n = Al(r);
       }
     }
   }
 }
-const currentMinimumLogLevel = /* @__PURE__ */ globalValue("effect/FiberRef/currentMinimumLogLevel", () => fiberRefUnsafeMake(fromLiteral("Info")));
-const loggerWithConsoleLog = (self) => makeLogger((opts) => {
-  const services = getOrDefault(opts.context, currentServices);
-  get$5(services, consoleTag).unsafe.log(self.log(opts));
-});
-const defaultLogger = /* @__PURE__ */ globalValue(/* @__PURE__ */ Symbol.for("effect/Logger/defaultLogger"), () => loggerWithConsoleLog(stringLogger));
-const tracerLogger = /* @__PURE__ */ globalValue(/* @__PURE__ */ Symbol.for("effect/Logger/tracerLogger"), () => makeLogger(({
-  annotations,
-  cause,
-  context,
-  fiberId: fiberId2,
-  logLevel,
-  message
+const sw = /* @__PURE__ */ Q("effect/FiberRef/currentMinimumLogLevel", () => st(Ov("Info"))), ow = (t) => rc((e) => {
+  const n = hv(e.context, Hn);
+  Vn(n, hf).unsafe.log(t.log(e));
+}), iw = /* @__PURE__ */ Q(/* @__PURE__ */ Symbol.for("effect/Logger/defaultLogger"), () => ow(kS)), cw = /* @__PURE__ */ Q(/* @__PURE__ */ Symbol.for("effect/Logger/tracerLogger"), () => rc(({
+  annotations: t,
+  cause: e,
+  context: n,
+  fiberId: r,
+  logLevel: s,
+  message: o
 }) => {
-  const span2 = flatMap$3(get(context, currentContext), getOption(spanTag));
-  const clockService = map$4(get(context, currentServices), (_) => get$5(_, clockTag));
-  if (span2._tag === "None" || span2.value._tag === "ExternalSpan" || clockService._tag === "None") {
+  const c = Eu(jo(n, pr), Gp(Ol)), a = ku(jo(n, Hn), (h) => Vn(h, zi));
+  if (c._tag === "None" || c.value._tag === "ExternalSpan" || a._tag === "None")
     return;
-  }
-  const attributes = Object.fromEntries(map$1(annotations, toStringUnknown));
-  attributes["effect.fiberId"] = threadName(fiberId2);
-  attributes["effect.logLevel"] = logLevel.label;
-  if (cause !== null && cause._tag !== "Empty") {
-    attributes["effect.cause"] = pretty(cause);
-  }
-  span2.value.event(String(message), clockService.value.unsafeCurrentTimeNanos(), attributes);
-}));
-const currentLoggers = /* @__PURE__ */ globalValue(/* @__PURE__ */ Symbol.for("effect/FiberRef/currentLoggers"), () => fiberRefUnsafeMakeHashSet(make$h(defaultLogger, tracerLogger)));
-const forEachConcurrentDiscard = (self, f, batching, processAll, n) => uninterruptibleMask((restore) => transplant((graft) => withFiberRuntime((parent) => {
-  let todos = Array.from(self).reverse();
-  let target = todos.length;
-  if (target === 0) {
-    return void_;
-  }
-  let counter2 = 0;
-  let interrupted = false;
-  const fibersCount = n ? Math.min(todos.length, n) : todos.length;
-  const fibers = /* @__PURE__ */ new Set();
-  const results = new Array();
-  const interruptAll = () => fibers.forEach((fiber) => {
-    fiber._scheduler.scheduleTask(() => {
-      fiber.unsafeInterruptAsFork(parent.id());
+  const u = Object.fromEntries(tl(t, qn));
+  u["effect.fiberId"] = Kg(r), u["effect.logLevel"] = s.label, e !== null && e._tag !== "Empty" && (u["effect.cause"] = Fi(e)), c.value.event(String(o), a.value.unsafeCurrentTimeNanos(), u);
+})), aw = /* @__PURE__ */ Q(/* @__PURE__ */ Symbol.for("effect/FiberRef/currentLoggers"), () => _y(wi(iw, cw))), Kf = (t, e, n, r, s) => dr((o) => iy((c) => rt((a) => {
+  let u = Array.from(t).reverse(), h = u.length;
+  if (h === 0)
+    return Ue;
+  let b = 0, y = !1;
+  const k = s ? Math.min(u.length, s) : u.length, w = /* @__PURE__ */ new Set(), R = new Array(), J = () => w.forEach((ne) => {
+    ne._scheduler.scheduleTask(() => {
+      ne.unsafeInterruptAsFork(a.id());
     }, 0);
-  });
-  const startOrder = new Array();
-  const joinOrder = new Array();
-  const residual = new Array();
-  const collectExits = () => {
-    const exits = results.filter(({
-      exit: exit2
-    }) => exit2._tag === "Failure").sort((a, b) => a.index < b.index ? -1 : a.index === b.index ? 0 : 1).map(({
-      exit: exit2
-    }) => exit2);
-    if (exits.length === 0) {
-      exits.push(exitVoid);
-    }
-    return exits;
-  };
-  const runFiber = (eff, interruptImmediately = false) => {
-    const runnable = uninterruptible(graft(eff));
-    const fiber = unsafeForkUnstarted(runnable, parent, parent._runtimeFlags, globalScope);
-    parent._scheduler.scheduleTask(() => {
-      if (interruptImmediately) {
-        fiber.unsafeInterruptAsFork(parent.id());
-      }
-      fiber.resume(runnable);
-    }, 0);
-    return fiber;
-  };
-  const onInterruptSignal = () => {
-    if (!processAll) {
-      target -= todos.length;
-      todos = [];
-    }
-    interrupted = true;
-    interruptAll();
-  };
-  const stepOrExit = batching ? step : exit;
-  const processingFiber = runFiber(async$1((resume2) => {
-    const pushResult = (res, index) => {
-      if (res._op === "Blocked") {
-        residual.push(res);
-      } else {
-        results.push({
-          index,
-          exit: res
-        });
-        if (res._op === "Failure" && !interrupted) {
-          onInterruptSignal();
-        }
-      }
-    };
-    const next = () => {
-      if (todos.length > 0) {
-        const a = todos.pop();
-        let index = counter2++;
-        const returnNextElement = () => {
-          const a2 = todos.pop();
-          index = counter2++;
-          return flatMap$1(yieldNow$1(), () => flatMap$1(stepOrExit(restore(f(a2, index))), onRes));
-        };
-        const onRes = (res) => {
-          if (todos.length > 0) {
-            pushResult(res, index);
-            if (todos.length > 0) {
-              return returnNextElement();
-            }
-          }
-          return succeed(res);
-        };
-        const todo = flatMap$1(stepOrExit(restore(f(a, index))), onRes);
-        const fiber = runFiber(todo);
-        startOrder.push(fiber);
-        fibers.add(fiber);
-        if (interrupted) {
-          fiber._scheduler.scheduleTask(() => {
-            fiber.unsafeInterruptAsFork(parent.id());
-          }, 0);
-        }
-        fiber.addObserver((wrapped) => {
-          let exit2;
-          if (wrapped._op === "Failure") {
-            exit2 = wrapped;
-          } else {
-            exit2 = wrapped.effect_instruction_i0;
-          }
-          joinOrder.push(fiber);
-          fibers.delete(fiber);
-          pushResult(exit2, index);
-          if (results.length === target) {
-            resume2(succeed(getOrElse(exitCollectAll(collectExits(), {
-              parallel: true
-            }), () => exitVoid)));
-          } else if (residual.length + results.length === target) {
-            const requests = residual.map((blocked2) => blocked2.effect_instruction_i0).reduce(par);
-            resume2(succeed(blocked(requests, forEachConcurrentDiscard([getOrElse(exitCollectAll(collectExits(), {
-              parallel: true
-            }), () => exitVoid), ...residual.map((blocked2) => blocked2.effect_instruction_i1)], (i) => i, batching, true, n))));
-          } else {
-            next();
-          }
+  }), B = new Array(), ce = new Array(), Y = new Array(), we = () => {
+    const ne = R.filter(({
+      exit: ve
+    }) => ve._tag === "Failure").sort((ve, ke) => ve.index < ke.index ? -1 : ve.index === ke.index ? 0 : 1).map(({
+      exit: ve
+    }) => ve);
+    return ne.length === 0 && ne.push(Tt), ne;
+  }, de = (ne, ve = !1) => {
+    const ke = Ul(c(ne)), pe = uw(ke, a, a._runtimeFlags, nc);
+    return a._scheduler.scheduleTask(() => {
+      ve && pe.unsafeInterruptAsFork(a.id()), pe.resume(ke);
+    }, 0), pe;
+  }, G = () => {
+    r || (h -= u.length, u = []), y = !0, J();
+  }, be = n ? sy : Ml, Ce = de(lt((ne) => {
+    const ve = (pe, Te) => {
+      pe._op === "Blocked" ? Y.push(pe) : (R.push({
+        index: Te,
+        exit: pe
+      }), pe._op === "Failure" && !y && G());
+    }, ke = () => {
+      if (u.length > 0) {
+        const pe = u.pop();
+        let Te = b++;
+        const ot = () => {
+          const E = u.pop();
+          return Te = b++, T(Di(), () => T(be(o(e(E, Te))), xe));
+        }, xe = (E) => u.length > 0 && (ve(E, Te), u.length > 0) ? ot() : ie(E), Re = T(be(o(e(pe, Te))), xe), ge = de(Re);
+        B.push(ge), w.add(ge), y && ge._scheduler.scheduleTask(() => {
+          ge.unsafeInterruptAsFork(a.id());
+        }, 0), ge.addObserver((E) => {
+          let qe;
+          if (E._op === "Failure" ? qe = E : qe = E.effect_instruction_i0, ce.push(ge), w.delete(ge), ve(qe, Te), R.length === h)
+            ne(ie(Nt(eo(we(), {
+              parallel: !0
+            }), () => Tt)));
+          else if (Y.length + R.length === h) {
+            const pt = Y.map((We) => We.effect_instruction_i0).reduce(ml);
+            ne(ie(Rl(pt, Kf([Nt(eo(we(), {
+              parallel: !0
+            }), () => Tt), ...Y.map((We) => We.effect_instruction_i1)], (We) => We, n, !0, s))));
+          } else
+            ke();
         });
       }
     };
-    for (let i = 0; i < fibersCount; i++) {
-      next();
-    }
+    for (let pe = 0; pe < k; pe++)
+      ke();
   }));
-  return asVoid(onExit(flatten$1(restore(join(processingFiber))), exitMatch({
+  return Ht(ji(Mi(o(bS(Ce))), zl({
     onFailure: () => {
-      onInterruptSignal();
-      const target2 = residual.length + 1;
-      const concurrency = Math.min(typeof n === "number" ? n : residual.length, residual.length);
-      const toPop = Array.from(residual);
-      return async$1((cb) => {
-        const exits = [];
-        let count = 0;
-        let index = 0;
-        const check = (index2, hitNext) => (exit2) => {
-          exits[index2] = exit2;
-          count++;
-          if (count === target2) {
-            cb(getOrThrow(exitCollectAll(exits, {
-              parallel: true
-            })));
-          }
-          if (toPop.length > 0 && hitNext) {
-            next();
-          }
+      G();
+      const ne = Y.length + 1, ve = Math.min(typeof s == "number" ? s : Y.length, Y.length), ke = Array.from(Y);
+      return lt((pe) => {
+        const Te = [];
+        let ot = 0, xe = 0;
+        const Re = (E, qe) => (pt) => {
+          Te[E] = pt, ot++, ot === ne && pe(ap(eo(Te, {
+            parallel: !0
+          }))), ke.length > 0 && qe && ge();
+        }, ge = () => {
+          de(ke.pop(), !0).addObserver(Re(xe, !0)), xe++;
         };
-        const next = () => {
-          runFiber(toPop.pop(), true).addObserver(check(index, true));
-          index++;
-        };
-        processingFiber.addObserver(check(index, false));
-        index++;
-        for (let i = 0; i < concurrency; i++) {
-          next();
-        }
+        Ce.addObserver(Re(xe, !1)), xe++;
+        for (let E = 0; E < ve; E++)
+          ge();
       });
     },
-    onSuccess: () => forEachSequential(joinOrder, (f2) => f2.inheritAll)
+    onSuccess: () => bt(ce, (ne) => ne.inheritAll)
   })));
-})));
-const fork$1 = (self) => withFiberRuntime((state, status) => succeed(unsafeFork$1(self, state, status.runtimeFlags)));
-const forkDaemon = (self) => forkWithScopeOverride(self, globalScope);
-const unsafeFork$1 = (effect, parentFiber, parentRuntimeFlags, overrideScope = null) => {
-  const childFiber = unsafeMakeChildFiber(effect, parentFiber, parentRuntimeFlags, overrideScope);
-  childFiber.resume(effect);
-  return childFiber;
-};
-const unsafeForkUnstarted = (effect, parentFiber, parentRuntimeFlags, overrideScope = null) => {
-  const childFiber = unsafeMakeChildFiber(effect, parentFiber, parentRuntimeFlags, overrideScope);
-  return childFiber;
-};
-const unsafeMakeChildFiber = (effect, parentFiber, parentRuntimeFlags, overrideScope = null) => {
-  const childId = unsafeMake$4();
-  const parentFiberRefs = parentFiber.getFiberRefs();
-  const childFiberRefs = forkAs(parentFiberRefs, childId);
-  const childFiber = new FiberRuntime(childId, childFiberRefs, parentRuntimeFlags);
-  const childContext = getOrDefault$1(childFiberRefs, currentContext);
-  const supervisor = childFiber._supervisor;
-  supervisor.onStart(childContext, effect, some$2(parentFiber), childFiber);
-  childFiber.addObserver((exit2) => supervisor.onEnd(exit2, childFiber));
-  const parentScope = overrideScope !== null ? overrideScope : pipe(parentFiber.getFiberRef(currentForkScopeOverride), getOrElse(() => parentFiber.scope()));
-  parentScope.add(parentRuntimeFlags, childFiber);
-  return childFiber;
-};
-const forkWithScopeOverride = (self, scopeOverride) => withFiberRuntime((parentFiber, parentStatus) => succeed(unsafeFork$1(self, parentFiber, parentStatus.runtimeFlags, scopeOverride)));
-const raceAll$1 = (all) => {
-  const list = fromIterable$5(all);
-  if (!isNonEmpty(list)) {
-    return dieSync(() => new IllegalArgumentException(`Received an empty collection of effects`));
-  }
-  const self = headNonEmpty(list);
-  const effects = tailNonEmpty(list);
-  const inheritAll$1 = (res) => pipe(inheritAll(res[1]), as(res[0]));
-  return pipe(deferredMake(), flatMap$1((done2) => pipe(make$6(effects.length), flatMap$1((fails) => uninterruptibleMask((restore) => pipe(fork$1(interruptible(self)), flatMap$1((head2) => pipe(effects, forEachSequential((effect) => fork$1(interruptible(effect))), map((fibers) => unsafeFromArray(fibers)), map((tail) => pipe(tail, prepend$1(head2))), tap((fibers) => pipe(fibers, reduce$6(void_, (effect, fiber) => pipe(effect, zipRight(pipe(_await(fiber), flatMap$1(raceAllArbiter(fibers, fiber, done2, fails)), fork$1, asVoid)))))), flatMap$1((fibers) => pipe(restore(pipe(_await$1(done2), flatMap$1(inheritAll$1))), onInterrupt(() => pipe(fibers, reduce$6(void_, (effect, fiber) => pipe(effect, zipLeft(interruptFiber(fiber))))))))))))))));
-};
-const raceAllArbiter = (fibers, winner, deferred, fails) => (exit2) => exitMatchEffect(exit2, {
-  onFailure: (cause) => pipe(modify(fails, (fails2) => [fails2 === 0 ? pipe(deferredFailCause(deferred, cause), asVoid) : void_, fails2 - 1]), flatten$1),
-  onSuccess: (value) => pipe(deferredSucceed(deferred, [value, winner]), flatMap$1((set2) => set2 ? pipe(fromIterable$5(fibers), reduce$6(void_, (effect, fiber) => fiber === winner ? effect : pipe(effect, zipLeft(interruptFiber(fiber))))) : void_))
-});
-const fiberRefUnsafeMakeSupervisor = (initial) => fiberRefUnsafeMakePatch(initial, {
-  differ,
-  fork: empty
-});
-const currentRuntimeFlags = /* @__PURE__ */ fiberRefUnsafeMakeRuntimeFlags(none$3);
-const currentSupervisor = /* @__PURE__ */ fiberRefUnsafeMakeSupervisor(none$2);
-const invokeWithInterrupt = (self, entries, onInterrupt2) => fiberIdWith((id) => flatMap$1(flatMap$1(forkDaemon(interruptible(self)), (processing) => async$1((cb) => {
-  const counts = entries.map((_) => _.listeners.count);
-  const checkDone = () => {
-    if (counts.every((count) => count === 0)) {
-      if (entries.every((_) => {
-        if (_.result.state.current._tag === "Pending") {
-          return true;
-        } else if (_.result.state.current._tag === "Done" && exitIsExit(_.result.state.current.effect) && _.result.state.current.effect._tag === "Failure" && isInterrupted(_.result.state.current.effect.cause)) {
-          return true;
-        } else {
-          return false;
-        }
-      })) {
-        cleanup.forEach((f) => f());
-        onInterrupt2 == null ? void 0 : onInterrupt2();
-        cb(interruptFiber(processing));
-      }
-    }
+}))), uo = (t) => rt((e, n) => ie(Jf(t, e, n.runtimeFlags))), Hf = (t) => lw(t, nc), Jf = (t, e, n, r = null) => {
+  const s = Wf(t, e, n, r);
+  return s.resume(t), s;
+}, uw = (t, e, n, r = null) => Wf(t, e, n, r), Wf = (t, e, n, r = null) => {
+  const s = Qu(), o = e.getFiberRefs(), c = lv(o, s), a = new Vf(s, c, n), u = Yi(c, pr), h = a._supervisor;
+  return h.onStart(u, t, H(e), a), a.addObserver((y) => h.onEnd(y, a)), (r !== null ? r : m(e.getFiberRef(Ao), Nt(() => e.scope()))).add(n, a), a;
+}, lw = (t, e) => rt((n, r) => ie(Jf(t, n, r.runtimeFlags, e))), fw = (t) => {
+  const e = ys(t);
+  if (!xt(e))
+    return ny(() => new Ay("Received an empty collection of effects"));
+  const n = jt(e), r = yt(e), s = (o) => m(yS(o[1]), Cn(o[0]));
+  return m(Uy(), T((o) => m(Pv(r.length), T((c) => dr((a) => m(uo(is(n)), T((u) => m(r, bt((h) => uo(is(h))), Me((h) => bs(h)), Me((h) => m(h, Ye(u))), Dl((h) => m(h, Wn(Ue, (b, y) => m(b, Ui(m(_S(y), T(hw(h, y, o, c)), uo, Ht)))))), T((h) => m(a(m(Hy(o), T(s))), Ll(() => m(h, Wn(Ue, (b, y) => m(b, Fs(qi(y))))))))))))))));
+}, hw = (t, e, n, r) => (s) => jy(s, {
+  onFailure: (o) => m(Nv(r, (c) => [c === 0 ? m(By(n, o), Ht) : Ue, c - 1]), Mi),
+  onSuccess: (o) => m(Vy(n, [o, e]), T((c) => c ? m(ys(t), Wn(Ue, (a, u) => u === e ? a : m(a, Fs(qi(u))))) : Ue))
+}), dw = (t) => Tn(t, {
+  differ: z0,
+  fork: Jn
+}), Ja = /* @__PURE__ */ by(o_), Wa = /* @__PURE__ */ dw(Ns), pw = (t, e, n) => xl((r) => T(T(Hf(is(t)), (s) => lt((o) => {
+  const c = e.map((h) => h.listeners.count), a = () => {
+    c.every((h) => h === 0) && e.every((h) => h.result.state.current._tag === "Pending" ? !0 : !!(h.result.state.current._tag === "Done" && Wi(h.result.state.current.effect) && h.result.state.current.effect._tag === "Failure" && R_(h.result.state.current.effect.cause))) && (u.forEach((h) => h()), n == null || n(), o(qi(s)));
   };
-  processing.addObserver((exit2) => {
-    cleanup.forEach((f) => f());
-    cb(exit2);
+  s.addObserver((h) => {
+    u.forEach((b) => b()), o(h);
   });
-  const cleanup = entries.map((r, i) => {
-    const observer = (count) => {
-      counts[i] = count;
-      checkDone();
+  const u = e.map((h, b) => {
+    const y = (k) => {
+      c[b] = k, a();
     };
-    r.listeners.addObserver(observer);
-    return () => r.listeners.removeObserver(observer);
+    return h.listeners.addObserver(y), () => h.listeners.removeObserver(y);
   });
-  checkDone();
-  return sync(() => {
-    cleanup.forEach((f) => f());
+  return a(), $(() => {
+    u.forEach((h) => h());
   });
-})), () => suspend(() => {
-  const residual = entries.flatMap((entry) => {
-    if (!entry.state.completed) {
-      return [entry];
-    }
-    return [];
+})), () => Ae(() => {
+  const s = e.flatMap((o) => o.state.completed ? [] : [o]);
+  return Ni(s, (o) => q0(o.request, xy(r)));
+}))), gw = Iy, mw = Cy, _w = Bi, Gf = (t) => (e, n) => {
+  const r = Qu(), s = [[pr, [[r, t.context]]]];
+  n != null && n.scheduler && s.push([qo, [[r, n.scheduler]]]);
+  let o = dv(t.fiberRefs, {
+    entries: s,
+    forkAs: r
   });
-  return forEachSequentialDiscard(residual, (entry) => complete(entry.request, exitInterrupt(id)));
-})));
-const close = scopeClose;
-const fork = scopeFork;
-const interruptAs = interruptAsFiber;
-const unsafeFork = (runtime) => (self, options) => {
-  const fiberId2 = unsafeMake$4();
-  const fiberRefUpdates = [[currentContext, [[fiberId2, runtime.context]]]];
-  if (options == null ? void 0 : options.scheduler) {
-    fiberRefUpdates.push([currentScheduler, [[fiberId2, options.scheduler]]]);
-  }
-  let fiberRefs = updateManyAs(runtime.fiberRefs, {
-    entries: fiberRefUpdates,
-    forkAs: fiberId2
+  n != null && n.updateRefs && (o = n.updateRefs(o, r));
+  const c = new Vf(r, o, t.runtimeFlags);
+  let a = e;
+  n != null && n.scope && (a = T(mw(n.scope, Kv), (h) => Ui(Ry(h, xl((b) => N(b, c.id()) ? Ue : Bi(c, b))), ji(e, (b) => gw(h, b)))));
+  const u = c._supervisor;
+  return u !== Ns && (u.onStart(t.context, a, M(), c), c.addObserver((h) => u.onEnd(h, c))), nc.add(t.runtimeFlags, c), (n == null ? void 0 : n.immediate) === !1 ? c.resume(a) : c.start(a), c;
+}, zf = (t) => (e, n = {}) => {
+  const r = Gf(t)(e, n);
+  return n.onExit && r.addObserver((s) => {
+    n.onExit(s);
+  }), (s, o) => zf(t)(m(r, _w(s ?? Is)), {
+    ...o,
+    onExit: o != null && o.onExit ? (c) => o.onExit(cb(c)) : void 0
   });
-  if (options == null ? void 0 : options.updateRefs) {
-    fiberRefs = options.updateRefs(fiberRefs, fiberId2);
-  }
-  const fiberRuntime = new FiberRuntime(fiberId2, fiberRefs, runtime.runtimeFlags);
-  let effect = self;
-  if (options == null ? void 0 : options.scope) {
-    effect = flatMap$1(fork(options.scope, sequential), (closeableScope) => zipRight(scopeAddFinalizer(closeableScope, fiberIdWith((id) => equals$1(id, fiberRuntime.id()) ? void_ : interruptAsFiber(fiberRuntime, id))), onExit(self, (exit2) => close(closeableScope, exit2))));
-  }
-  const supervisor = fiberRuntime._supervisor;
-  if (supervisor !== none$2) {
-    supervisor.onStart(runtime.context, effect, none$6(), fiberRuntime);
-    fiberRuntime.addObserver((exit2) => supervisor.onEnd(exit2, fiberRuntime));
-  }
-  globalScope.add(runtime.runtimeFlags, fiberRuntime);
-  if ((options == null ? void 0 : options.immediate) === false) {
-    fiberRuntime.resume(effect);
-  } else {
-    fiberRuntime.start(effect);
-  }
-  return fiberRuntime;
-};
-const unsafeRunCallback = (runtime) => (effect, options = {}) => {
-  const fiberRuntime = unsafeFork(runtime)(effect, options);
-  if (options.onExit) {
-    fiberRuntime.addObserver((exit2) => {
-      options.onExit(exit2);
-    });
-  }
-  return (id, cancelOptions) => unsafeRunCallback(runtime)(pipe(fiberRuntime, interruptAs(id ?? none$4)), {
-    ...cancelOptions,
-    onExit: (cancelOptions == null ? void 0 : cancelOptions.onExit) ? (exit2) => cancelOptions.onExit(flatten(exit2)) : void 0
-  });
-};
-const FiberFailureId = /* @__PURE__ */ Symbol.for("effect/Runtime/FiberFailure");
-const FiberFailureCauseId = /* @__PURE__ */ Symbol.for("effect/Runtime/FiberFailure/Cause");
-class FiberFailureImpl extends Error {
-  constructor(cause) {
+}, lo = /* @__PURE__ */ Symbol.for("effect/Runtime/FiberFailure"), fo = /* @__PURE__ */ Symbol.for("effect/Runtime/FiberFailure/Cause");
+var Ok, Rk;
+class yw extends Error {
+  constructor(n) {
     super();
-    __publicField(this, _O);
-    __publicField(this, _P);
-    this[FiberFailureId] = FiberFailureId;
-    this[FiberFailureCauseId] = cause;
-    const prettyErrors$1 = prettyErrors(cause);
-    if (prettyErrors$1.length > 0) {
-      const head2 = prettyErrors$1[0];
-      this.name = head2.name;
-      this.message = head2.message;
-      this.stack = head2.stack;
+    f(this, Ok);
+    f(this, Rk);
+    this[lo] = lo, this[fo] = n;
+    const r = kl(n);
+    if (r.length > 0) {
+      const s = r[0];
+      this.name = s.name, this.message = s.message, this.stack = s.stack;
     }
-    this.name = `(FiberFailure) ${this.name}`;
-    if (this.message === void 0 || this.message.length === 0) {
-      this.message = "An error has occurred";
-    }
+    this.name = `(FiberFailure) ${this.name}`, (this.message === void 0 || this.message.length === 0) && (this.message = "An error has occurred");
   }
   toJSON() {
     return {
       _id: "FiberFailure",
-      cause: this[FiberFailureCauseId].toJSON()
+      cause: this[fo].toJSON()
     };
   }
   toString() {
     return "(FiberFailure) " + (this.stack ?? this.message);
   }
-  [(_O = FiberFailureId, _P = FiberFailureCauseId, NodeInspectSymbol)]() {
+  [(Ok = lo, Rk = fo, he)]() {
     return this.toString();
   }
 }
-const fiberFailure = (cause) => {
-  const limit = Error.stackTraceLimit;
+const bw = (t) => {
+  const e = Error.stackTraceLimit;
   Error.stackTraceLimit = 0;
-  const error = new FiberFailureImpl(cause);
-  Error.stackTraceLimit = limit;
-  return error;
-};
-const fastPath = (effect) => {
-  const op = effect;
-  switch (op._op) {
+  const n = new yw(t);
+  return Error.stackTraceLimit = e, n;
+}, vw = (t) => {
+  const e = t;
+  switch (e._op) {
     case "Failure":
-    case "Success": {
-      return op;
-    }
-    case "Left": {
-      return exitFail(op.left);
-    }
-    case "Right": {
-      return exitSucceed(op.right);
-    }
-    case "Some": {
-      return exitSucceed(op.value);
-    }
-    case "None": {
-      return exitFail(NoSuchElementException());
-    }
+    case "Success":
+      return e;
+    case "Left":
+      return Ea(e.left);
+    case "Right":
+      return Oe(e.right);
+    case "Some":
+      return Oe(e.value);
+    case "None":
+      return Ea(Gl());
   }
-};
-const unsafeRunPromise = (runtime) => (effect, options) => unsafeRunPromiseExit(runtime)(effect, options).then((result) => {
-  switch (result._tag) {
-    case OP_SUCCESS: {
-      return result.effect_instruction_i0;
-    }
-    case OP_FAILURE: {
-      throw fiberFailure(result.effect_instruction_i0);
-    }
+}, Sw = (t) => (e, n) => ww(t)(e, n).then((r) => {
+  switch (r._tag) {
+    case Le:
+      return r.effect_instruction_i0;
+    case je:
+      throw bw(r.effect_instruction_i0);
   }
+}), ww = (t) => (e, n) => new Promise((r) => {
+  const s = vw(e);
+  s && r(s);
+  const o = Gf(t)(e);
+  o.addObserver((c) => {
+    r(c);
+  }), (n == null ? void 0 : n.signal) !== void 0 && (n.signal.aborted ? o.unsafeInterruptAsFork(o.id()) : n.signal.addEventListener("abort", () => {
+    o.unsafeInterruptAsFork(o.id());
+  }, {
+    once: !0
+  }));
 });
-const unsafeRunPromiseExit = (runtime) => (effect, options) => new Promise((resolve2) => {
-  const op = fastPath(effect);
-  if (op) {
-    resolve2(op);
-  }
-  const fiber = unsafeFork(runtime)(effect);
-  fiber.addObserver((exit2) => {
-    resolve2(exit2);
-  });
-  if ((options == null ? void 0 : options.signal) !== void 0) {
-    if (options.signal.aborted) {
-      fiber.unsafeInterruptAsFork(fiber.id());
-    } else {
-      options.signal.addEventListener("abort", () => {
-        fiber.unsafeInterruptAsFork(fiber.id());
-      }, {
-        once: true
-      });
-    }
-  }
-});
-class RuntimeImpl {
-  constructor(context, runtimeFlags, fiberRefs) {
-    __publicField(this, "context");
-    __publicField(this, "runtimeFlags");
-    __publicField(this, "fiberRefs");
-    this.context = context;
-    this.runtimeFlags = runtimeFlags;
-    this.fiberRefs = fiberRefs;
+class kw {
+  constructor(e, n, r) {
+    f(this, "context");
+    f(this, "runtimeFlags");
+    f(this, "fiberRefs");
+    this.context = e, this.runtimeFlags = n, this.fiberRefs = r;
   }
   pipe() {
-    return pipeArguments(this, arguments);
+    return A(this, arguments);
   }
 }
-const make = (options) => new RuntimeImpl(options.context, options.runtimeFlags, options.fiberRefs);
-const defaultRuntimeFlags = /* @__PURE__ */ make$d(Interruption, CooperativeYielding, RuntimeMetrics);
-const defaultRuntime = /* @__PURE__ */ make({
-  context: /* @__PURE__ */ empty$h(),
-  runtimeFlags: defaultRuntimeFlags,
-  fiberRefs: /* @__PURE__ */ empty$2()
-});
-const unsafeRunEffect = /* @__PURE__ */ unsafeRunCallback(defaultRuntime);
-const unsafeRunPromiseEffect = /* @__PURE__ */ unsafeRunPromise(defaultRuntime);
-const async = async$1;
-const promise = promise$1;
-const _void = void_;
-const flatMap = flatMap$1;
-const raceAll = raceAll$1;
-const runCallback = unsafeRunEffect;
-const runPromise = unsafeRunPromiseEffect;
-exports.Work = void 0;
-(function(Work2) {
-  function Seq(lhs, rhs) {
-    return flatMap(lhs, (x) => x == null ? rhs : Work2.Seq(x, rhs));
+const Ew = (t) => new kw(t.context, t.runtimeFlags, t.fiberRefs), Ow = /* @__PURE__ */ pl(En, hl, fl), Yf = /* @__PURE__ */ Ew({
+  context: /* @__PURE__ */ di(),
+  runtimeFlags: Ow,
+  fiberRefs: /* @__PURE__ */ pv()
+}), Rw = /* @__PURE__ */ zf(Yf), Iw = /* @__PURE__ */ Sw(Yf), Ga = lt, Cw = Bv, Tw = Ue, $w = T, Fw = fw, Aw = Rw, Mw = Iw;
+class cn {
+  constructor(e) {
+    f(this, "_apply");
+    this._apply = e;
   }
-  Work2.Seq = Seq;
-  function Par(self, that) {
-    return raceAll([self, that]);
-  }
-  Work2.Par = Par;
-  Work2.ZERO = _void;
-  function fromPromise(promise2) {
-    return async((callback, signal) => {
-      promise2.then((value) => callback(value));
-    });
-  }
-  Work2.fromPromise = fromPromise;
-  function fromThunk(thunk) {
-    return async((callback, signal) => {
-      callback(thunk());
-    });
-  }
-  Work2.fromThunk = fromThunk;
-  function Submit(self) {
-    return runCallback(self);
-  }
-  Work2.Submit = Submit;
-  function Promise2(self) {
-    return runPromise(self);
-  }
-  Work2.Promise = Promise2;
-})(exports.Work || (exports.Work = {}));
-class Apply {
-  constructor(_apply) {
-    __publicField(this, "_apply");
-    this._apply = _apply;
-  }
-  apply(a) {
-    return this._apply(a);
+  apply(e) {
+    return this._apply(e);
   }
 }
-class Cont extends Apply {
+class Pw extends cn {
 }
-class Settler extends Cont {
+class Qf extends Pw {
 }
-class Allocator extends Settler {
-  flat_fold(fn) {
-    return new Allocator((cont) => {
-      return this.apply(new Apply((p) => {
-        let a = p.then((outcome) => {
-          return fn(outcome);
-        });
-        let b = a.then((x) => {
-          let a2 = x.apply(cont);
-          return a2;
-        });
-        let c = exports.Work.fromPromise(b);
-        return c;
-      }));
-    });
+class Mt extends Qf {
+  flat_fold(e) {
+    return new Mt(
+      (n) => this.apply(
+        new cn(
+          (r) => {
+            let o = r.then(
+              (a) => e(a)
+            ).then(
+              (a) => a.apply(n)
+            );
+            return _e.fromPromise(o);
+          }
+        )
+      )
+    );
   }
-  zip(that) {
-    return Allocator.Zip(this, that);
+  zip(e) {
+    return Mt.Zip(this, e);
   }
-  static Zip(self, that) {
-    return new Allocator((f) => {
-      var lhs = null;
-      var rhs = null;
-      let work_left = self.apply(new Apply((ocI) => {
-        lhs = ocI;
-        return exports.Work.ZERO;
-      }));
-      var work_right = that.apply(new Apply((ocII) => {
-        rhs = ocII;
-        return exports.Work.ZERO;
-      }));
-      return exports.Work.Seq(exports.Work.Par(work_left, work_right), f.apply(Promise.all([lhs, rhs]).then((values) => {
-        let tuple = [values[0], values[1]];
-        return tuple;
-      })));
-    });
+  static Zip(e, n) {
+    return new Mt(
+      (r) => {
+        var s = null, o = null;
+        let c = e.apply(
+          new cn((u) => (s = u, _e.ZERO))
+        );
+        var a = n.apply(
+          new cn((u) => (o = u, _e.ZERO))
+        );
+        return _e.Seq(
+          _e.Par(c, a),
+          r.apply(
+            Promise.all([s, o]).then(
+              (u) => [u[0], u[1]]
+            )
+          )
+        );
+      }
+    );
   }
 }
-class Junction extends Settler {
-  receive(receiver) {
-    return receiver.apply(new Apply((a) => {
-      return this.apply(new Apply((b) => {
-        return exports.Work.fromPromise(a.then((v) => {
-          b.resolve(v);
-          return exports.Work.ZERO;
-        }));
-      }));
-    }));
+var _e;
+((t) => {
+  function e(a, u) {
+    return $w(
+      a,
+      (h) => h == null ? u : t.Seq(h, u)
+    );
   }
-  static later(payload) {
-    return new Allocator((fn) => {
-      return fn.apply(payload);
+  t.Seq = e;
+  function n(a, u) {
+    return Fw([a, u]);
+  }
+  t.Par = n, t.ZERO = Tw;
+  function r(a) {
+    return Ga((u, h) => {
+      a.then(
+        (b) => u(b)
+      );
     });
   }
-  static issue(self) {
-    return new Allocator(function(fn) {
-      let promise2 = new Promise((resolve2) => {
-        resolve2(self);
-      });
-      return fn.apply(promise2);
+  t.fromPromise = r;
+  function s(a) {
+    return Ga((u, h) => {
+      u(a());
     });
   }
-  static Pure(deferred) {
-    return new Junction((a) => {
-      return a.apply(deferred);
-    });
+  t.fromThunk = s;
+  function o(a) {
+    return Aw(a);
+  }
+  t.Submit = o;
+  function c(a) {
+    return Mw(a);
+  }
+  t.Promise = c;
+})(_e || (_e = {}));
+class Pe extends Qf {
+  receive(e) {
+    return e.apply(
+      new cn(
+        (n) => this.apply(
+          new cn(
+            (r) => _e.fromPromise(
+              n.then(
+                (s) => (r.resolve(s), _e.ZERO)
+              )
+            )
+          )
+        )
+      )
+    );
+  }
+  static later(e) {
+    return new Mt(
+      (n) => n.apply(e)
+    );
+  }
+  static issue(e) {
+    return new Mt(
+      function(n) {
+        let r = new Promise(
+          (s) => {
+            s(e);
+          }
+        );
+        return n.apply(r);
+      }
+    );
+  }
+  static Pure(e) {
+    return new Pe(
+      (n) => n.apply(e)
+    );
   }
   /**Takes a resolver to use later that may return Work to be done in a scheduler once all inputs are known*/
   static Unit() {
-    return new Junction((a) => {
-      return a.apply(new Deferred_1());
+    return new Pe(
+      (e) => e.apply(new Kt())
+    );
+  }
+}
+var x = {};
+/**
+ * @license React
+ * react.production.min.js
+ *
+ * Copyright (c) Facebook, Inc. and its affiliates.
+ *
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
+ */
+var za;
+function Nw() {
+  if (za)
+    return x;
+  za = 1;
+  var t = Symbol.for("react.element"), e = Symbol.for("react.portal"), n = Symbol.for("react.fragment"), r = Symbol.for("react.strict_mode"), s = Symbol.for("react.profiler"), o = Symbol.for("react.provider"), c = Symbol.for("react.context"), a = Symbol.for("react.forward_ref"), u = Symbol.for("react.suspense"), h = Symbol.for("react.memo"), b = Symbol.for("react.lazy"), y = Symbol.iterator;
+  function k(d) {
+    return d === null || typeof d != "object" ? null : (d = y && d[y] || d["@@iterator"], typeof d == "function" ? d : null);
+  }
+  var w = { isMounted: function() {
+    return !1;
+  }, enqueueForceUpdate: function() {
+  }, enqueueReplaceState: function() {
+  }, enqueueSetState: function() {
+  } }, R = Object.assign, J = {};
+  function B(d, v, U) {
+    this.props = d, this.context = v, this.refs = J, this.updater = U || w;
+  }
+  B.prototype.isReactComponent = {}, B.prototype.setState = function(d, v) {
+    if (typeof d != "object" && typeof d != "function" && d != null)
+      throw Error("setState(...): takes an object of state variables to update or a function which returns an object of state variables.");
+    this.updater.enqueueSetState(this, d, v, "setState");
+  }, B.prototype.forceUpdate = function(d) {
+    this.updater.enqueueForceUpdate(this, d, "forceUpdate");
+  };
+  function ce() {
+  }
+  ce.prototype = B.prototype;
+  function Y(d, v, U) {
+    this.props = d, this.context = v, this.refs = J, this.updater = U || w;
+  }
+  var we = Y.prototype = new ce();
+  we.constructor = Y, R(we, B.prototype), we.isPureReactComponent = !0;
+  var de = Array.isArray, G = Object.prototype.hasOwnProperty, be = { current: null }, Ce = { key: !0, ref: !0, __self: !0, __source: !0 };
+  function ne(d, v, U) {
+    var V, W = {}, ae = null, re = null;
+    if (v != null)
+      for (V in v.ref !== void 0 && (re = v.ref), v.key !== void 0 && (ae = "" + v.key), v)
+        G.call(v, V) && !Ce.hasOwnProperty(V) && (W[V] = v[V]);
+    var se = arguments.length - 2;
+    if (se === 1)
+      W.children = U;
+    else if (1 < se) {
+      for (var X = Array(se), $e = 0; $e < se; $e++)
+        X[$e] = arguments[$e + 2];
+      W.children = X;
+    }
+    if (d && d.defaultProps)
+      for (V in se = d.defaultProps, se)
+        W[V] === void 0 && (W[V] = se[V]);
+    return { $$typeof: t, type: d, key: ae, ref: re, props: W, _owner: be.current };
+  }
+  function ve(d, v) {
+    return { $$typeof: t, type: d.type, key: v, ref: d.ref, props: d.props, _owner: d._owner };
+  }
+  function ke(d) {
+    return typeof d == "object" && d !== null && d.$$typeof === t;
+  }
+  function pe(d) {
+    var v = { "=": "=0", ":": "=2" };
+    return "$" + d.replace(/[=:]/g, function(U) {
+      return v[U];
     });
   }
-}
-class Fun {
-  constructor(_apply) {
-    __publicField(this, "_apply");
-    this._apply = _apply;
+  var Te = /\/+/g;
+  function ot(d, v) {
+    return typeof d == "object" && d !== null && d.key != null ? pe("" + d.key) : v.toString(36);
   }
-  defer(p, cont) {
-    return cont.receive(Junction.issue(this._apply(p)));
-  }
-}
-let Anon$1 = class Anon {
-  constructor(_defer) {
-    __publicField(this, "_defer");
-    this._defer = _defer;
-  }
-  defer(p, cont) {
-    return this._defer(p, cont);
-  }
-};
-let Unit$1 = class Unit extends Fun {
-  constructor() {
-    super((p) => p);
-  }
-};
-function forward(self, p) {
-  return new Allocator((k) => {
-    let deferred = new Deferred_1();
-    let fst = self.defer(p, new Junction((t_sink) => {
-      let result = t_sink.apply(deferred);
-      return result;
-    }));
-    let snd = k.apply(deferred.promise);
-    return exports.Work.Seq(fst, snd);
-  });
-}
-function resolve(self, input) {
-  let deferred = new Deferred_1();
-  let cycle = self.defer(input, Junction.Pure(deferred));
-  let finish = exports.Work.Promise(cycle);
-  return finish.then((_) => {
-    return deferred.promise.then((x) => {
-      return x;
-    });
-  });
-}
-function unit() {
-  return new Fun((pi) => {
-    return null;
-  });
-}
-class EventArrowlet {
-  constructor(event_name) {
-    __publicField(this, "event_name");
-    this.event_name = event_name;
-  }
-  defer(target, cont) {
-    let event_handler_removed = false;
-    let deferred = new Deferred_1();
-    let handler = {
-      handleEvent: function(evt) {
-        console.log("loaded");
-        deferred.resolve(evt);
-        event_handler_removed = true;
-        target.removeEventListener(this.event_name, handler);
+  function xe(d, v, U, V, W) {
+    var ae = typeof d;
+    (ae === "undefined" || ae === "boolean") && (d = null);
+    var re = !1;
+    if (d === null)
+      re = !0;
+    else
+      switch (ae) {
+        case "string":
+        case "number":
+          re = !0;
+          break;
+        case "object":
+          switch (d.$$typeof) {
+            case t:
+            case e:
+              re = !0;
+          }
       }
-    };
-    target.addEventListener(this.event_name, handler);
-    let canceller = exports.Work.fromThunk(() => {
-      if (!event_handler_removed) {
-        target.removeEventListener(this.event_name, handler);
+    if (re)
+      return re = d, W = W(re), d = V === "" ? "." + ot(re, 0) : V, de(W) ? (U = "", d != null && (U = d.replace(Te, "$&/") + "/"), xe(W, v, U, "", function($e) {
+        return $e;
+      })) : W != null && (ke(W) && (W = ve(W, U + (!W.key || re && re.key === W.key ? "" : ("" + W.key).replace(Te, "$&/") + "/") + d)), v.push(W)), 1;
+    if (re = 0, V = V === "" ? "." : V + ":", de(d))
+      for (var se = 0; se < d.length; se++) {
+        ae = d[se];
+        var X = V + ot(ae, se);
+        re += xe(ae, v, U, X, W);
       }
-      return null;
-    });
-    return exports.Work.Seq(cont.receive(Junction.later(deferred.promise)), canceller);
+    else if (X = k(d), typeof X == "function")
+      for (d = X.call(d), se = 0; !(ae = d.next()).done; )
+        ae = ae.value, X = V + ot(ae, se++), re += xe(ae, v, U, X, W);
+    else if (ae === "object")
+      throw v = String(d), Error("Objects are not valid as a React child (found: " + (v === "[object Object]" ? "object with keys {" + Object.keys(d).join(", ") + "}" : v) + "). If you meant to render a collection of children, use an array instead.");
+    return re;
   }
+  function Re(d, v, U) {
+    if (d == null)
+      return d;
+    var V = [], W = 0;
+    return xe(d, V, "", "", function(ae) {
+      return v.call(U, ae, W++);
+    }), V;
+  }
+  function ge(d) {
+    if (d._status === -1) {
+      var v = d._result;
+      v = v(), v.then(function(U) {
+        (d._status === 0 || d._status === -1) && (d._status = 1, d._result = U);
+      }, function(U) {
+        (d._status === 0 || d._status === -1) && (d._status = 2, d._result = U);
+      }), d._status === -1 && (d._status = 0, d._result = v);
+    }
+    if (d._status === 1)
+      return d._result.default;
+    throw d._result;
+  }
+  var E = { current: null }, qe = { transition: null }, pt = { ReactCurrentDispatcher: E, ReactCurrentBatchConfig: qe, ReactCurrentOwner: be };
+  function We() {
+    throw Error("act(...) is not supported in production builds of React.");
+  }
+  return x.Children = { map: Re, forEach: function(d, v, U) {
+    Re(d, function() {
+      v.apply(this, arguments);
+    }, U);
+  }, count: function(d) {
+    var v = 0;
+    return Re(d, function() {
+      v++;
+    }), v;
+  }, toArray: function(d) {
+    return Re(d, function(v) {
+      return v;
+    }) || [];
+  }, only: function(d) {
+    if (!ke(d))
+      throw Error("React.Children.only expected to receive a single React element child.");
+    return d;
+  } }, x.Component = B, x.Fragment = n, x.Profiler = s, x.PureComponent = Y, x.StrictMode = r, x.Suspense = u, x.__SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED = pt, x.act = We, x.cloneElement = function(d, v, U) {
+    if (d == null)
+      throw Error("React.cloneElement(...): The argument must be a React element, but you passed " + d + ".");
+    var V = R({}, d.props), W = d.key, ae = d.ref, re = d._owner;
+    if (v != null) {
+      if (v.ref !== void 0 && (ae = v.ref, re = be.current), v.key !== void 0 && (W = "" + v.key), d.type && d.type.defaultProps)
+        var se = d.type.defaultProps;
+      for (X in v)
+        G.call(v, X) && !Ce.hasOwnProperty(X) && (V[X] = v[X] === void 0 && se !== void 0 ? se[X] : v[X]);
+    }
+    var X = arguments.length - 2;
+    if (X === 1)
+      V.children = U;
+    else if (1 < X) {
+      se = Array(X);
+      for (var $e = 0; $e < X; $e++)
+        se[$e] = arguments[$e + 2];
+      V.children = se;
+    }
+    return { $$typeof: t, type: d.type, key: W, ref: ae, props: V, _owner: re };
+  }, x.createContext = function(d) {
+    return d = { $$typeof: c, _currentValue: d, _currentValue2: d, _threadCount: 0, Provider: null, Consumer: null, _defaultValue: null, _globalName: null }, d.Provider = { $$typeof: o, _context: d }, d.Consumer = d;
+  }, x.createElement = ne, x.createFactory = function(d) {
+    var v = ne.bind(null, d);
+    return v.type = d, v;
+  }, x.createRef = function() {
+    return { current: null };
+  }, x.forwardRef = function(d) {
+    return { $$typeof: a, render: d };
+  }, x.isValidElement = ke, x.lazy = function(d) {
+    return { $$typeof: b, _payload: { _status: -1, _result: d }, _init: ge };
+  }, x.memo = function(d, v) {
+    return { $$typeof: h, type: d, compare: v === void 0 ? null : v };
+  }, x.startTransition = function(d) {
+    var v = qe.transition;
+    qe.transition = {};
+    try {
+      d();
+    } finally {
+      qe.transition = v;
+    }
+  }, x.unstable_act = We, x.useCallback = function(d, v) {
+    return E.current.useCallback(d, v);
+  }, x.useContext = function(d) {
+    return E.current.useContext(d);
+  }, x.useDebugValue = function() {
+  }, x.useDeferredValue = function(d) {
+    return E.current.useDeferredValue(d);
+  }, x.useEffect = function(d, v) {
+    return E.current.useEffect(d, v);
+  }, x.useId = function() {
+    return E.current.useId();
+  }, x.useImperativeHandle = function(d, v, U) {
+    return E.current.useImperativeHandle(d, v, U);
+  }, x.useInsertionEffect = function(d, v) {
+    return E.current.useInsertionEffect(d, v);
+  }, x.useLayoutEffect = function(d, v) {
+    return E.current.useLayoutEffect(d, v);
+  }, x.useMemo = function(d, v) {
+    return E.current.useMemo(d, v);
+  }, x.useReducer = function(d, v, U) {
+    return E.current.useReducer(d, v, U);
+  }, x.useRef = function(d) {
+    return E.current.useRef(d);
+  }, x.useState = function(d) {
+    return E.current.useState(d);
+  }, x.useSyncExternalStore = function(d, v, U) {
+    return E.current.useSyncExternalStore(d, v, U);
+  }, x.useTransition = function() {
+    return E.current.useTransition();
+  }, x.version = "18.3.1", x;
 }
-let Then$1 = class Then {
-  constructor(lhs, rhs) {
-    __publicField(this, "lhs");
-    __publicField(this, "rhs");
-    this.lhs = lhs;
-    this.rhs = rhs;
+var Un = { exports: {} };
+/**
+ * @license React
+ * react.development.js
+ *
+ * Copyright (c) Facebook, Inc. and its affiliates.
+ *
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
+ */
+Un.exports;
+var Ya;
+function xw() {
+  return Ya || (Ya = 1, function(t, e) {
+    process.env.NODE_ENV !== "production" && function() {
+      typeof __REACT_DEVTOOLS_GLOBAL_HOOK__ < "u" && typeof __REACT_DEVTOOLS_GLOBAL_HOOK__.registerInternalModuleStart == "function" && __REACT_DEVTOOLS_GLOBAL_HOOK__.registerInternalModuleStart(new Error());
+      var n = "18.3.1", r = Symbol.for("react.element"), s = Symbol.for("react.portal"), o = Symbol.for("react.fragment"), c = Symbol.for("react.strict_mode"), a = Symbol.for("react.profiler"), u = Symbol.for("react.provider"), h = Symbol.for("react.context"), b = Symbol.for("react.forward_ref"), y = Symbol.for("react.suspense"), k = Symbol.for("react.suspense_list"), w = Symbol.for("react.memo"), R = Symbol.for("react.lazy"), J = Symbol.for("react.offscreen"), B = Symbol.iterator, ce = "@@iterator";
+      function Y(i) {
+        if (i === null || typeof i != "object")
+          return null;
+        var l = B && i[B] || i[ce];
+        return typeof l == "function" ? l : null;
+      }
+      var we = {
+        /**
+         * @internal
+         * @type {ReactComponent}
+         */
+        current: null
+      }, de = {
+        transition: null
+      }, G = {
+        current: null,
+        // Used to reproduce behavior of `batchedUpdates` in legacy mode.
+        isBatchingLegacy: !1,
+        didScheduleLegacyUpdate: !1
+      }, be = {
+        /**
+         * @internal
+         * @type {ReactComponent}
+         */
+        current: null
+      }, Ce = {}, ne = null;
+      function ve(i) {
+        ne = i;
+      }
+      Ce.setExtraStackFrame = function(i) {
+        ne = i;
+      }, Ce.getCurrentStack = null, Ce.getStackAddendum = function() {
+        var i = "";
+        ne && (i += ne);
+        var l = Ce.getCurrentStack;
+        return l && (i += l() || ""), i;
+      };
+      var ke = !1, pe = !1, Te = !1, ot = !1, xe = !1, Re = {
+        ReactCurrentDispatcher: we,
+        ReactCurrentBatchConfig: de,
+        ReactCurrentOwner: be
+      };
+      Re.ReactDebugCurrentFrame = Ce, Re.ReactCurrentActQueue = G;
+      function ge(i) {
+        {
+          for (var l = arguments.length, p = new Array(l > 1 ? l - 1 : 0), _ = 1; _ < l; _++)
+            p[_ - 1] = arguments[_];
+          qe("warn", i, p);
+        }
+      }
+      function E(i) {
+        {
+          for (var l = arguments.length, p = new Array(l > 1 ? l - 1 : 0), _ = 1; _ < l; _++)
+            p[_ - 1] = arguments[_];
+          qe("error", i, p);
+        }
+      }
+      function qe(i, l, p) {
+        {
+          var _ = Re.ReactDebugCurrentFrame, S = _.getStackAddendum();
+          S !== "" && (l += "%s", p = p.concat([S]));
+          var C = p.map(function(O) {
+            return String(O);
+          });
+          C.unshift("Warning: " + l), Function.prototype.apply.call(console[i], console, C);
+        }
+      }
+      var pt = {};
+      function We(i, l) {
+        {
+          var p = i.constructor, _ = p && (p.displayName || p.name) || "ReactClass", S = _ + "." + l;
+          if (pt[S])
+            return;
+          E("Can't call %s on a component that is not yet mounted. This is a no-op, but it might indicate a bug in your application. Instead, assign to `this.state` directly or define a `state = {};` class property with the desired state in the %s component.", l, _), pt[S] = !0;
+        }
+      }
+      var d = {
+        /**
+         * Checks whether or not this composite component is mounted.
+         * @param {ReactClass} publicInstance The instance we want to test.
+         * @return {boolean} True if mounted, false otherwise.
+         * @protected
+         * @final
+         */
+        isMounted: function(i) {
+          return !1;
+        },
+        /**
+         * Forces an update. This should only be invoked when it is known with
+         * certainty that we are **not** in a DOM transaction.
+         *
+         * You may want to call this when you know that some deeper aspect of the
+         * component's state has changed but `setState` was not called.
+         *
+         * This will not invoke `shouldComponentUpdate`, but it will invoke
+         * `componentWillUpdate` and `componentDidUpdate`.
+         *
+         * @param {ReactClass} publicInstance The instance that should rerender.
+         * @param {?function} callback Called after component is updated.
+         * @param {?string} callerName name of the calling function in the public API.
+         * @internal
+         */
+        enqueueForceUpdate: function(i, l, p) {
+          We(i, "forceUpdate");
+        },
+        /**
+         * Replaces all of the state. Always use this or `setState` to mutate state.
+         * You should treat `this.state` as immutable.
+         *
+         * There is no guarantee that `this.state` will be immediately updated, so
+         * accessing `this.state` after calling this method may return the old value.
+         *
+         * @param {ReactClass} publicInstance The instance that should rerender.
+         * @param {object} completeState Next state.
+         * @param {?function} callback Called after component is updated.
+         * @param {?string} callerName name of the calling function in the public API.
+         * @internal
+         */
+        enqueueReplaceState: function(i, l, p, _) {
+          We(i, "replaceState");
+        },
+        /**
+         * Sets a subset of the state. This only exists because _pendingState is
+         * internal. This provides a merging strategy that is not available to deep
+         * properties which is confusing. TODO: Expose pendingState or don't use it
+         * during the merge.
+         *
+         * @param {ReactClass} publicInstance The instance that should rerender.
+         * @param {object} partialState Next partial state to be merged with state.
+         * @param {?function} callback Called after component is updated.
+         * @param {?string} Name of the calling function in the public API.
+         * @internal
+         */
+        enqueueSetState: function(i, l, p, _) {
+          We(i, "setState");
+        }
+      }, v = Object.assign, U = {};
+      Object.freeze(U);
+      function V(i, l, p) {
+        this.props = i, this.context = l, this.refs = U, this.updater = p || d;
+      }
+      V.prototype.isReactComponent = {}, V.prototype.setState = function(i, l) {
+        if (typeof i != "object" && typeof i != "function" && i != null)
+          throw new Error("setState(...): takes an object of state variables to update or a function which returns an object of state variables.");
+        this.updater.enqueueSetState(this, i, l, "setState");
+      }, V.prototype.forceUpdate = function(i) {
+        this.updater.enqueueForceUpdate(this, i, "forceUpdate");
+      };
+      {
+        var W = {
+          isMounted: ["isMounted", "Instead, make sure to clean up subscriptions and pending requests in componentWillUnmount to prevent memory leaks."],
+          replaceState: ["replaceState", "Refactor your code to use setState instead (see https://github.com/facebook/react/issues/3236)."]
+        }, ae = function(i, l) {
+          Object.defineProperty(V.prototype, i, {
+            get: function() {
+              ge("%s(...) is deprecated in plain JavaScript React classes. %s", l[0], l[1]);
+            }
+          });
+        };
+        for (var re in W)
+          W.hasOwnProperty(re) && ae(re, W[re]);
+      }
+      function se() {
+      }
+      se.prototype = V.prototype;
+      function X(i, l, p) {
+        this.props = i, this.context = l, this.refs = U, this.updater = p || d;
+      }
+      var $e = X.prototype = new se();
+      $e.constructor = X, v($e, V.prototype), $e.isPureReactComponent = !0;
+      function eh() {
+        var i = {
+          current: null
+        };
+        return Object.seal(i), i;
+      }
+      var th = Array.isArray;
+      function br(i) {
+        return th(i);
+      }
+      function nh(i) {
+        {
+          var l = typeof Symbol == "function" && Symbol.toStringTag, p = l && i[Symbol.toStringTag] || i.constructor.name || "Object";
+          return p;
+        }
+      }
+      function rh(i) {
+        try {
+          return ac(i), !1;
+        } catch {
+          return !0;
+        }
+      }
+      function ac(i) {
+        return "" + i;
+      }
+      function vr(i) {
+        if (rh(i))
+          return E("The provided key is an unsupported type %s. This value must be coerced to a string before before using it here.", nh(i)), ac(i);
+      }
+      function sh(i, l, p) {
+        var _ = i.displayName;
+        if (_)
+          return _;
+        var S = l.displayName || l.name || "";
+        return S !== "" ? p + "(" + S + ")" : p;
+      }
+      function uc(i) {
+        return i.displayName || "Context";
+      }
+      function gt(i) {
+        if (i == null)
+          return null;
+        if (typeof i.tag == "number" && E("Received an unexpected object in getComponentNameFromType(). This is likely a bug in React. Please file an issue."), typeof i == "function")
+          return i.displayName || i.name || null;
+        if (typeof i == "string")
+          return i;
+        switch (i) {
+          case o:
+            return "Fragment";
+          case s:
+            return "Portal";
+          case a:
+            return "Profiler";
+          case c:
+            return "StrictMode";
+          case y:
+            return "Suspense";
+          case k:
+            return "SuspenseList";
+        }
+        if (typeof i == "object")
+          switch (i.$$typeof) {
+            case h:
+              var l = i;
+              return uc(l) + ".Consumer";
+            case u:
+              var p = i;
+              return uc(p._context) + ".Provider";
+            case b:
+              return sh(i, i.render, "ForwardRef");
+            case w:
+              var _ = i.displayName || null;
+              return _ !== null ? _ : gt(i.type) || "Memo";
+            case R: {
+              var S = i, C = S._payload, O = S._init;
+              try {
+                return gt(O(C));
+              } catch {
+                return null;
+              }
+            }
+          }
+        return null;
+      }
+      var Fn = Object.prototype.hasOwnProperty, lc = {
+        key: !0,
+        ref: !0,
+        __self: !0,
+        __source: !0
+      }, fc, hc, xs;
+      xs = {};
+      function dc(i) {
+        if (Fn.call(i, "ref")) {
+          var l = Object.getOwnPropertyDescriptor(i, "ref").get;
+          if (l && l.isReactWarning)
+            return !1;
+        }
+        return i.ref !== void 0;
+      }
+      function pc(i) {
+        if (Fn.call(i, "key")) {
+          var l = Object.getOwnPropertyDescriptor(i, "key").get;
+          if (l && l.isReactWarning)
+            return !1;
+        }
+        return i.key !== void 0;
+      }
+      function oh(i, l) {
+        var p = function() {
+          fc || (fc = !0, E("%s: `key` is not a prop. Trying to access it will result in `undefined` being returned. If you need to access the same value within the child component, you should pass it as a different prop. (https://reactjs.org/link/special-props)", l));
+        };
+        p.isReactWarning = !0, Object.defineProperty(i, "key", {
+          get: p,
+          configurable: !0
+        });
+      }
+      function ih(i, l) {
+        var p = function() {
+          hc || (hc = !0, E("%s: `ref` is not a prop. Trying to access it will result in `undefined` being returned. If you need to access the same value within the child component, you should pass it as a different prop. (https://reactjs.org/link/special-props)", l));
+        };
+        p.isReactWarning = !0, Object.defineProperty(i, "ref", {
+          get: p,
+          configurable: !0
+        });
+      }
+      function ch(i) {
+        if (typeof i.ref == "string" && be.current && i.__self && be.current.stateNode !== i.__self) {
+          var l = gt(be.current.type);
+          xs[l] || (E('Component "%s" contains the string ref "%s". Support for string refs will be removed in a future major release. This case cannot be automatically converted to an arrow function. We ask you to manually fix this case by using useRef() or createRef() instead. Learn more about using refs safely here: https://reactjs.org/link/strict-mode-string-ref', l, i.ref), xs[l] = !0);
+        }
+      }
+      var js = function(i, l, p, _, S, C, O) {
+        var F = {
+          // This tag allows us to uniquely identify this as a React Element
+          $$typeof: r,
+          // Built-in properties that belong on the element
+          type: i,
+          key: l,
+          ref: p,
+          props: O,
+          // Record the component responsible for creating this element.
+          _owner: C
+        };
+        return F._store = {}, Object.defineProperty(F._store, "validated", {
+          configurable: !1,
+          enumerable: !1,
+          writable: !0,
+          value: !1
+        }), Object.defineProperty(F, "_self", {
+          configurable: !1,
+          enumerable: !1,
+          writable: !1,
+          value: _
+        }), Object.defineProperty(F, "_source", {
+          configurable: !1,
+          enumerable: !1,
+          writable: !1,
+          value: S
+        }), Object.freeze && (Object.freeze(F.props), Object.freeze(F)), F;
+      };
+      function ah(i, l, p) {
+        var _, S = {}, C = null, O = null, F = null, q = null;
+        if (l != null) {
+          dc(l) && (O = l.ref, ch(l)), pc(l) && (vr(l.key), C = "" + l.key), F = l.__self === void 0 ? null : l.__self, q = l.__source === void 0 ? null : l.__source;
+          for (_ in l)
+            Fn.call(l, _) && !lc.hasOwnProperty(_) && (S[_] = l[_]);
+        }
+        var z = arguments.length - 2;
+        if (z === 1)
+          S.children = p;
+        else if (z > 1) {
+          for (var ee = Array(z), te = 0; te < z; te++)
+            ee[te] = arguments[te + 2];
+          Object.freeze && Object.freeze(ee), S.children = ee;
+        }
+        if (i && i.defaultProps) {
+          var oe = i.defaultProps;
+          for (_ in oe)
+            S[_] === void 0 && (S[_] = oe[_]);
+        }
+        if (C || O) {
+          var le = typeof i == "function" ? i.displayName || i.name || "Unknown" : i;
+          C && oh(S, le), O && ih(S, le);
+        }
+        return js(i, C, O, F, q, be.current, S);
+      }
+      function uh(i, l) {
+        var p = js(i.type, l, i.ref, i._self, i._source, i._owner, i.props);
+        return p;
+      }
+      function lh(i, l, p) {
+        if (i == null)
+          throw new Error("React.cloneElement(...): The argument must be a React element, but you passed " + i + ".");
+        var _, S = v({}, i.props), C = i.key, O = i.ref, F = i._self, q = i._source, z = i._owner;
+        if (l != null) {
+          dc(l) && (O = l.ref, z = be.current), pc(l) && (vr(l.key), C = "" + l.key);
+          var ee;
+          i.type && i.type.defaultProps && (ee = i.type.defaultProps);
+          for (_ in l)
+            Fn.call(l, _) && !lc.hasOwnProperty(_) && (l[_] === void 0 && ee !== void 0 ? S[_] = ee[_] : S[_] = l[_]);
+        }
+        var te = arguments.length - 2;
+        if (te === 1)
+          S.children = p;
+        else if (te > 1) {
+          for (var oe = Array(te), le = 0; le < te; le++)
+            oe[le] = arguments[le + 2];
+          S.children = oe;
+        }
+        return js(i.type, C, O, F, q, z, S);
+      }
+      function Wt(i) {
+        return typeof i == "object" && i !== null && i.$$typeof === r;
+      }
+      var gc = ".", fh = ":";
+      function hh(i) {
+        var l = /[=:]/g, p = {
+          "=": "=0",
+          ":": "=2"
+        }, _ = i.replace(l, function(S) {
+          return p[S];
+        });
+        return "$" + _;
+      }
+      var mc = !1, dh = /\/+/g;
+      function _c(i) {
+        return i.replace(dh, "$&/");
+      }
+      function Ls(i, l) {
+        return typeof i == "object" && i !== null && i.key != null ? (vr(i.key), hh("" + i.key)) : l.toString(36);
+      }
+      function Sr(i, l, p, _, S) {
+        var C = typeof i;
+        (C === "undefined" || C === "boolean") && (i = null);
+        var O = !1;
+        if (i === null)
+          O = !0;
+        else
+          switch (C) {
+            case "string":
+            case "number":
+              O = !0;
+              break;
+            case "object":
+              switch (i.$$typeof) {
+                case r:
+                case s:
+                  O = !0;
+              }
+          }
+        if (O) {
+          var F = i, q = S(F), z = _ === "" ? gc + Ls(F, 0) : _;
+          if (br(q)) {
+            var ee = "";
+            z != null && (ee = _c(z) + "/"), Sr(q, l, ee, "", function(od) {
+              return od;
+            });
+          } else
+            q != null && (Wt(q) && (q.key && (!F || F.key !== q.key) && vr(q.key), q = uh(
+              q,
+              // Keep both the (mapped) and old keys if they differ, just as
+              // traverseAllChildren used to do for objects as children
+              p + // $FlowFixMe Flow incorrectly thinks React.Portal doesn't have a key
+              (q.key && (!F || F.key !== q.key) ? (
+                // $FlowFixMe Flow incorrectly thinks existing element's key can be a number
+                // eslint-disable-next-line react-internal/safe-string-coercion
+                _c("" + q.key) + "/"
+              ) : "") + z
+            )), l.push(q));
+          return 1;
+        }
+        var te, oe, le = 0, Ee = _ === "" ? gc : _ + fh;
+        if (br(i))
+          for (var Tr = 0; Tr < i.length; Tr++)
+            te = i[Tr], oe = Ee + Ls(te, Tr), le += Sr(te, l, p, oe, S);
+        else {
+          var Ws = Y(i);
+          if (typeof Ws == "function") {
+            var Bc = i;
+            Ws === Bc.entries && (mc || ge("Using Maps as children is not supported. Use an array of keyed ReactElements instead."), mc = !0);
+            for (var rd = Ws.call(Bc), Vc, sd = 0; !(Vc = rd.next()).done; )
+              te = Vc.value, oe = Ee + Ls(te, sd++), le += Sr(te, l, p, oe, S);
+          } else if (C === "object") {
+            var Kc = String(i);
+            throw new Error("Objects are not valid as a React child (found: " + (Kc === "[object Object]" ? "object with keys {" + Object.keys(i).join(", ") + "}" : Kc) + "). If you meant to render a collection of children, use an array instead.");
+          }
+        }
+        return le;
+      }
+      function wr(i, l, p) {
+        if (i == null)
+          return i;
+        var _ = [], S = 0;
+        return Sr(i, _, "", "", function(C) {
+          return l.call(p, C, S++);
+        }), _;
+      }
+      function ph(i) {
+        var l = 0;
+        return wr(i, function() {
+          l++;
+        }), l;
+      }
+      function gh(i, l, p) {
+        wr(i, function() {
+          l.apply(this, arguments);
+        }, p);
+      }
+      function mh(i) {
+        return wr(i, function(l) {
+          return l;
+        }) || [];
+      }
+      function _h(i) {
+        if (!Wt(i))
+          throw new Error("React.Children.only expected to receive a single React element child.");
+        return i;
+      }
+      function yh(i) {
+        var l = {
+          $$typeof: h,
+          // As a workaround to support multiple concurrent renderers, we categorize
+          // some renderers as primary and others as secondary. We only expect
+          // there to be two concurrent renderers at most: React Native (primary) and
+          // Fabric (secondary); React DOM (primary) and React ART (secondary).
+          // Secondary renderers store their context values on separate fields.
+          _currentValue: i,
+          _currentValue2: i,
+          // Used to track how many concurrent renderers this context currently
+          // supports within in a single renderer. Such as parallel server rendering.
+          _threadCount: 0,
+          // These are circular
+          Provider: null,
+          Consumer: null,
+          // Add these to use same hidden class in VM as ServerContext
+          _defaultValue: null,
+          _globalName: null
+        };
+        l.Provider = {
+          $$typeof: u,
+          _context: l
+        };
+        var p = !1, _ = !1, S = !1;
+        {
+          var C = {
+            $$typeof: h,
+            _context: l
+          };
+          Object.defineProperties(C, {
+            Provider: {
+              get: function() {
+                return _ || (_ = !0, E("Rendering <Context.Consumer.Provider> is not supported and will be removed in a future major release. Did you mean to render <Context.Provider> instead?")), l.Provider;
+              },
+              set: function(O) {
+                l.Provider = O;
+              }
+            },
+            _currentValue: {
+              get: function() {
+                return l._currentValue;
+              },
+              set: function(O) {
+                l._currentValue = O;
+              }
+            },
+            _currentValue2: {
+              get: function() {
+                return l._currentValue2;
+              },
+              set: function(O) {
+                l._currentValue2 = O;
+              }
+            },
+            _threadCount: {
+              get: function() {
+                return l._threadCount;
+              },
+              set: function(O) {
+                l._threadCount = O;
+              }
+            },
+            Consumer: {
+              get: function() {
+                return p || (p = !0, E("Rendering <Context.Consumer.Consumer> is not supported and will be removed in a future major release. Did you mean to render <Context.Consumer> instead?")), l.Consumer;
+              }
+            },
+            displayName: {
+              get: function() {
+                return l.displayName;
+              },
+              set: function(O) {
+                S || (ge("Setting `displayName` on Context.Consumer has no effect. You should set it directly on the context with Context.displayName = '%s'.", O), S = !0);
+              }
+            }
+          }), l.Consumer = C;
+        }
+        return l._currentRenderer = null, l._currentRenderer2 = null, l;
+      }
+      var An = -1, Ds = 0, yc = 1, bh = 2;
+      function vh(i) {
+        if (i._status === An) {
+          var l = i._result, p = l();
+          if (p.then(function(C) {
+            if (i._status === Ds || i._status === An) {
+              var O = i;
+              O._status = yc, O._result = C;
+            }
+          }, function(C) {
+            if (i._status === Ds || i._status === An) {
+              var O = i;
+              O._status = bh, O._result = C;
+            }
+          }), i._status === An) {
+            var _ = i;
+            _._status = Ds, _._result = p;
+          }
+        }
+        if (i._status === yc) {
+          var S = i._result;
+          return S === void 0 && E(`lazy: Expected the result of a dynamic import() call. Instead received: %s
+
+Your code should look like: 
+  const MyComponent = lazy(() => import('./MyComponent'))
+
+Did you accidentally put curly braces around the import?`, S), "default" in S || E(`lazy: Expected the result of a dynamic import() call. Instead received: %s
+
+Your code should look like: 
+  const MyComponent = lazy(() => import('./MyComponent'))`, S), S.default;
+        } else
+          throw i._result;
+      }
+      function Sh(i) {
+        var l = {
+          // We use these fields to store the result.
+          _status: An,
+          _result: i
+        }, p = {
+          $$typeof: R,
+          _payload: l,
+          _init: vh
+        };
+        {
+          var _, S;
+          Object.defineProperties(p, {
+            defaultProps: {
+              configurable: !0,
+              get: function() {
+                return _;
+              },
+              set: function(C) {
+                E("React.lazy(...): It is not supported to assign `defaultProps` to a lazy component import. Either specify them where the component is defined, or create a wrapping component around it."), _ = C, Object.defineProperty(p, "defaultProps", {
+                  enumerable: !0
+                });
+              }
+            },
+            propTypes: {
+              configurable: !0,
+              get: function() {
+                return S;
+              },
+              set: function(C) {
+                E("React.lazy(...): It is not supported to assign `propTypes` to a lazy component import. Either specify them where the component is defined, or create a wrapping component around it."), S = C, Object.defineProperty(p, "propTypes", {
+                  enumerable: !0
+                });
+              }
+            }
+          });
+        }
+        return p;
+      }
+      function wh(i) {
+        i != null && i.$$typeof === w ? E("forwardRef requires a render function but received a `memo` component. Instead of forwardRef(memo(...)), use memo(forwardRef(...)).") : typeof i != "function" ? E("forwardRef requires a render function but was given %s.", i === null ? "null" : typeof i) : i.length !== 0 && i.length !== 2 && E("forwardRef render functions accept exactly two parameters: props and ref. %s", i.length === 1 ? "Did you forget to use the ref parameter?" : "Any additional parameter will be undefined."), i != null && (i.defaultProps != null || i.propTypes != null) && E("forwardRef render functions do not support propTypes or defaultProps. Did you accidentally pass a React component?");
+        var l = {
+          $$typeof: b,
+          render: i
+        };
+        {
+          var p;
+          Object.defineProperty(l, "displayName", {
+            enumerable: !1,
+            configurable: !0,
+            get: function() {
+              return p;
+            },
+            set: function(_) {
+              p = _, !i.name && !i.displayName && (i.displayName = _);
+            }
+          });
+        }
+        return l;
+      }
+      var bc;
+      bc = Symbol.for("react.module.reference");
+      function vc(i) {
+        return !!(typeof i == "string" || typeof i == "function" || i === o || i === a || xe || i === c || i === y || i === k || ot || i === J || ke || pe || Te || typeof i == "object" && i !== null && (i.$$typeof === R || i.$$typeof === w || i.$$typeof === u || i.$$typeof === h || i.$$typeof === b || // This needs to include all possible module reference object
+        // types supported by any Flight configuration anywhere since
+        // we don't know which Flight build this will end up being used
+        // with.
+        i.$$typeof === bc || i.getModuleId !== void 0));
+      }
+      function kh(i, l) {
+        vc(i) || E("memo: The first argument must be a component. Instead received: %s", i === null ? "null" : typeof i);
+        var p = {
+          $$typeof: w,
+          type: i,
+          compare: l === void 0 ? null : l
+        };
+        {
+          var _;
+          Object.defineProperty(p, "displayName", {
+            enumerable: !1,
+            configurable: !0,
+            get: function() {
+              return _;
+            },
+            set: function(S) {
+              _ = S, !i.name && !i.displayName && (i.displayName = S);
+            }
+          });
+        }
+        return p;
+      }
+      function Fe() {
+        var i = we.current;
+        return i === null && E(`Invalid hook call. Hooks can only be called inside of the body of a function component. This could happen for one of the following reasons:
+1. You might have mismatching versions of React and the renderer (such as React DOM)
+2. You might be breaking the Rules of Hooks
+3. You might have more than one copy of React in the same app
+See https://reactjs.org/link/invalid-hook-call for tips about how to debug and fix this problem.`), i;
+      }
+      function Eh(i) {
+        var l = Fe();
+        if (i._context !== void 0) {
+          var p = i._context;
+          p.Consumer === i ? E("Calling useContext(Context.Consumer) is not supported, may cause bugs, and will be removed in a future major release. Did you mean to call useContext(Context) instead?") : p.Provider === i && E("Calling useContext(Context.Provider) is not supported. Did you mean to call useContext(Context) instead?");
+        }
+        return l.useContext(i);
+      }
+      function Oh(i) {
+        var l = Fe();
+        return l.useState(i);
+      }
+      function Rh(i, l, p) {
+        var _ = Fe();
+        return _.useReducer(i, l, p);
+      }
+      function Ih(i) {
+        var l = Fe();
+        return l.useRef(i);
+      }
+      function Ch(i, l) {
+        var p = Fe();
+        return p.useEffect(i, l);
+      }
+      function Th(i, l) {
+        var p = Fe();
+        return p.useInsertionEffect(i, l);
+      }
+      function $h(i, l) {
+        var p = Fe();
+        return p.useLayoutEffect(i, l);
+      }
+      function Fh(i, l) {
+        var p = Fe();
+        return p.useCallback(i, l);
+      }
+      function Ah(i, l) {
+        var p = Fe();
+        return p.useMemo(i, l);
+      }
+      function Mh(i, l, p) {
+        var _ = Fe();
+        return _.useImperativeHandle(i, l, p);
+      }
+      function Ph(i, l) {
+        {
+          var p = Fe();
+          return p.useDebugValue(i, l);
+        }
+      }
+      function Nh() {
+        var i = Fe();
+        return i.useTransition();
+      }
+      function xh(i) {
+        var l = Fe();
+        return l.useDeferredValue(i);
+      }
+      function jh() {
+        var i = Fe();
+        return i.useId();
+      }
+      function Lh(i, l, p) {
+        var _ = Fe();
+        return _.useSyncExternalStore(i, l, p);
+      }
+      var Mn = 0, Sc, wc, kc, Ec, Oc, Rc, Ic;
+      function Cc() {
+      }
+      Cc.__reactDisabledLog = !0;
+      function Dh() {
+        {
+          if (Mn === 0) {
+            Sc = console.log, wc = console.info, kc = console.warn, Ec = console.error, Oc = console.group, Rc = console.groupCollapsed, Ic = console.groupEnd;
+            var i = {
+              configurable: !0,
+              enumerable: !0,
+              value: Cc,
+              writable: !0
+            };
+            Object.defineProperties(console, {
+              info: i,
+              log: i,
+              warn: i,
+              error: i,
+              group: i,
+              groupCollapsed: i,
+              groupEnd: i
+            });
+          }
+          Mn++;
+        }
+      }
+      function Uh() {
+        {
+          if (Mn--, Mn === 0) {
+            var i = {
+              configurable: !0,
+              enumerable: !0,
+              writable: !0
+            };
+            Object.defineProperties(console, {
+              log: v({}, i, {
+                value: Sc
+              }),
+              info: v({}, i, {
+                value: wc
+              }),
+              warn: v({}, i, {
+                value: kc
+              }),
+              error: v({}, i, {
+                value: Ec
+              }),
+              group: v({}, i, {
+                value: Oc
+              }),
+              groupCollapsed: v({}, i, {
+                value: Rc
+              }),
+              groupEnd: v({}, i, {
+                value: Ic
+              })
+            });
+          }
+          Mn < 0 && E("disabledDepth fell below zero. This is a bug in React. Please file an issue.");
+        }
+      }
+      var Us = Re.ReactCurrentDispatcher, qs;
+      function kr(i, l, p) {
+        {
+          if (qs === void 0)
+            try {
+              throw Error();
+            } catch (S) {
+              var _ = S.stack.trim().match(/\n( *(at )?)/);
+              qs = _ && _[1] || "";
+            }
+          return `
+` + qs + i;
+        }
+      }
+      var Bs = !1, Er;
+      {
+        var qh = typeof WeakMap == "function" ? WeakMap : Map;
+        Er = new qh();
+      }
+      function Tc(i, l) {
+        if (!i || Bs)
+          return "";
+        {
+          var p = Er.get(i);
+          if (p !== void 0)
+            return p;
+        }
+        var _;
+        Bs = !0;
+        var S = Error.prepareStackTrace;
+        Error.prepareStackTrace = void 0;
+        var C;
+        C = Us.current, Us.current = null, Dh();
+        try {
+          if (l) {
+            var O = function() {
+              throw Error();
+            };
+            if (Object.defineProperty(O.prototype, "props", {
+              set: function() {
+                throw Error();
+              }
+            }), typeof Reflect == "object" && Reflect.construct) {
+              try {
+                Reflect.construct(O, []);
+              } catch (Ee) {
+                _ = Ee;
+              }
+              Reflect.construct(i, [], O);
+            } else {
+              try {
+                O.call();
+              } catch (Ee) {
+                _ = Ee;
+              }
+              i.call(O.prototype);
+            }
+          } else {
+            try {
+              throw Error();
+            } catch (Ee) {
+              _ = Ee;
+            }
+            i();
+          }
+        } catch (Ee) {
+          if (Ee && _ && typeof Ee.stack == "string") {
+            for (var F = Ee.stack.split(`
+`), q = _.stack.split(`
+`), z = F.length - 1, ee = q.length - 1; z >= 1 && ee >= 0 && F[z] !== q[ee]; )
+              ee--;
+            for (; z >= 1 && ee >= 0; z--, ee--)
+              if (F[z] !== q[ee]) {
+                if (z !== 1 || ee !== 1)
+                  do
+                    if (z--, ee--, ee < 0 || F[z] !== q[ee]) {
+                      var te = `
+` + F[z].replace(" at new ", " at ");
+                      return i.displayName && te.includes("<anonymous>") && (te = te.replace("<anonymous>", i.displayName)), typeof i == "function" && Er.set(i, te), te;
+                    }
+                  while (z >= 1 && ee >= 0);
+                break;
+              }
+          }
+        } finally {
+          Bs = !1, Us.current = C, Uh(), Error.prepareStackTrace = S;
+        }
+        var oe = i ? i.displayName || i.name : "", le = oe ? kr(oe) : "";
+        return typeof i == "function" && Er.set(i, le), le;
+      }
+      function Bh(i, l, p) {
+        return Tc(i, !1);
+      }
+      function Vh(i) {
+        var l = i.prototype;
+        return !!(l && l.isReactComponent);
+      }
+      function Or(i, l, p) {
+        if (i == null)
+          return "";
+        if (typeof i == "function")
+          return Tc(i, Vh(i));
+        if (typeof i == "string")
+          return kr(i);
+        switch (i) {
+          case y:
+            return kr("Suspense");
+          case k:
+            return kr("SuspenseList");
+        }
+        if (typeof i == "object")
+          switch (i.$$typeof) {
+            case b:
+              return Bh(i.render);
+            case w:
+              return Or(i.type, l, p);
+            case R: {
+              var _ = i, S = _._payload, C = _._init;
+              try {
+                return Or(C(S), l, p);
+              } catch {
+              }
+            }
+          }
+        return "";
+      }
+      var $c = {}, Fc = Re.ReactDebugCurrentFrame;
+      function Rr(i) {
+        if (i) {
+          var l = i._owner, p = Or(i.type, i._source, l ? l.type : null);
+          Fc.setExtraStackFrame(p);
+        } else
+          Fc.setExtraStackFrame(null);
+      }
+      function Kh(i, l, p, _, S) {
+        {
+          var C = Function.call.bind(Fn);
+          for (var O in i)
+            if (C(i, O)) {
+              var F = void 0;
+              try {
+                if (typeof i[O] != "function") {
+                  var q = Error((_ || "React class") + ": " + p + " type `" + O + "` is invalid; it must be a function, usually from the `prop-types` package, but received `" + typeof i[O] + "`.This often happens because of typos such as `PropTypes.function` instead of `PropTypes.func`.");
+                  throw q.name = "Invariant Violation", q;
+                }
+                F = i[O](l, O, _, p, null, "SECRET_DO_NOT_PASS_THIS_OR_YOU_WILL_BE_FIRED");
+              } catch (z) {
+                F = z;
+              }
+              F && !(F instanceof Error) && (Rr(S), E("%s: type specification of %s `%s` is invalid; the type checker function must return `null` or an `Error` but returned a %s. You may have forgotten to pass an argument to the type checker creator (arrayOf, instanceOf, objectOf, oneOf, oneOfType, and shape all require an argument).", _ || "React class", p, O, typeof F), Rr(null)), F instanceof Error && !(F.message in $c) && ($c[F.message] = !0, Rr(S), E("Failed %s type: %s", p, F.message), Rr(null));
+            }
+        }
+      }
+      function Gt(i) {
+        if (i) {
+          var l = i._owner, p = Or(i.type, i._source, l ? l.type : null);
+          ve(p);
+        } else
+          ve(null);
+      }
+      var Vs;
+      Vs = !1;
+      function Ac() {
+        if (be.current) {
+          var i = gt(be.current.type);
+          if (i)
+            return `
+
+Check the render method of \`` + i + "`.";
+        }
+        return "";
+      }
+      function Hh(i) {
+        if (i !== void 0) {
+          var l = i.fileName.replace(/^.*[\\\/]/, ""), p = i.lineNumber;
+          return `
+
+Check your code at ` + l + ":" + p + ".";
+        }
+        return "";
+      }
+      function Jh(i) {
+        return i != null ? Hh(i.__source) : "";
+      }
+      var Mc = {};
+      function Wh(i) {
+        var l = Ac();
+        if (!l) {
+          var p = typeof i == "string" ? i : i.displayName || i.name;
+          p && (l = `
+
+Check the top-level render call using <` + p + ">.");
+        }
+        return l;
+      }
+      function Pc(i, l) {
+        if (!(!i._store || i._store.validated || i.key != null)) {
+          i._store.validated = !0;
+          var p = Wh(l);
+          if (!Mc[p]) {
+            Mc[p] = !0;
+            var _ = "";
+            i && i._owner && i._owner !== be.current && (_ = " It was passed a child from " + gt(i._owner.type) + "."), Gt(i), E('Each child in a list should have a unique "key" prop.%s%s See https://reactjs.org/link/warning-keys for more information.', p, _), Gt(null);
+          }
+        }
+      }
+      function Nc(i, l) {
+        if (typeof i == "object") {
+          if (br(i))
+            for (var p = 0; p < i.length; p++) {
+              var _ = i[p];
+              Wt(_) && Pc(_, l);
+            }
+          else if (Wt(i))
+            i._store && (i._store.validated = !0);
+          else if (i) {
+            var S = Y(i);
+            if (typeof S == "function" && S !== i.entries)
+              for (var C = S.call(i), O; !(O = C.next()).done; )
+                Wt(O.value) && Pc(O.value, l);
+          }
+        }
+      }
+      function xc(i) {
+        {
+          var l = i.type;
+          if (l == null || typeof l == "string")
+            return;
+          var p;
+          if (typeof l == "function")
+            p = l.propTypes;
+          else if (typeof l == "object" && (l.$$typeof === b || // Note: Memo only checks outer props here.
+          // Inner props are checked in the reconciler.
+          l.$$typeof === w))
+            p = l.propTypes;
+          else
+            return;
+          if (p) {
+            var _ = gt(l);
+            Kh(p, i.props, "prop", _, i);
+          } else if (l.PropTypes !== void 0 && !Vs) {
+            Vs = !0;
+            var S = gt(l);
+            E("Component %s declared `PropTypes` instead of `propTypes`. Did you misspell the property assignment?", S || "Unknown");
+          }
+          typeof l.getDefaultProps == "function" && !l.getDefaultProps.isReactClassApproved && E("getDefaultProps is only used on classic React.createClass definitions. Use a static property named `defaultProps` instead.");
+        }
+      }
+      function Gh(i) {
+        {
+          for (var l = Object.keys(i.props), p = 0; p < l.length; p++) {
+            var _ = l[p];
+            if (_ !== "children" && _ !== "key") {
+              Gt(i), E("Invalid prop `%s` supplied to `React.Fragment`. React.Fragment can only have `key` and `children` props.", _), Gt(null);
+              break;
+            }
+          }
+          i.ref !== null && (Gt(i), E("Invalid attribute `ref` supplied to `React.Fragment`."), Gt(null));
+        }
+      }
+      function jc(i, l, p) {
+        var _ = vc(i);
+        if (!_) {
+          var S = "";
+          (i === void 0 || typeof i == "object" && i !== null && Object.keys(i).length === 0) && (S += " You likely forgot to export your component from the file it's defined in, or you might have mixed up default and named imports.");
+          var C = Jh(l);
+          C ? S += C : S += Ac();
+          var O;
+          i === null ? O = "null" : br(i) ? O = "array" : i !== void 0 && i.$$typeof === r ? (O = "<" + (gt(i.type) || "Unknown") + " />", S = " Did you accidentally export a JSX literal instead of a component?") : O = typeof i, E("React.createElement: type is invalid -- expected a string (for built-in components) or a class/function (for composite components) but got: %s.%s", O, S);
+        }
+        var F = ah.apply(this, arguments);
+        if (F == null)
+          return F;
+        if (_)
+          for (var q = 2; q < arguments.length; q++)
+            Nc(arguments[q], i);
+        return i === o ? Gh(F) : xc(F), F;
+      }
+      var Lc = !1;
+      function zh(i) {
+        var l = jc.bind(null, i);
+        return l.type = i, Lc || (Lc = !0, ge("React.createFactory() is deprecated and will be removed in a future major release. Consider using JSX or use React.createElement() directly instead.")), Object.defineProperty(l, "type", {
+          enumerable: !1,
+          get: function() {
+            return ge("Factory.type is deprecated. Access the class directly before passing it to createFactory."), Object.defineProperty(this, "type", {
+              value: i
+            }), i;
+          }
+        }), l;
+      }
+      function Yh(i, l, p) {
+        for (var _ = lh.apply(this, arguments), S = 2; S < arguments.length; S++)
+          Nc(arguments[S], _.type);
+        return xc(_), _;
+      }
+      function Qh(i, l) {
+        var p = de.transition;
+        de.transition = {};
+        var _ = de.transition;
+        de.transition._updatedFibers = /* @__PURE__ */ new Set();
+        try {
+          i();
+        } finally {
+          if (de.transition = p, p === null && _._updatedFibers) {
+            var S = _._updatedFibers.size;
+            S > 10 && ge("Detected a large number of updates inside startTransition. If this is due to a subscription please re-write it to use React provided hooks. Otherwise concurrent mode guarantees are off the table."), _._updatedFibers.clear();
+          }
+        }
+      }
+      var Dc = !1, Ir = null;
+      function Xh(i) {
+        if (Ir === null)
+          try {
+            var l = ("require" + Math.random()).slice(0, 7), p = t && t[l];
+            Ir = p.call(t, "timers").setImmediate;
+          } catch {
+            Ir = function(S) {
+              Dc === !1 && (Dc = !0, typeof MessageChannel > "u" && E("This browser does not have a MessageChannel implementation, so enqueuing tasks via await act(async () => ...) will fail. Please file an issue at https://github.com/facebook/react/issues if you encounter this warning."));
+              var C = new MessageChannel();
+              C.port1.onmessage = S, C.port2.postMessage(void 0);
+            };
+          }
+        return Ir(i);
+      }
+      var zt = 0, Uc = !1;
+      function qc(i) {
+        {
+          var l = zt;
+          zt++, G.current === null && (G.current = []);
+          var p = G.isBatchingLegacy, _;
+          try {
+            if (G.isBatchingLegacy = !0, _ = i(), !p && G.didScheduleLegacyUpdate) {
+              var S = G.current;
+              S !== null && (G.didScheduleLegacyUpdate = !1, Js(S));
+            }
+          } catch (oe) {
+            throw Cr(l), oe;
+          } finally {
+            G.isBatchingLegacy = p;
+          }
+          if (_ !== null && typeof _ == "object" && typeof _.then == "function") {
+            var C = _, O = !1, F = {
+              then: function(oe, le) {
+                O = !0, C.then(function(Ee) {
+                  Cr(l), zt === 0 ? Ks(Ee, oe, le) : oe(Ee);
+                }, function(Ee) {
+                  Cr(l), le(Ee);
+                });
+              }
+            };
+            return !Uc && typeof Promise < "u" && Promise.resolve().then(function() {
+            }).then(function() {
+              O || (Uc = !0, E("You called act(async () => ...) without await. This could lead to unexpected testing behaviour, interleaving multiple act calls and mixing their scopes. You should - await act(async () => ...);"));
+            }), F;
+          } else {
+            var q = _;
+            if (Cr(l), zt === 0) {
+              var z = G.current;
+              z !== null && (Js(z), G.current = null);
+              var ee = {
+                then: function(oe, le) {
+                  G.current === null ? (G.current = [], Ks(q, oe, le)) : oe(q);
+                }
+              };
+              return ee;
+            } else {
+              var te = {
+                then: function(oe, le) {
+                  oe(q);
+                }
+              };
+              return te;
+            }
+          }
+        }
+      }
+      function Cr(i) {
+        i !== zt - 1 && E("You seem to have overlapping act() calls, this is not supported. Be sure to await previous act() calls before making a new one. "), zt = i;
+      }
+      function Ks(i, l, p) {
+        {
+          var _ = G.current;
+          if (_ !== null)
+            try {
+              Js(_), Xh(function() {
+                _.length === 0 ? (G.current = null, l(i)) : Ks(i, l, p);
+              });
+            } catch (S) {
+              p(S);
+            }
+          else
+            l(i);
+        }
+      }
+      var Hs = !1;
+      function Js(i) {
+        if (!Hs) {
+          Hs = !0;
+          var l = 0;
+          try {
+            for (; l < i.length; l++) {
+              var p = i[l];
+              do
+                p = p(!0);
+              while (p !== null);
+            }
+            i.length = 0;
+          } catch (_) {
+            throw i = i.slice(l + 1), _;
+          } finally {
+            Hs = !1;
+          }
+        }
+      }
+      var Zh = jc, ed = Yh, td = zh, nd = {
+        map: wr,
+        forEach: gh,
+        count: ph,
+        toArray: mh,
+        only: _h
+      };
+      e.Children = nd, e.Component = V, e.Fragment = o, e.Profiler = a, e.PureComponent = X, e.StrictMode = c, e.Suspense = y, e.__SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED = Re, e.act = qc, e.cloneElement = ed, e.createContext = yh, e.createElement = Zh, e.createFactory = td, e.createRef = eh, e.forwardRef = wh, e.isValidElement = Wt, e.lazy = Sh, e.memo = kh, e.startTransition = Qh, e.unstable_act = qc, e.useCallback = Fh, e.useContext = Eh, e.useDebugValue = Ph, e.useDeferredValue = xh, e.useEffect = Ch, e.useId = jh, e.useImperativeHandle = Mh, e.useInsertionEffect = Th, e.useLayoutEffect = $h, e.useMemo = Ah, e.useReducer = Rh, e.useRef = Ih, e.useState = Oh, e.useSyncExternalStore = Lh, e.useTransition = Nh, e.version = n, typeof __REACT_DEVTOOLS_GLOBAL_HOOK__ < "u" && typeof __REACT_DEVTOOLS_GLOBAL_HOOK__.registerInternalModuleStop == "function" && __REACT_DEVTOOLS_GLOBAL_HOOK__.registerInternalModuleStop(new Error());
+    }();
+  }(Un, Un.exports)), Un.exports;
+}
+process.env.NODE_ENV === "production" ? Nw() : xw();
+function jw(t) {
+  return new en(
+    (e, n) => (t(e), n.receive(Pe.issue(null)))
+  );
+}
+function Lw(t) {
+  function e(n) {
+    switch (typeof n) {
+      case "function":
+        return n(e);
+      default:
+        t(n);
+    }
   }
-  defer(p, cont) {
-    var a = forward(this.lhs, p);
-    return cont.receive(a.flat_fold((ok) => forward(this.rhs, ok)));
+  return e;
+}
+let Xf = class L {
+  constructor(e) {
+    f(this, "_apply");
+    this._apply = e;
   }
-};
-let Arrow$1 = class Arrow {
-  constructor(_apply) {
-    __publicField(this, "_apply");
-    this._apply = _apply;
-  }
-  apply(self) {
-    return this._apply(self);
+  apply(e) {
+    return this._apply(e);
   }
   /**
    * You liked arrows so much, we put arrows in your arrows.
    * @param that You
-   * @returns
+   * @returns 
    */
-  next(that) {
-    return new Arrow((self) => {
-      let next = this.apply(self);
-      return that.apply(next);
+  next(e) {
+    return new L((n) => {
+      let r = this.apply(n);
+      return e.apply(r);
     });
   }
-  static Make(apply) {
-    return new Arrow(apply);
+  static Make(e) {
+    return new L(e);
   }
   static Unit() {
-    return new Arrow((self) => self);
+    return new L(
+      (e) => e
+    );
   }
-  static Pure(self) {
-    return new Arrow((_) => {
-      return self;
-    });
+  static Pure(e) {
+    return new L(
+      (n) => e
+    );
   }
-  static Then(that) {
-    return new Arrow((self) => new Then$1(self, that));
+  static Then(e) {
+    return new L(
+      (n) => new Zo(n, e)
+    );
   }
-  then(that) {
-    return this.next(Arrow.Then(that));
+  then(e) {
+    return this.next(L.Then(e));
   }
-  static Pair(that) {
-    return new Arrow((self) => new Anon$1((p, cont) => {
-      let [l, r] = p;
-      let lhs = forward(self, l);
-      let rhs = forward(that, r);
-      return cont.receive(lhs.zip(rhs));
-    }));
+  static Pair(e) {
+    return new L(
+      (n) => new en(
+        (r, s) => {
+          let [o, c] = r, a = it(n, o), u = it(e, c);
+          return s.receive(a.zip(u));
+        }
+      )
+    );
   }
-  pair(that) {
-    return this.next(Arrow.Pair(that));
+  pair(e) {
+    return this.next(L.Pair(e));
   }
-  static Split(that) {
-    return new Arrow((self) => {
-      return new Anon$1((p, cont) => {
-        return Arrow.Pair(that).apply(self).defer([p, p], cont);
-      });
-    });
+  static Split(e) {
+    return new L(
+      (n) => new en(
+        (r, s) => L.Pair(e).apply(n).defer([r, r], s)
+      )
+    );
   }
-  split(that) {
-    return this.next(Arrow.Split(that));
+  split(e) {
+    return this.next(L.Split(e));
   }
-  static FlatMap(fn) {
-    return new Arrow((self) => {
-      return new Anon$1((p, cont) => {
-        return cont.receive(forward(self, p).flat_fold((ok) => forward(fn(ok), p)));
-      });
-    });
+  static FlatMap(e) {
+    return new L(
+      (n) => new en(
+        (r, s) => s.receive(it(n, r).flat_fold(
+          (o) => it(e(o), r)
+        ))
+      )
+    );
   }
-  flat_map(fn) {
-    return this.next(Arrow.FlatMap(fn));
+  flat_map(e) {
+    return this.next(L.FlatMap(e));
   }
   static First() {
-    return new Arrow((self) => {
-      let l = Arrow.Pure(new Fun((x) => x));
-      let r = Arrow.Pair(l.apply(self)).apply(self);
-      return r;
+    return new L((e) => {
+      let n = L.Pure(new nn((s) => s));
+      return L.Pair(n.apply(e)).apply(e);
     });
   }
   first() {
-    return this.next(Arrow.First());
+    return this.next(L.First());
   }
   static Second() {
-    return new Arrow((self) => {
-      let l = Arrow.Pure(new Fun((x) => x));
-      let r = Arrow.Pair(self).apply(l.apply(self));
-      return r;
+    return new L((e) => {
+      let n = L.Pure(new nn((s) => s));
+      return L.Pair(e).apply(n.apply(e));
     });
   }
   second() {
-    return this.next(Arrow.Second());
+    return this.next(L.Second());
   }
-  static Pinch(that) {
-    return new Arrow((self) => {
-      return new Anon$1((p, cont) => {
-        return cont.receive(forward(self, p).zip(forward(that, p)));
-      });
-    });
+  static Pinch(e) {
+    return new L(
+      (n) => new en(
+        (r, s) => s.receive(
+          it(n, r).zip(it(e, r))
+        )
+      )
+    );
   }
-  pinch(that) {
-    return this.next(Arrow.Pinch(that));
+  pinch(e) {
+    return this.next(L.Pinch(e));
   }
-  static Joint(that) {
-    return new Arrow((self) => {
-      return Arrow.Then(Arrow.Pure(Arrow.Split(that).apply(new Unit$1())).apply(new Unit$1())).apply(self);
-    });
+  static Joint(e) {
+    return new L(
+      (n) => L.Then(
+        L.Pure(L.Split(e).apply(new Nr())).apply(new Nr())
+      ).apply(n)
+    );
   }
-  joint(that) {
-    return this.next(Arrow.Joint(that));
+  joint(e) {
+    return this.next(L.Joint(e));
   }
-  static Bound(that) {
-    return new Arrow((self) => {
-      let u = new Unit$1();
-      let l = Arrow.Then(that);
-      let r = Arrow.Joint(self).apply(u);
-      let n = l.apply(r);
-      return n;
-    });
+  static Bound(e) {
+    return new L(
+      (n) => {
+        let r = new Nr(), s = L.Then(e), o = L.Joint(n).apply(r);
+        return s.apply(o);
+      }
+    );
   }
-  bound(that) {
-    return this.next(Arrow.Bound(that));
+  bound(e) {
+    return this.next(L.Bound(e));
   }
   static Broach() {
-    return new Arrow((self) => {
-      let unit2 = new Fun((p) => p);
-      return Arrow.Bound(unit2).apply(self);
-    });
+    return new L(
+      (e) => {
+        let n = new nn((r) => r);
+        return L.Bound(n).apply(e);
+      }
+    );
   }
   broach() {
-    return this.next(Arrow.Broach());
+    return this.next(L.Broach());
   }
-  resolve(p) {
-    return resolve(this.apply(unit()), p);
+  // public resolve(p:Pii){
+  //   return resolve(this.apply(unit()),p);
+  // }
+  static Compose(e, n) {
+    return n.next(e);
   }
-  static Compose(lhs, rhs) {
-    return rhs.next(lhs);
-  }
-  compose(before) {
-    return Arrow.Compose(this, before);
-  }
-};
-function react(dispatch) {
-  return new Anon$1((p, cont) => {
-    dispatch(p);
-    return exports.Work.ZERO;
-  });
-}
-function useReducerWithThunk(dispatch) {
-  function customAllocator(action) {
-    switch (typeof action) {
-      case "function":
-        return action(customAllocator);
-      default:
-        dispatch(action);
-    }
-  }
-  return customAllocator;
-}
-(function(to, from, pack2) {
-  if (pack2 || arguments.length === 2)
-    for (var i = 0, l = from.length, ar; i < l; i++) {
-      if (ar || !(i in from)) {
-        if (!ar)
-          ar = Array.prototype.slice.call(from, 0, i);
-        ar[i] = from[i];
-      }
-    }
-  return to.concat(ar || Array.prototype.slice.call(from));
-});
-var none$1 = { _tag: "None" };
-var some$1 = function(a) {
-  return { _tag: "Some", value: a };
-};
-var left$1 = function(e) {
-  return { _tag: "Left", left: e };
-};
-var right$1 = function(a) {
-  return { _tag: "Right", right: a };
-};
-var none = none$1;
-var some = some$1;
-var isNone = function(fa) {
-  return fa._tag === "None";
-};
-var matchW = function(onNone, onSome) {
-  return function(ma) {
-    return isNone(ma) ? onNone() : onSome(ma.value);
-  };
-};
-var match = matchW;
-var fold = match;
-let Option$1 = class Option {
-  constructor(delegate) {
-    __publicField(this, "delegate");
-    this.delegate = delegate;
-  }
-  defer(p, cont) {
-    let result = fold(() => cont.receive(Junction.issue(none)), (p2) => new Then$1(this.delegate, new Fun((r) => some(r))).defer(p2, cont))(p);
-    return result;
+  compose(e) {
+    return L.Compose(this, e);
   }
 };
-let OptionM$1 = class OptionM {
-  constructor(delegate) {
-    __publicField(this, "delegate");
-    this.delegate = delegate;
-  }
-  defer(p, cont) {
-    let result = fold(() => cont.receive(Junction.issue(none)), (p2) => this.delegate.defer(p2, cont))(p);
-    return result;
-  }
-};
-var left = left$1;
-var right = right$1;
-let Callback$1 = class Callback {
-  constructor(deferred) {
-    __publicField(this, "deferred");
-    this.deferred = deferred;
-  }
-  defer(p, cont) {
-    let d = new Deferred_1();
-    this.deferred(p, (r) => {
-      d.resolve(r);
-    });
-    return exports.Work.fromPromise(d.promise.then((x) => exports.Work.ZERO));
-  }
-};
-let Receiver$1 = class Receiver {
-  constructor(deferred) {
-    __publicField(this, "deferred");
-    this.deferred = deferred;
-  }
-  defer(_, cont) {
-    return cont.receive(this.deferred);
-  }
-};
-function Unit2() {
-  return new Unit$1();
+function xk() {
+  return new Nr();
 }
-function Arrow2() {
-  return Arrow$1;
+function Jt() {
+  return Xf;
 }
-function Fun1R(fn) {
-  return new Fun(fn);
+function Et(t) {
+  return new nn(t);
 }
-function Pure(r) {
-  return Fun1R((_) => r);
+function jk(t) {
+  return Et((e) => t);
 }
-function Anon2(fn) {
-  return new Anon$1(fn);
+function yr(t) {
+  return new en(t);
 }
-function Resolve(self, input) {
-  return resolve(self, input);
+function Qo(t, e) {
+  return bd(t, e);
 }
-function Forward(self, input) {
-  return forward(self, input);
+function Lk(t, e) {
+  return it(t, e);
 }
-function Event(self) {
-  return new EventArrowlet(self);
+function Dk(t) {
+  return new hd(t);
 }
-function Then2(self, that) {
-  return new Then$1(self, that);
+function vn(t, e) {
+  return new Zo(t, e);
 }
-function Pair(self, that) {
-  return Arrow2().Pair(that).apply(self);
+function Uk(t, e) {
+  return Jt().Pair(e).apply(t);
 }
-function FlatMap(fn) {
-  return Arrow2().FlatMap(fn);
+function qk(t) {
+  return Xf.FlatMap(t);
 }
-function First(self) {
-  return Arrow2().First().apply(self);
+function Bk(t) {
+  return Jt().First().apply(t);
 }
-function Second(self) {
-  return Arrow2().Second().apply(self);
+function Vk(t) {
+  return Jt().Second().apply(t);
 }
-function Pinch(self, that) {
-  return Arrow2().Pinch(that).apply(self);
+function Kk(t, e) {
+  return Jt().Pinch(e).apply(t);
 }
-function Joint(self, that) {
-  return Arrow2().Joint(that).apply(self);
+function Hk(t, e) {
+  return Jt().Joint(e).apply(t);
 }
-function Bound(self, that) {
-  return Arrow2().Bound(that).apply(self);
+function Jk(t, e) {
+  return Jt().Bound(e).apply(t);
 }
-function Broach(self) {
-  return Arrow2().Broach().apply(self);
+function Wk(t) {
+  return Jt().Broach().apply(t);
 }
-function Next(lhs, rhs) {
-  return lhs.next(rhs);
+function Gk(t, e) {
+  return t.next(e);
 }
-function React(dispatch) {
-  return react(useReducerWithThunk(dispatch));
+function zk(t) {
+  return jw(Lw(t));
 }
-function Handler(self) {
-  return (r) => {
-    exports.Work.Submit(self.defer(r, Junction.Unit()));
+function Yk(t) {
+  return (e) => {
+    _e.Submit(t.defer(e, Pe.Unit()));
   };
 }
-function Race(self, that) {
-  return Anon2((p, cont) => {
-    const deferred = new Deferred_1();
-    var complete2 = false;
-    function handler(r) {
-      if (!complete2) {
-        complete2 = true;
-        deferred.resolve(r);
+function Zf(t, e) {
+  return yr(
+    (n, r) => {
+      const s = new Kt();
+      var o = !1;
+      function c(h) {
+        o || (o = !0, s.resolve(h));
       }
+      const a = vn(t, Et(c)), u = vn(e, Et(c));
+      return _e.fromPromise(Promise.any([Qo(a, n), Qo(u, n)]).then(
+        (h) => s.promise.then(
+          (b) => r.receive(
+            Pe.issue(b)
+          )
+        )
+      ));
     }
-    const a = Then2(self, Fun1R(handler));
-    const b = Then2(that, Fun1R(handler));
-    return exports.Work.fromPromise(Promise.any([Resolve(a, p), Resolve(b, p)]).then((_) => deferred.promise.then((r) => cont.receive(Junction.issue(r)))));
-  });
+  );
 }
-function Stage(self, before, after) {
-  return Anon2((p, cont) => {
-    if (before) {
-      before(p);
-    }
-    return Then2(self, Fun1R((r) => {
-      if (after) {
-        after(r);
+function Qk(t, e, n) {
+  return yr(
+    (r, s) => (e && e(r), vn(t, Et(
+      (o) => (n && n(o), o)
+    )).defer(r, s))
+  );
+}
+function Xk(t) {
+  return new md(t);
+}
+function Zk(t) {
+  return new _d(t);
+}
+function eE(t) {
+  return Et(
+    (e) => t(e) ? Xa(e) : Xo
+  );
+}
+function Qa(t, e, n) {
+  return Zf(
+    yr(
+      (r, s) => {
+        const o = new Kt();
+        return setTimeout(
+          () => {
+            o.resolve(Pt(n));
+          },
+          e
+        ), s.receive(Pe.later(o.promise));
       }
-      return r;
-    })).defer(p, cont);
-  });
+    ),
+    vn(t, Et(at))
+  );
 }
-function Option2(self) {
-  return new Option$1(self);
+function tE(t) {
+  return yr(
+    (e, n) => _e.Seq(n.receive(Pe.issue(e)), t)
+  );
 }
-function OptionM2(self) {
-  return new OptionM$1(self);
+function nE(t, e, n, r) {
+  const s = Qa(t, n, r), o = Qa(e, n, r);
+  return Zf(s, o);
 }
-function OptionP(fn) {
-  return Fun1R((p) => {
-    if (fn(p)) {
-      return some(p);
-    } else {
-      return none;
+function rE(t, e) {
+  return vn(t, Et(e));
+}
+function sE(t, e) {
+  return vn(Et(e), t);
+}
+function oE(t) {
+  return (e) => Cw((n) => Qo(t, e));
+}
+function iE(t) {
+  return yr(
+    function e(n, r) {
+      return it(t, n).flat_fold(
+        (s) => vu({
+          onLeft: (o) => _e.fromThunk(() => e(o, r)),
+          //yay?
+          onRight: (o) => r.receive(Pe.issue(o))
+        })
+      );
     }
-  });
+  );
 }
-function Timeout(self, ms, error) {
-  return Race(Anon2((p, junc) => {
-    const deferred = new Deferred_1();
-    setTimeout(() => {
-      deferred.resolve(left(error));
-    }, ms);
-    return junc.receive(Junction.later(deferred.promise));
-  }), Then2(self, Fun1R(right)));
+function cE(t) {
+  return new ud(t);
 }
-function Worker(work) {
-  return Anon2((p, junc) => {
-    return exports.Work.Seq(junc.receive(Junction.issue(p)), work);
-  });
+function aE(t) {
+  return new yd(t);
 }
-function RaceWithTimeout(l, r, ms, error) {
-  const lhs = Timeout(l, ms, error);
-  const rhs = Timeout(r, ms, error);
-  return Race(lhs, rhs);
-}
-function Map$1(l, fn) {
-  return Then2(l, Fun1R(fn));
-}
-function Mapi(self, fn) {
-  return Then2(Fun1R(fn), self);
-}
-function Effect(self) {
-  return (pi) => {
-    return promise((signal) => Resolve(self, pi));
-  };
-}
-function Loop(self) {
-  return Anon2(function rec(pi, cont) {
-    return forward(self, pi).flat_fold((r) => match$3({
-      onLeft: (pi2) => exports.Work.fromThunk(() => rec(pi2, cont)),
-      //yay?
-      onRight: (r2) => cont.receive(Junction.issue(r2))
-    }));
-  });
-}
-function Callback2(fn) {
-  return new Callback$1(fn);
-}
-function Receiver2(self) {
-  return new Receiver$1(self);
-}
-exports.Allocator = Allocator;
-exports.Anon = Anon2;
-exports.Apply = Apply;
-exports.Arrow = Arrow2;
-exports.Bound = Bound;
-exports.Broach = Broach;
-exports.Callback = Callback2;
-exports.Effect = Effect;
-exports.Event = Event;
-exports.First = First;
-exports.FlatMap = FlatMap;
-exports.Forward = Forward;
-exports.Fun1R = Fun1R;
-exports.Handler = Handler;
-exports.Joint = Joint;
-exports.Junction = Junction;
-exports.Loop = Loop;
-exports.Map = Map$1;
-exports.Mapi = Mapi;
-exports.Next = Next;
-exports.Option = Option2;
-exports.OptionM = OptionM2;
-exports.OptionP = OptionP;
-exports.Pair = Pair;
-exports.Pinch = Pinch;
-exports.Pure = Pure;
-exports.Race = Race;
-exports.RaceWithTimeout = RaceWithTimeout;
-exports.React = React;
-exports.Receiver = Receiver2;
-exports.Resolve = Resolve;
-exports.Second = Second;
-exports.Stage = Stage;
-exports.Then = Then2;
-exports.Timeout = Timeout;
-exports.Unit = Unit2;
-exports.Worker = Worker;
+export {
+  Mt as Allocator,
+  yr as Anon,
+  cn as Apply,
+  Jt as Arrow,
+  Jk as Bound,
+  Wk as Broach,
+  cE as Callback,
+  Pw as Cont,
+  oE as Effect,
+  Dk as Event,
+  Bk as First,
+  qk as FlatMap,
+  Lk as Forward,
+  Et as Fun1R,
+  Yk as Handler,
+  Hk as Joint,
+  Pe as Junction,
+  iE as Loop,
+  rE as Map,
+  sE as Mapi,
+  Gk as Next,
+  Xk as Option,
+  Zk as OptionM,
+  eE as OptionP,
+  Uk as Pair,
+  Kk as Pinch,
+  jk as Pure,
+  Zf as Race,
+  nE as RaceWithTimeout,
+  zk as React,
+  aE as Receiver,
+  Qo as Resolve,
+  Vk as Second,
+  Qf as Settler,
+  Qk as Stage,
+  vn as Then,
+  Qa as Timeout,
+  xk as Unit,
+  _e as Work,
+  tE as Worker
+};
