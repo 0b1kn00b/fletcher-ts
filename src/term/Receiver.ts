@@ -1,5 +1,4 @@
 import { Arrowlet, Junction, Work } from "src/Core";
-import { Fletcher } from "src/Fletcher";
 import { Allocator } from "src/core/Allocator";
 
 export class Receiver<R> implements Arrowlet<void,R>{

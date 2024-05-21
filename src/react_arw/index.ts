@@ -1,14 +1,15 @@
 // https://chwastek.eu/blog/async-actions-with-usereducer-in-react
 import { useReducer, useCallback, Reducer } from 'react';
 import { Arrowlet } from "../Core";
-import { Allocator} from 'react'; 
+import { Dispatch } from 'react'; 
 import { ReactAsyncAction } from './ReactAsyncAction';
 import { resolve } from '../util';
 import { Junction } from '../core/Junction';
 import { Anon } from '../term/Anon';
 import { Work } from '../core/Work';
+import { Allocator } from '../Core';
 
-export function react<P,R>(dispatch:Allocator<R>):Arrowlet<R,void>{
+export function react<P,R>(dispatch:Dispatch<R>):Arrowlet<R,void>{
   return new Anon(
     (p:R,cont:Junction<void>) => {
       dispatch(p);
@@ -19,7 +20,7 @@ export function react<P,R>(dispatch:Allocator<R>):Arrowlet<R,void>{
 
 //(reducer: Reducer<S, A>, initialState: S): [S, Allocator<A>] 
 //<Reducer<S, A>>(reducer: Reducer<S, A>, initialState: S, initializer?: undefined): [S, Allocator<A>] (+4 overloads) import useReducer
-function useReducerWithThunk<A>(dispatch:Allocator<A>):Allocator<A> {
+function useReducerWithThunk<A>(dispatch:Dispatch<A>):Dispatch<A> {
   //const [state, dispatch] : [S, Allocator<A>]= useReducer(reducer, initialState);
 
   function customAllocator(action:((a:A)=>void) | A):void{

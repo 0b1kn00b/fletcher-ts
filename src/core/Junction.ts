@@ -67,4 +67,14 @@ export class Junction<R> extends Settler<Deferred<R>> {
       }
     );
   }
+  /**Takes a resolver to use later that may return Work to be done in a scheduler once all inputs are known*/
+
+  static Unit<R>():Junction<R>{
+    return new Junction(
+      (a:Apply<Deferred<R>,Work.Work>):Work.Work => {
+        return a.apply(new Deferred());
+      }
+    )
+  }
+
 }

@@ -8,7 +8,7 @@
     "target": "ESNext",
     "declaration": true,
     "outDir": "./dist",
-    "baseUrl" : "./",
+    "baseUrl" : ".",
     "paths" : {
       "fletcher-ts/*": ["fletcher-ts/dist/*"]
     },

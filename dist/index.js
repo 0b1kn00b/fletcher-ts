@@ -49,15 +49,6 @@ var Deferred = function() {
   return Deferred2;
 }();
 var Deferred_1 = Deferred;
-class Apply {
-  constructor(_apply) {
-    __publicField(this, "_apply");
-    this._apply = _apply;
-  }
-  apply(a) {
-    return this._apply(a);
-  }
-}
 const isFunction$1 = (input) => typeof input === "function";
 const dual = function(arity, body) {
   if (typeof arity === "function") {
@@ -2805,7 +2796,7 @@ const flatten$2 = (self) => {
   let updated = empty$b();
   while (1) {
     const [parallel2, sequential2] = reduce$1(current, [parallelCollectionEmpty(), empty$b()], ([parallel3, sequential3], blockedRequest) => {
-      const [par2, seq2] = step(blockedRequest);
+      const [par2, seq2] = step$1(blockedRequest);
       return [parallelCollectionCombine(parallel3, par2), appendAll(sequential3, seq2)];
     });
     updated = merge(updated, parallel2);
@@ -2816,7 +2807,7 @@ const flatten$2 = (self) => {
   }
   throw new Error("BUG: BlockedRequests.flatten - please report an issue at https://github.com/Effect-TS/effect/issues");
 };
-const step = (requests) => {
+const step$1 = (requests) => {
   let current = requests;
   let parallel2 = parallelCollectionEmpty();
   let stack = empty$b();
@@ -3855,6 +3846,11 @@ const flatMap$1 = /* @__PURE__ */ dual(2, (self, f) => {
   effect.effect_instruction_i1 = f;
   return effect;
 });
+const step = (self) => {
+  const effect = new EffectPrimitive("OnStep");
+  effect.effect_instruction_i0 = self;
+  return effect;
+};
 const flatten$1 = (self) => flatMap$1(self, identity);
 const matchCause = /* @__PURE__ */ dual(2, (self, options) => matchCauseEffect(self, {
   onFailure: (cause) => succeed(options.onFailure(cause)),
@@ -7943,7 +7939,7 @@ const forEachConcurrentDiscard = (self, f, batching, processAll, n) => uninterru
   }
   let counter2 = 0;
   let interrupted = false;
-  const fibersCount = todos.length;
+  const fibersCount = n ? Math.min(todos.length, n) : todos.length;
   const fibers = /* @__PURE__ */ new Set();
   const results = new Array();
   const interruptAll = () => fibers.forEach((fiber) => {
@@ -7984,7 +7980,7 @@ const forEachConcurrentDiscard = (self, f, batching, processAll, n) => uninterru
     interrupted = true;
     interruptAll();
   };
-  const stepOrExit = exit;
+  const stepOrExit = batching ? step : exit;
   const processingFiber = runFiber(async$1((resume2) => {
     const pushResult = (res, index) => {
       if (res._op === "Blocked") {
@@ -8044,7 +8040,7 @@ const forEachConcurrentDiscard = (self, f, batching, processAll, n) => uninterru
             const requests = residual.map((blocked2) => blocked2.effect_instruction_i0).reduce(par);
             resume2(succeed(blocked(requests, forEachConcurrentDiscard([getOrElse(exitCollectAll(collectExits(), {
               parallel: true
-            }), () => exitVoid), ...residual.map((blocked2) => blocked2.effect_instruction_i1)], (i) => i, batching, true))));
+            }), () => exitVoid), ...residual.map((blocked2) => blocked2.effect_instruction_i1)], (i) => i, batching, true, n))));
           } else {
             next();
           }
@@ -8059,7 +8055,7 @@ const forEachConcurrentDiscard = (self, f, batching, processAll, n) => uninterru
     onFailure: () => {
       onInterruptSignal();
       const target2 = residual.length + 1;
-      const concurrency = Math.min(residual.length, residual.length);
+      const concurrency = Math.min(typeof n === "number" ? n : residual.length, residual.length);
       const toPop = Array.from(residual);
       return async$1((cb) => {
         const exits = [];
@@ -8380,6 +8376,15 @@ exports.Work = void 0;
   }
   Work2.Promise = Promise2;
 })(exports.Work || (exports.Work = {}));
+class Apply {
+  constructor(_apply) {
+    __publicField(this, "_apply");
+    this._apply = _apply;
+  }
+  apply(a) {
+    return this._apply(a);
+  }
+}
 class Cont extends Apply {
 }
 class Settler extends Cont {
@@ -8451,6 +8456,12 @@ class Junction extends Settler {
       return a.apply(deferred);
     });
   }
+  /**Takes a resolver to use later that may return Work to be done in a scheduler once all inputs are known*/
+  static Unit() {
+    return new Junction((a) => {
+      return a.apply(new Deferred_1());
+    });
+  }
 }
 class Fun {
   constructor(_apply) {
@@ -8461,7 +8472,7 @@ class Fun {
     return cont.receive(Junction.issue(this._apply(p)));
   }
 }
-class Anon {
+let Anon$1 = class Anon {
   constructor(_defer) {
     __publicField(this, "_defer");
     this._defer = _defer;
@@ -8469,12 +8480,12 @@ class Anon {
   defer(p, cont) {
     return this._defer(p, cont);
   }
-}
-class Unit extends Fun {
+};
+let Unit$1 = class Unit extends Fun {
   constructor() {
     super((p) => p);
   }
-}
+};
 function forward(self, p) {
   return new Allocator((k) => {
     let deferred = new Deferred_1();
@@ -8527,7 +8538,7 @@ class EventArrowlet {
     return exports.Work.Seq(cont.receive(Junction.later(deferred.promise)), canceller);
   }
 }
-class Then {
+let Then$1 = class Then {
   constructor(lhs, rhs) {
     __publicField(this, "lhs");
     __publicField(this, "rhs");
@@ -8538,8 +8549,8 @@ class Then {
     var a = forward(this.lhs, p);
     return cont.receive(a.flat_fold((ok) => forward(this.rhs, ok)));
   }
-}
-class Arrow {
+};
+let Arrow$1 = class Arrow {
   constructor(_apply) {
     __publicField(this, "_apply");
     this._apply = _apply;
@@ -8570,13 +8581,13 @@ class Arrow {
     });
   }
   static Then(that) {
-    return new Arrow((self) => new Then(self, that));
+    return new Arrow((self) => new Then$1(self, that));
   }
   then(that) {
     return this.next(Arrow.Then(that));
   }
   static Pair(that) {
-    return new Arrow((self) => new Anon((p, cont) => {
+    return new Arrow((self) => new Anon$1((p, cont) => {
       let [l, r] = p;
       let lhs = forward(self, l);
       let rhs = forward(that, r);
@@ -8588,7 +8599,7 @@ class Arrow {
   }
   static Split(that) {
     return new Arrow((self) => {
-      return new Anon((p, cont) => {
+      return new Anon$1((p, cont) => {
         return Arrow.Pair(that).apply(self).defer([p, p], cont);
       });
     });
@@ -8598,7 +8609,7 @@ class Arrow {
   }
   static FlatMap(fn) {
     return new Arrow((self) => {
-      return new Anon((p, cont) => {
+      return new Anon$1((p, cont) => {
         return cont.receive(forward(self, p).flat_fold((ok) => forward(fn(ok), p)));
       });
     });
@@ -8628,7 +8639,7 @@ class Arrow {
   }
   static Pinch(that) {
     return new Arrow((self) => {
-      return new Anon((p, cont) => {
+      return new Anon$1((p, cont) => {
         return cont.receive(forward(self, p).zip(forward(that, p)));
       });
     });
@@ -8638,7 +8649,7 @@ class Arrow {
   }
   static Joint(that) {
     return new Arrow((self) => {
-      return Arrow.Then(Arrow.Pure(Arrow.Split(that).apply(new Unit())).apply(new Unit())).apply(self);
+      return Arrow.Then(Arrow.Pure(Arrow.Split(that).apply(new Unit$1())).apply(new Unit$1())).apply(self);
     });
   }
   joint(that) {
@@ -8646,7 +8657,7 @@ class Arrow {
   }
   static Bound(that) {
     return new Arrow((self) => {
-      let u = new Unit();
+      let u = new Unit$1();
       let l = Arrow.Then(that);
       let r = Arrow.Joint(self).apply(u);
       let n = l.apply(r);
@@ -8674,9 +8685,9 @@ class Arrow {
   compose(before) {
     return Arrow.Compose(this, before);
   }
-}
+};
 function react(dispatch) {
-  return new Anon((p, cont) => {
+  return new Anon$1((p, cont) => {
     dispatch(p);
     return exports.Work.ZERO;
   });
@@ -8725,17 +8736,17 @@ var matchW = function(onNone, onSome) {
 };
 var match = matchW;
 var fold = match;
-class Option {
+let Option$1 = class Option {
   constructor(delegate) {
     __publicField(this, "delegate");
     this.delegate = delegate;
   }
   defer(p, cont) {
-    let result = fold(() => cont.receive(Junction.issue(none)), (p2) => new Then(this.delegate, new Fun((r) => some(r))).defer(p2, cont))(p);
+    let result = fold(() => cont.receive(Junction.issue(none)), (p2) => new Then$1(this.delegate, new Fun((r) => some(r))).defer(p2, cont))(p);
     return result;
   }
-}
-class OptionM {
+};
+let OptionM$1 = class OptionM {
   constructor(delegate) {
     __publicField(this, "delegate");
     this.delegate = delegate;
@@ -8744,10 +8755,10 @@ class OptionM {
     let result = fold(() => cont.receive(Junction.issue(none)), (p2) => this.delegate.defer(p2, cont))(p);
     return result;
   }
-}
+};
 var left = left$1;
 var right = right$1;
-class Callback {
+let Callback$1 = class Callback {
   constructor(deferred) {
     __publicField(this, "deferred");
     this.deferred = deferred;
@@ -8759,8 +8770,8 @@ class Callback {
     });
     return exports.Work.fromPromise(d.promise.then((x) => exports.Work.ZERO));
   }
-}
-class Receiver {
+};
+let Receiver$1 = class Receiver {
   constructor(deferred) {
     __publicField(this, "deferred");
     this.deferred = deferred;
@@ -8768,199 +8779,191 @@ class Receiver {
   defer(_, cont) {
     return cont.receive(this.deferred);
   }
+};
+function Unit2() {
+  return new Unit$1();
 }
-exports.Fletcher = void 0;
-(function(Fletcher2) {
-  function Junction$1() {
-    return new Junction((a) => {
-      return a.apply(new Deferred_1());
-    });
-  }
-  Fletcher2.Junction = Junction$1;
-  function Unit$1() {
-    return new Unit();
-  }
-  Fletcher2.Unit = Unit$1;
-  function Arrow$1() {
-    return Arrow;
-  }
-  Fletcher2.Arrow = Arrow$1;
-  function Fun1R(fn) {
-    return new Fun(fn);
-  }
-  Fletcher2.Fun1R = Fun1R;
-  function Pure(r) {
-    return Fletcher2.Fun1R((_) => r);
-  }
-  Fletcher2.Pure = Pure;
-  function Anon$1(fn) {
-    return new Anon(fn);
-  }
-  Fletcher2.Anon = Anon$1;
-  function Resolve(self, input) {
-    return resolve(self, input);
-  }
-  Fletcher2.Resolve = Resolve;
-  function Forward(self, input) {
-    return forward(self, input);
-  }
-  Fletcher2.Forward = Forward;
-  function Event(self) {
-    return new EventArrowlet(self);
-  }
-  Fletcher2.Event = Event;
-  function Then$1(self, that) {
-    return new Then(self, that);
-  }
-  Fletcher2.Then = Then$1;
-  function Pair(self, that) {
-    return Fletcher2.Arrow().Pair(that).apply(self);
-  }
-  Fletcher2.Pair = Pair;
-  function FlatMap(fn) {
-    return Fletcher2.Arrow().FlatMap(fn);
-  }
-  Fletcher2.FlatMap = FlatMap;
-  function First(self) {
-    return Fletcher2.Arrow().First().apply(self);
-  }
-  Fletcher2.First = First;
-  function Second(self) {
-    return Fletcher2.Arrow().Second().apply(self);
-  }
-  Fletcher2.Second = Second;
-  function Pinch(self, that) {
-    return Fletcher2.Arrow().Pinch(that).apply(self);
-  }
-  Fletcher2.Pinch = Pinch;
-  function Joint(self, that) {
-    return Fletcher2.Arrow().Joint(that).apply(self);
-  }
-  Fletcher2.Joint = Joint;
-  function Bound(self, that) {
-    return Fletcher2.Arrow().Bound(that).apply(self);
-  }
-  Fletcher2.Bound = Bound;
-  function Broach(self) {
-    return Fletcher2.Arrow().Broach().apply(self);
-  }
-  Fletcher2.Broach = Broach;
-  function Next(lhs, rhs) {
-    return lhs.next(rhs);
-  }
-  Fletcher2.Next = Next;
-  function React(dispatch) {
-    return react(useReducerWithThunk(dispatch));
-  }
-  Fletcher2.React = React;
-  function Handler(self) {
-    return (r) => {
-      exports.Work.Submit(self.defer(r, Fletcher2.Junction()));
-    };
-  }
-  Fletcher2.Handler = Handler;
-  function Race(self, that) {
-    return Fletcher2.Anon((p, cont) => {
-      const deferred = new Deferred_1();
-      var complete2 = false;
-      function handler(r) {
-        if (!complete2) {
-          complete2 = true;
-          deferred.resolve(r);
-        }
+function Arrow2() {
+  return Arrow$1;
+}
+function Fun1R(fn) {
+  return new Fun(fn);
+}
+function Pure(r) {
+  return Fun1R((_) => r);
+}
+function Anon2(fn) {
+  return new Anon$1(fn);
+}
+function Resolve(self, input) {
+  return resolve(self, input);
+}
+function Forward(self, input) {
+  return forward(self, input);
+}
+function Event(self) {
+  return new EventArrowlet(self);
+}
+function Then2(self, that) {
+  return new Then$1(self, that);
+}
+function Pair(self, that) {
+  return Arrow2().Pair(that).apply(self);
+}
+function FlatMap(fn) {
+  return Arrow2().FlatMap(fn);
+}
+function First(self) {
+  return Arrow2().First().apply(self);
+}
+function Second(self) {
+  return Arrow2().Second().apply(self);
+}
+function Pinch(self, that) {
+  return Arrow2().Pinch(that).apply(self);
+}
+function Joint(self, that) {
+  return Arrow2().Joint(that).apply(self);
+}
+function Bound(self, that) {
+  return Arrow2().Bound(that).apply(self);
+}
+function Broach(self) {
+  return Arrow2().Broach().apply(self);
+}
+function Next(lhs, rhs) {
+  return lhs.next(rhs);
+}
+function React(dispatch) {
+  return react(useReducerWithThunk(dispatch));
+}
+function Handler(self) {
+  return (r) => {
+    exports.Work.Submit(self.defer(r, Junction.Unit()));
+  };
+}
+function Race(self, that) {
+  return Anon2((p, cont) => {
+    const deferred = new Deferred_1();
+    var complete2 = false;
+    function handler(r) {
+      if (!complete2) {
+        complete2 = true;
+        deferred.resolve(r);
       }
-      const a = Fletcher2.Then(self, Fletcher2.Fun1R(handler));
-      const b = Fletcher2.Then(self, Fletcher2.Fun1R(handler));
-      return exports.Work.fromPromise(Promise.any([Fletcher2.Resolve(a, p), Fletcher2.Resolve(b, p)]).then((_) => deferred.promise.then((r) => cont.receive(Junction.issue(r)))));
-    });
-  }
-  Fletcher2.Race = Race;
-  function Stage(self, before, after) {
-    return Fletcher2.Anon((p, cont) => {
-      if (before) {
-        before(p);
+    }
+    const a = Then2(self, Fun1R(handler));
+    const b = Then2(that, Fun1R(handler));
+    return exports.Work.fromPromise(Promise.any([Resolve(a, p), Resolve(b, p)]).then((_) => deferred.promise.then((r) => cont.receive(Junction.issue(r)))));
+  });
+}
+function Stage(self, before, after) {
+  return Anon2((p, cont) => {
+    if (before) {
+      before(p);
+    }
+    return Then2(self, Fun1R((r) => {
+      if (after) {
+        after(r);
       }
-      return Fletcher2.Then(self, Fletcher2.Fun1R((r) => {
-        if (after) {
-          after(r);
-        }
-        return r;
-      })).defer(p, cont);
-    });
-  }
-  Fletcher2.Stage = Stage;
-  function Option$1(self) {
-    return new Option(self);
-  }
-  Fletcher2.Option = Option$1;
-  function OptionM$1(self) {
-    return new OptionM(self);
-  }
-  Fletcher2.OptionM = OptionM$1;
-  function OptionP(fn) {
-    return Fletcher2.Fun1R((p) => {
-      if (fn(p)) {
-        return some(p);
-      } else {
-        return none;
-      }
-    });
-  }
-  Fletcher2.OptionP = OptionP;
-  function Timeout(self, ms, error) {
-    return Fletcher2.Race(Fletcher2.Anon((p, junc) => {
-      const deferred = new Deferred_1();
-      setTimeout(() => {
-        deferred.resolve(left(error));
-      }, ms);
-      return junc.receive(Junction.later(deferred.promise));
-    }), Fletcher2.Then(self, Fletcher2.Fun1R(right)));
-  }
-  Fletcher2.Timeout = Timeout;
-  function Worker(work) {
-    return Fletcher2.Anon((p, junc) => {
-      return exports.Work.Seq(junc.receive(Junction.issue(p)), work);
-    });
-  }
-  Fletcher2.Worker = Worker;
-  function RaceWithTimeout(l, r, ms, error) {
-    const lhs = Fletcher2.Timeout(l, ms, error);
-    const rhs = Fletcher2.Timeout(r, ms, error);
-    return Fletcher2.Race(lhs, rhs);
-  }
-  Fletcher2.RaceWithTimeout = RaceWithTimeout;
-  function Map2(l, fn) {
-    return Fletcher2.Then(l, Fletcher2.Fun1R(fn));
-  }
-  Fletcher2.Map = Map2;
-  function Mapi(self, fn) {
-    return Fletcher2.Then(Fletcher2.Fun1R(fn), self);
-  }
-  Fletcher2.Mapi = Mapi;
-  function Effect(self) {
-    return (pi) => {
-      return promise((signal) => Fletcher2.Resolve(self, pi));
-    };
-  }
-  Fletcher2.Effect = Effect;
-  function Loop(self) {
-    return Fletcher2.Anon(function rec(pi, cont) {
-      return forward(self, pi).flat_fold((r) => match$3({
-        onLeft: (pi2) => exports.Work.fromThunk(() => rec(pi2, cont)),
-        //yay?
-        onRight: (r2) => cont.receive(Junction.issue(r2))
-      }));
-    });
-  }
-  Fletcher2.Loop = Loop;
-  function Callback$1(fn) {
-    return new Callback(fn);
-  }
-  Fletcher2.Callback = Callback$1;
-  function Receiver$1(self) {
-    return new Receiver(self);
-  }
-  Fletcher2.Receiver = Receiver$1;
-})(exports.Fletcher || (exports.Fletcher = {}));
+      return r;
+    })).defer(p, cont);
+  });
+}
+function Option2(self) {
+  return new Option$1(self);
+}
+function OptionM2(self) {
+  return new OptionM$1(self);
+}
+function OptionP(fn) {
+  return Fun1R((p) => {
+    if (fn(p)) {
+      return some(p);
+    } else {
+      return none;
+    }
+  });
+}
+function Timeout(self, ms, error) {
+  return Race(Anon2((p, junc) => {
+    const deferred = new Deferred_1();
+    setTimeout(() => {
+      deferred.resolve(left(error));
+    }, ms);
+    return junc.receive(Junction.later(deferred.promise));
+  }), Then2(self, Fun1R(right)));
+}
+function Worker(work) {
+  return Anon2((p, junc) => {
+    return exports.Work.Seq(junc.receive(Junction.issue(p)), work);
+  });
+}
+function RaceWithTimeout(l, r, ms, error) {
+  const lhs = Timeout(l, ms, error);
+  const rhs = Timeout(r, ms, error);
+  return Race(lhs, rhs);
+}
+function Map$1(l, fn) {
+  return Then2(l, Fun1R(fn));
+}
+function Mapi(self, fn) {
+  return Then2(Fun1R(fn), self);
+}
+function Effect(self) {
+  return (pi) => {
+    return promise((signal) => Resolve(self, pi));
+  };
+}
+function Loop(self) {
+  return Anon2(function rec(pi, cont) {
+    return forward(self, pi).flat_fold((r) => match$3({
+      onLeft: (pi2) => exports.Work.fromThunk(() => rec(pi2, cont)),
+      //yay?
+      onRight: (r2) => cont.receive(Junction.issue(r2))
+    }));
+  });
+}
+function Callback2(fn) {
+  return new Callback$1(fn);
+}
+function Receiver2(self) {
+  return new Receiver$1(self);
+}
+exports.Allocator = Allocator;
+exports.Anon = Anon2;
 exports.Apply = Apply;
+exports.Arrow = Arrow2;
+exports.Bound = Bound;
+exports.Broach = Broach;
+exports.Callback = Callback2;
+exports.Effect = Effect;
+exports.Event = Event;
+exports.First = First;
+exports.FlatMap = FlatMap;
+exports.Forward = Forward;
+exports.Fun1R = Fun1R;
+exports.Handler = Handler;
+exports.Joint = Joint;
 exports.Junction = Junction;
+exports.Loop = Loop;
+exports.Map = Map$1;
+exports.Mapi = Mapi;
+exports.Next = Next;
+exports.Option = Option2;
+exports.OptionM = OptionM2;
+exports.OptionP = OptionP;
+exports.Pair = Pair;
+exports.Pinch = Pinch;
+exports.Pure = Pure;
+exports.Race = Race;
+exports.RaceWithTimeout = RaceWithTimeout;
+exports.React = React;
+exports.Receiver = Receiver2;
+exports.Resolve = Resolve;
+exports.Second = Second;
+exports.Stage = Stage;
+exports.Then = Then2;
+exports.Timeout = Timeout;
+exports.Unit = Unit2;
+exports.Worker = Worker;

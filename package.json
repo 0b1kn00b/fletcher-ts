@@ -1,6 +1,6 @@
 {
 	"name": "fletcher-ts",
-	"version": "0.12.0",
+	"version": "0.13.0",
 	"description": "arrowlet library for typescript",
 	"dependencies": {
 		"effect": "^3.2.1",
@@ -18,7 +18,7 @@
 	"module": "./dist/index.js",
 	"types": "./dist/index.d.ts",
 	"files": [
-		"./dist"
+		"./dist/*"
 	],
 	"devDependencies": {
 		"@rollup/plugin-typescript": "^11.1.6",

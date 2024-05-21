@@ -17,4 +17,6 @@ export declare class Junction<R> extends Settler<Deferred<R>> {
     static later<R>(payload: Promise<R>): Allocator<R>;
     static issue<R>(self: R): Allocator<R>;
     static Pure<R>(deferred: Deferred<R>): Junction<R>;
+    /**Takes a resolver to use later that may return Work to be done in a scheduler once all inputs are known*/
+    static Unit<R>(): Junction<R>;
 }
