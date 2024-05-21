@@ -1,5 +1,5 @@
 import { Then } from "../term/Then";
-import { Arrowlet, Terminal } from "../Core"
+import { Arrowlet, Junction } from "../Core"
 import { Anon } from "../term/Anon";
 import { forward, resolve, unit } from "../util";
 import { Fun } from "../term/Fun";
@@ -51,7 +51,7 @@ export class Arrow<Pi,Ri,Pii,Rii>{
   static Pair<Pi,Pii,Ri,Rii>(that:Arrowlet<Pii,Rii>):Arrow<Pi,Ri,[Pi,Pii],[Ri,Rii]>{
     return new Arrow(
       (self:Arrowlet<Pi,Ri>) => new Anon(
-        (p:[Pi,Pii],cont:Terminal<[Ri,Rii]>) => {
+        (p:[Pi,Pii],cont:Junction<[Ri,Rii]>) => {
           let [l, r] = p;
           let lhs = forward(self,l);
           let rhs = forward(that,r);
@@ -67,7 +67,7 @@ export class Arrow<Pi,Ri,Pii,Rii>{
     return new Arrow(
       (self:Arrowlet<Pi,Ri>) => {
         return new Anon(
-          (p:Pi,cont:Terminal<[Ri,Rii]>) => {
+          (p:Pi,cont:Junction<[Ri,Rii]>) => {
             return Arrow.Pair(that).apply(self).defer([p,p],cont);
           }
         )       
@@ -81,10 +81,10 @@ export class Arrow<Pi,Ri,Pii,Rii>{
     return new Arrow(
       (self:Arrowlet<Pi,Ri>) => {
         return new Anon(
-          (p:Pi,cont:Terminal<Rii>) => {
+          (p:Pi,cont:Junction<Rii>) => {
             return cont.receive(forward(self,p).flat_fold(
               ok => forward(fn(ok),p),
-              no => Terminal.error(no) 
+              no => Junction.error(no) 
             ))
           }
         )
@@ -119,7 +119,7 @@ export class Arrow<Pi,Ri,Pii,Rii>{
     return new Arrow(
       (self:Arrowlet<Pi,Ri>) => {
         return new Anon(
-          (p:Pi,cont:Terminal<[Ri,Rii]>) =>{
+          (p:Pi,cont:Junction<[Ri,Rii]>) =>{
             return cont.receive(
               forward(self,p).zip(forward(that,p))
             )

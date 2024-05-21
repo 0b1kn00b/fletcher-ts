@@ -1,8 +1,7 @@
-import { Receiver } from "./core/Receiver";
+import { Allocator } from "./core/Allocator";
 import { Arrowlet } from "./core/Arrowlet";
-import { Result } from "./core/Result";
-export declare function forward<P, R>(self: Arrowlet<P, R>, p: P): Receiver<R>;
-export declare function resolve<P, R>(self: Arrowlet<P, R>, input: P): Promise<Result<R>>;
+export declare function forward<P, R>(self: Arrowlet<P, R>, p: P): Allocator<R>;
+export declare function resolve<P, R>(self: Arrowlet<P, R>, input: P): Promise<R>;
 /**
  * normallly as Arrowlet<void,void> to drive Arrow
  * @returns

@@ -1,20 +1,22 @@
 import { Arrowlet } from "../Core";
-import { Terminal } from "../core/Terminal";
+import { Junction } from "../core/Junction";
+import { Work } from "../Core";
 import { Deferred } from "ts-deferred";
 import * as E from 'fp-ts/Either';
-import { Result } from "../core/Result";
 export class EventArrowlet<T extends Event> implements Arrowlet<EventTarget,T>{
   private event_name : string;
   constructor(event_name:string){
     this.event_name = event_name;
   }
-  public defer(target:EventTarget,cont:Terminal<T>){
-    let deferred : Deferred<Result<T>>  = new Deferred();
+  public defer(target:EventTarget,cont:Junction<T>){
+    let event_handler_removed           = false;
+    let deferred : Deferred<T>  = new Deferred();
     let self                            = this;
     let handler = {
       handleEvent : function (evt:T):void{
         console.log('loaded');
-        deferred.resolve(E.left(evt));
+        deferred.resolve(evt);
+        event_handler_removed = true;
         target.removeEventListener(this.event_name,handler);
       }
     }
@@ -22,6 +24,14 @@ export class EventArrowlet<T extends Event> implements Arrowlet<EventTarget,T>{
       this.event_name,
       handler
     );
-    return cont.receive(Terminal.later(deferred.promise))
+    let canceller = new Work(
+      () => {
+        if(!event_handler_removed){
+          target.removeEventListener(this.event_name,handler);
+        }
+        return null;
+      }
+    )
+    return cont.receive(Junction.later(deferred.promise)).seq(canceller)
   }
 }

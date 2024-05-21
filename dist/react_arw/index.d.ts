@@ -1,5 +1,5 @@
 import { Arrowlet } from "../Core";
-import { Dispatch } from 'react';
-export declare function react<P, R>(dispatch: Dispatch<R>): Arrowlet<R, void>;
-declare function useReducerWithThunk<A>(dispatch: Dispatch<A>): Dispatch<A>;
+import { Allocator } from 'react';
+export declare function react<P, R>(dispatch: Allocator<R>): Arrowlet<R, void>;
+declare function useReducerWithThunk<A>(dispatch: Allocator<A>): Allocator<A>;
 export { useReducerWithThunk };

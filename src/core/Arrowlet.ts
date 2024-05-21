@@ -1,7 +1,7 @@
-import { Terminal } from "./Terminal";
-import { Cycle } from "./Cycle";
+import { Junction } from "./Junction";
+import { Work } from "./Work";
 
 export interface Arrowlet<P, R> {
-  defer(p: P, cont: Terminal<R>): Cycle;
+  defer(p: P, cont: Junction<R>): Work;
   //toArrowlet(): Arrowlet<P, R, E>;
 }

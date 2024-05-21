@@ -1,5 +1,5 @@
-import { Cycle } from "../core/Cycle";
-import { Terminal } from "../core/Terminal";
+import { Work } from "../core/Work";
+import { Junction } from "../core/Junction";
 import { Fun } from "./Fun";
 
 export class Unit<Pi> extends Fun<Pi,Pi>{

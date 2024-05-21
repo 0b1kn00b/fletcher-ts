@@ -1,3 +1,3 @@
 import { Cont } from "./Cont";
-import { Cycle } from "./Cycle";
-export class Settler<P> extends Cont<P, Cycle> { };
+import { Work } from "./Work";
+export class Settler<P> extends Cont<P, Work> { };

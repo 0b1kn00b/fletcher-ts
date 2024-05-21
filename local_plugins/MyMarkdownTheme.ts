@@ -1,6 +1,4 @@
-import { Models, Options, Reflection } from "typedoc";
-
-import { MarkdownPageEvent, MarkdownRenderer, MarkdownTheme, MarkdownThemeContext } from "typedoc-plugin-markdown";
+import { MarkdownRenderer, MarkdownTheme, MarkdownThemeContext } from "typedoc-plugin-markdown";
 
 import { partials } from '../node_modules/typedoc-plugin-markdown/dist/theme/resources';
 

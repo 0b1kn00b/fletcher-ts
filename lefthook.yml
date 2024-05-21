@@ -14,8 +14,8 @@
 pre-commit:
   parallel: true
   commands:
-    build-library:
-      run: npm run build && git add dist
+    # build-library:
+    #   run: npm run build && git add dist
 #     eslint:
 #       glob: "*.{js,ts,jsx,tsx}"
 #       run: yarn eslint {staged_files}

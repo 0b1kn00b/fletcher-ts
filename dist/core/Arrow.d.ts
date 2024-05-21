@@ -32,7 +32,7 @@ export declare class Arrow<Pi, Ri, Pii, Rii> {
     bound<Riii>(that: Arrowlet<[Pii, Rii], Riii>): Arrow<Pi, Ri, Pii, Riii>;
     static Broach<Pi, Ri>(): Arrow<Pi, Ri, Pi, [Pi, Ri]>;
     broach(): Arrow<Pi, Ri, Pii, [Pii, Rii]>;
-    resolve(p: Pii): Promise<import("./Result").Result<Rii>>;
+    resolve(p: Pii): Promise<Rii>;
     static Compose<Pi, Pii, Piii, Ri, Rii, Riii>(lhs: Arrow<Ri, Rii, Piii, Riii>, rhs: Arrow<Pi, Pii, Ri, Rii>): Arrow<Pi, Pii, Piii, Riii>;
     compose<P, R>(before: Arrow<P, R, Pi, Ri>): Arrow<P, R, Pii, Rii>;
 }

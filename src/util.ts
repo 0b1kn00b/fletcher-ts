@@ -1,38 +1,35 @@
-import { Receiver } from "./core/Receiver";
+import { Allocator } from "./core/Allocator";
 import { Deferred } from "ts-deferred";
 import { Arrowlet } from "./core/Arrowlet";
-import { Cycle } from "./core/Cycle";
-import { ReceiverSink } from "./core/Receiver";
-import { TerminalInput } from "./core/Terminal";
+import { Work } from "./core/Work";
 import { Apply } from "./core/Apply";
-import { Terminal } from "./core/Terminal";
-import { Result } from "./core/Result";
+import { Junction } from "./core/Junction";
 import { Fun } from "./term/Fun";
 
-export function forward<P,R>(self:Arrowlet<P,R>, p: P) : Receiver<R>{
-  return new Receiver(
-    (k:ReceiverSink<R>): Cycle => {
-      let deferred : TerminalInput<R> = new Deferred();
+export function forward<P,R>(self:Arrowlet<P,R>, p: P) : Allocator<R>{
+  return new Allocator(
+    (k:Apply<Promise<R>,Work>): Work => {
+      let deferred : Deferred<R> = new Deferred();
       let fst      = self.defer(
         p,
-        new Terminal(
-          (t_sink:Apply<TerminalInput<R>,Cycle>):Cycle => {
+        new Junction(
+          (t_sink:Apply<Deferred<R>,Work>):Work => {
             let result = t_sink.apply(deferred);
             return result;
           }
         )
       );
       let snd       = k.apply(deferred.promise);
-      return Cycle.Seq(fst,snd);
+      return Work.Seq(fst,snd);
     }
   );
 }
-export function resolve<P,R>(self:Arrowlet<P,R>,input:P):Promise<Result<R>>{
+export function resolve<P,R>(self:Arrowlet<P,R>,input:P):Promise<R>{
   //console.log('resolve init');
-  let deferred : Deferred<Result<R>> = new Deferred();
+  let deferred : Deferred<R> = new Deferred();
   let cycle = self.defer(
     input,
-    Terminal.Pure(deferred)
+    Junction.Pure(deferred)
   );
   //console.log('resolve: post defer');
   let finish  = cycle.submit();

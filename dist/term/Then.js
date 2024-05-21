@@ -1,5 +1,4 @@
-import { Arrowlet } from "../Core";
-import { Junction } from "../core/Junction";
+import { forward } from "../util";
 /**
  * Creates an arrowlet that outputs the result of the first into the second and returns the result.
  *
@@ -10,9 +9,15 @@ import { Junction } from "../core/Junction";
  * @typeParam R right hand side output type
  * @typeParam E error typeq
  */
-export declare class Then<Pi, Pii, R> implements Arrowlet<Pi, R> {
-    lhs: Arrowlet<Pi, Pii>;
-    rhs: Arrowlet<Pii, R>;
-    constructor(lhs: Arrowlet<Pi, Pii>, rhs: Arrowlet<Pii, R>);
-    defer(p: Pi, cont: Junction<R>): import("../Core").Work;
+export class Then {
+    lhs;
+    rhs;
+    constructor(lhs, rhs) {
+        this.lhs = lhs;
+        this.rhs = rhs;
+    }
+    defer(p, cont) {
+        var a = forward(this.lhs, p);
+        return cont.receive(a.flat_fold(ok => forward(this.rhs, ok)));
+    }
 }
