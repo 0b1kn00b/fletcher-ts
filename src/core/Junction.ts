@@ -25,13 +25,15 @@ export class Junction<R> extends Settler<Deferred<R>> {
           return this.apply(
             new Apply(
               (b:Deferred<R>):Work.Work => {
-                let result = a.then(
-                  (v) => {
-                    //console.log('receiver inner',v);
-                    b.resolve(v);
-                  }
+                return Work.fromPromise(
+                  a.then(
+                    (v) => {
+                      //console.log('receiver inner',v);
+                      b.resolve(v);
+                      return Work.ZERO;
+                    }
+                  )
                 );
-                return Work.ZERO;
               }
             )
           );
