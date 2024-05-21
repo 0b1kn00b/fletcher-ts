@@ -83,8 +83,7 @@ export class Arrow<Pi,Ri,Pii,Rii>{
         return new Anon(
           (p:Pi,cont:Junction<Rii>) => {
             return cont.receive(forward(self,p).flat_fold(
-              ok => forward(fn(ok),p),
-              no => Junction.error(no) 
+              ok => forward(fn(ok),p) 
             ))
           }
         )

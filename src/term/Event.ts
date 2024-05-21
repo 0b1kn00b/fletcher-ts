@@ -24,7 +24,7 @@ export class EventArrowlet<T extends Event> implements Arrowlet<EventTarget,T>{
       this.event_name,
       handler
     );
-    let canceller = new Work(
+    let canceller = Work.fromThunk(
       () => {
         if(!event_handler_removed){
           target.removeEventListener(this.event_name,handler);
@@ -32,6 +32,6 @@ export class EventArrowlet<T extends Event> implements Arrowlet<EventTarget,T>{
         return null;
       }
     )
-    return cont.receive(Junction.later(deferred.promise)).seq(canceller)
+    return Work.Seq(cont.receive(Junction.later(deferred.promise)),canceller)
   }
 }

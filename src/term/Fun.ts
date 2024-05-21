@@ -5,7 +5,7 @@ export class Fun<P,R> implements Arrowlet<P,R>{
   constructor(_apply:(p:P) => R){
     this._apply = _apply;
   }
-  defer(p: P, cont: Junction<R>): Work {
-    return cont.receive(Junction.value(this._apply(p)));
+  defer(p: P, cont: Junction<R>): Work.Work {
+    return cont.receive(Junction.issue(this._apply(p)));
   }
 }

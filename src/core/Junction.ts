@@ -6,7 +6,7 @@ import { Apply } from "./Apply";
 import { Work } from "./Work";
 
 //Discharge
-export type JunctionSink<R>       = Apply<Deferred<R>,Work>;
+export type JunctionSink<R>       = Apply<Deferred<R>,Work.Work>;
 
 /**
  * Junction represents the contiuation passed through the Arrowlets to run them
@@ -17,29 +17,21 @@ export type JunctionSink<R>       = Apply<Deferred<R>,Work>;
  * @typeParam E
  */
 export class Junction<R> extends Settler<Deferred<R>> {
-  receive(receiver:Allocator<R>):Work{
+  receive(receiver:Allocator<R>):Work.Work{
     //console.log('receiver called');``
     return receiver.apply(
       new Apply(
-        (a:Promise<R>):Work => {
+        (a:Promise<R>):Work.Work => {
           return this.apply(
             new Apply(
-              (b:Deferred<R>):Work => {
+              (b:Deferred<R>):Work.Work => {
                 let result = a.then(
                   (v) => {
                     //console.log('receiver inner',v);
                     b.resolve(v);
                   }
                 );
-                return new Work(() => {
-                  //console.log('receiver done');
-                  return result.then(
-                    _ => {
-                      //console.log('receiver unit');
-                      return Work.ZERO;
-                    }
-                  )
-                });
+                return Work.ZERO;
               }
             )
           );
@@ -49,14 +41,14 @@ export class Junction<R> extends Settler<Deferred<R>> {
   }
   static later<R>(payload: Promise<R>): Allocator<R> {
     return new Allocator(
-      (fn: Apply<Promise<R>, Work>): Work => {
+      (fn: Apply<Promise<R>, Work.Work>): Work.Work => {
         return fn.apply(payload);
       }
     );
   }
   static issue<R>(self: R) {
     return new Allocator(
-      function (fn: Apply<Promise<R>, Work>): Work {
+      function (fn: Apply<Promise<R>, Work.Work>): Work.Work {
         let promise: Promise<R> = new Promise(
           (resolve) => {
             resolve(self);
@@ -68,7 +60,7 @@ export class Junction<R> extends Settler<Deferred<R>> {
   }
   static Pure<R>(deferred:Deferred<R>):Junction<R>{
     return new Junction(
-      (a:Apply<Deferred<R>,Work>)=>{
+      (a:Apply<Deferred<R>,Work.Work>)=>{
         return a.apply(deferred);
       }
     );

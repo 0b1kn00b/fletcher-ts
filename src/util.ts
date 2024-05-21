@@ -8,12 +8,12 @@ import { Fun } from "./term/Fun";
 
 export function forward<P,R>(self:Arrowlet<P,R>, p: P) : Allocator<R>{
   return new Allocator(
-    (k:Apply<Promise<R>,Work>): Work => {
+    (k:Apply<Promise<R>,Work.Work>): Work.Work => {
       let deferred : Deferred<R> = new Deferred();
       let fst      = self.defer(
         p,
         new Junction(
-          (t_sink:Apply<Deferred<R>,Work>):Work => {
+          (t_sink:Apply<Deferred<R>,Work.Work>):Work.Work => {
             let result = t_sink.apply(deferred);
             return result;
           }
@@ -32,10 +32,10 @@ export function resolve<P,R>(self:Arrowlet<P,R>,input:P):Promise<R>{
     Junction.Pure(deferred)
   );
   //console.log('resolve: post defer');
-  let finish  = cycle.submit();
+  let finish  = Work.Promise(cycle);
   //console.log('resolve: post submit')
   return finish.then(
-    () => {
+    (_) => {
       //console.log('resolve resolved')
       return deferred.promise.then(
         x => {

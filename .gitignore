@@ -1,2 +1,4 @@
 /node_modules
 /sumfin
+/.lsp
+/.clj-kondo

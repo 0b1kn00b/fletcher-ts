@@ -5,21 +5,21 @@ import { Arrowlet } from '../src/Core';
 import { Arrow } from '../src/core/Arrow';
 import * as O from 'fp-ts/Option';
 import * as E from 'fp-ts/Either';
-// test(
-//   'test run then',
-//   async () => {
-//     //console.log('strarting');
-//     let l = F.Fun1R((x:number) => x * 10);
-//     let r = F.Fun1R((x:number) => x + 1);
-//     let n = F.Then(r).apply(l);
-//     expect(false);
-//     let a = await vi.waitFor(
-//       async () => F.Resolve(n,1)
-//     );
-//     console.log(a);
-//     expect(false);
-//   }
-// );
+test(
+  'test run then',
+  async () => {
+    //console.log('strarting');
+    let l = F.Fun1R((x:number) => x * 10);
+    let r = F.Fun1R((x:number) => x + 1);
+    let n = F.Then(l,r);
+    expect(false);
+    let a = await vi.waitFor(
+      async () => F.Resolve(n,1)
+    );
+    console.log(a);
+    expect(false);
+  }
+);
 test(
   'option',
   () => describe(
@@ -36,7 +36,7 @@ test(
           //console.log(b);
         },
         (_) => {}
-      )(b);
+      )(E.left(b));
     }
   )
 )

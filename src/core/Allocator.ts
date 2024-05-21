@@ -8,7 +8,7 @@ import * as Either from "fp-ts/Either";
 /**
  * The `Junction` is responsible for both creating `Allocators` and fullfilling
  * Promises to them.
- * The `Allocator` can return `Work` to be done by a scheduler, which is passed through
+ * The `Allocator` can return `Work.Work` to be done by a scheduler, which is passed through
  * the allocator. 
  * @export
  * @class Allocator
@@ -18,7 +18,7 @@ import * as Either from "fp-ts/Either";
 export class Allocator<R> extends Settler<Promise<R>>{
   flat_fold<Ri>(fn:(r:R)=>Allocator<Ri>):Allocator<Ri>{
     return new Allocator(
-      (cont:Apply<Promise<Ri>,Work>) => {
+      (cont:Apply<Promise<Ri>,Work.Work>) => {
         return this.apply(
           new Apply(
             (p:Promise<R>) => {
@@ -28,12 +28,12 @@ export class Allocator<R> extends Settler<Promise<R>>{
                 }
               );
               let b = a.then(
-                (x:Allocator<Ri>):Work => {
-                  let a : Work = x.apply(cont);
+                (x:Allocator<Ri>):Work.Work => {
+                  let a : Work.Work = x.apply(cont);
                   return a;
                 }
               );
-              let c = new Work(() => b);
+              let c = Work.fromPromise(b);
               return c;
             }
           )
@@ -46,7 +46,7 @@ export class Allocator<R> extends Settler<Promise<R>>{
   }
   static Zip<R,Ri>(self:Allocator<R>,that:Allocator<Ri>):Allocator<[R,Ri]>{
     return new Allocator(
-      (f:Apply<Promise<[R,Ri]>,Work>) => {
+      (f:Apply<Promise<[R,Ri]>,Work.Work>) => {
           var lhs  : Promise<R>     | null = null;
           var rhs  : Promise<Ri>    | null = null;
           let work_left  = self.apply(
@@ -63,34 +63,14 @@ export class Allocator<R> extends Settler<Promise<R>>{
               return Work.ZERO;
             })
           );
-          return work_left.par(work_right).seq(
-            new Work(
-              () => {
-                let lhs_ : Promise<R>   = lhs!;
-                let rhs_ : Promise<Ri>  = rhs!;
-                let ipt = 
-                  lhs_.then(
-                    (okI:R) => rhs_.then(
-                      (okII:Ri) => { 
-                        //console.log("zip: set both");
-                        return {fst : okI, snd : okII} 
-                      }
-                    )
-                  );
-
-                let nxt = ipt.then(
-                  (p:{ fst : R,snd : Ri}):[R,Ri] => {
-                    return [p.fst,p.snd];
-                  }
-                );
-                let res = f.apply(nxt);
-                return new Promise(
-                  resolve => {
-                    //console.log('zip:zippped', res);
-                    resolve(res)
-                  }
-                );
-              }
+          return Work.Seq(Work.Par(work_left,work_right),
+            f.apply(
+              Promise.all([lhs,rhs]).then(
+                (values) => {
+                  let tuple : [R,Ri] = [values[0],values[1]];
+                  return tuple;
+                }
+              )
             )
           );
         }

@@ -7,13 +7,14 @@ import { EventArrowlet } from "./term/Event";
 import { Arrow } from "./core/Arrow";
 import { react, useReducerWithThunk } from "./react_arw"
 import { ReactAsyncAction } from "./react_arw/ReactAsyncAction";
-import { Allocator } from "react";
 import { Option as OptionArw } from "./term/Option";
 import { OptionM } from "./term/OptionM";
 import * as O from 'fp-ts/Option';
 import { Arrowlet, Junction, Work, Apply } from "./Core";
 import * as E from 'fp-ts/Either';
 import { Then } from "./term/Then";
+import { Allocator } from "./core/Allocator";
+import { Effect, Either, pipe } from "effect";
 /** Returns Work from Continuation */
 
 /**Takes a resolver to use later that may return Work to be done in a scheduler once all inputs are known*/
@@ -21,7 +22,7 @@ import { Then } from "./term/Then";
 export class Fletcher{
   static Junction<P>(){
     return new Junction(
-      (a:Apply<Deferred<P>,Work>):Work => {
+      (a:Apply<Deferred<P>,Work.Work>):Work.Work => {
         return a.apply(new Deferred());
       }
     )
@@ -72,11 +73,11 @@ export class Fletcher{
    * @static
    * @typeParam Pi
    * @typeParam Ri
-   * @param {(p:Pi,cont:Junction<Ri>)=>Work} fn
+   * @param {(p:Pi,cont:Junction<Ri>)=>Work.Work} fn
    * @return {*} 
    * @memberof Fletcher
    */
-  static Anon<Pi,Ri>(fn:(p:Pi,cont:Junction<Ri>)=>Work):Arrowlet<Pi,Ri>{
+  static Anon<Pi,Ri>(fn:(p:Pi,cont:Junction<Ri>)=>Work.Work):Arrowlet<Pi,Ri>{
     return new Anon(fn)
   }
   /**
@@ -256,7 +257,7 @@ export class Fletcher{
   }
   static Handler<R>(self:Arrowlet<R,void>):(r:R) => void{
     return (r:R) =>{
-      self.defer(r,Fletcher.Junction()).submit();
+      Work.Submit(self.defer(r,Fletcher.Junction()));
     } 
   }
 /**
@@ -283,7 +284,7 @@ static Race<P,R>(self:Arrowlet<P,R>,that:Arrowlet<P,R>):Arrowlet<P,R>{
         }
         const a = Fletcher.Then(self,Fletcher.Fun1R(handler));
         const b = Fletcher.Then(self,Fletcher.Fun1R(handler));
-        return new Work(() => Promise.any([Fletcher.Resolve(a,p),Fletcher.Resolve(b,p)]).then(
+        return Work.fromPromise(Promise.any([Fletcher.Resolve(a,p),Fletcher.Resolve(b,p)]).then(
           (_) => deferred.promise.then(
             (r:R) => cont.receive(
               Junction.issue(r)
@@ -407,10 +408,10 @@ static Race<P,R>(self:Arrowlet<P,R>,that:Arrowlet<P,R>):Arrowlet<P,R>{
    * @return {*}  {Arrowlet<P,P>}
    * @memberof Fletcher
    */
-  static Worker<P>(work:Work):Arrowlet<P,P>{
+  static Worker<P>(work:Work.Work):Arrowlet<P,P>{
     return Fletcher.Anon(
       (p:P,junc:Junction<P>) => {
-        return junc.receive(Junction.issue(p)).seq(work)
+        return Work.Seq(junc.receive(Junction.issue(p)),work)
       }
     );
   }
@@ -448,17 +449,21 @@ static Race<P,R>(self:Arrowlet<P,R>,that:Arrowlet<P,R>):Arrowlet<P,R>{
   static Map<Pi,R,Ri>(l:Arrowlet<Pi,R>,fn:(r:R) => Ri):Arrowlet<Pi,Ri>{
     return Fletcher.Then(l,Fletcher.Fun1R(fn));
   }
-  static Instances = {
-    EventArrowlet : EventArrowlet,
-    Anon          : Anon,
-    Fun           : Fun,
-    Option        : OptionArw,
-    OptionM       : OptionM,
-    Then          : Then,
-    Unit          : Unit
+  static Effect<Pi,R>(self:Arrowlet<Pi,R>):(pi:Pi) => Effect.Effect<R,any,Pi>{
+    return (pi:Pi) => {
+      return Effect.promise((signal:AbortSignal) => Fletcher.Resolve(self,pi));
+    }
   }
-  static Core = {
-    Junction  : Junction,
-    Work     : Work 
+  static Loop<Pi,R>(self:Arrowlet<Pi,Either.Either<R,Pi>>):Arrowlet<Pi,R>{
+    return Fletcher.Anon(
+      function rec(pi:Pi,cont:Junction<R>){
+        return forward(self,pi).flat_fold(
+          (r:Either.Either<R,Pi>) => Either.match({
+            onLeft    : (pi:Pi)   => Work.fromThunk(() => rec(pi,cont)),//yay?
+            onRight   : (r:R)     => cont.receive(Junction.issue(r))
+          })
+        )
+      }
+    );
   }
 }
