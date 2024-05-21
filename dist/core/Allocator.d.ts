@@ -2,7 +2,7 @@ import { Settler } from "./Settler";
 /**
  * The `Junction` is responsible for both creating `Allocators` and fullfilling
  * Promises to them.
- * The `Allocator` can return `Work` to be done by a scheduler, which is passed through
+ * The `Allocator` can return `Work.Work` to be done by a scheduler, which is passed through
  * the allocator.
  * @export
  * @class Allocator

@@ -3,7 +3,7 @@ import { Allocator } from "./Allocator";
 import { Settler } from "./Settler";
 import { Apply } from "./Apply";
 import { Work } from "./Work";
-export type JunctionSink<R> = Apply<Deferred<R>, Work>;
+export type JunctionSink<R> = Apply<Deferred<R>, Work.Work>;
 /**
  * Junction represents the contiuation passed through the Arrowlets to run them
  *
@@ -13,7 +13,7 @@ export type JunctionSink<R> = Apply<Deferred<R>, Work>;
  * @typeParam E
  */
 export declare class Junction<R> extends Settler<Deferred<R>> {
-    receive(receiver: Allocator<R>): Work;
+    receive(receiver: Allocator<R>): Work.Work;
     static later<R>(payload: Promise<R>): Allocator<R>;
     static issue<R>(self: R): Allocator<R>;
     static Pure<R>(deferred: Deferred<R>): Junction<R>;

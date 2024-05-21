@@ -1,17 +1,11 @@
-/**
- * An item of work embeded in the after call, with the option
- * to return a promise of later work.
- */
-export declare class Work {
-    private _after;
-    constructor(_after: ((() => (Promise<Work> | null)) | null));
-    get after(): Promise<Work>;
-    static Seq(lhs: Work, rhs: Work): Work;
-    seq(rhs: Work): Work;
-    par(rhs: Work): Work;
-    submit(): Promise<unknown>;
-    static Submit(self: Work): Promise<unknown>;
-    static Par(self: Work, that: Work): Work;
-    static ZERO: Work;
-    static Pure(self: Promise<Work>): Work;
+import { Effect } from "effect";
+export declare namespace Work {
+    type Work = Effect.Effect<Work | void, never, never>;
+    function Seq(lhs: Work, rhs: Work): Work;
+    function Par(self: Work, that: Work): Work;
+    const ZERO: Work;
+    function fromPromise(promise: Promise<Work>): Work;
+    function fromThunk(thunk: () => Work): Work;
+    function Submit(self: Work): import("effect/Runtime").Cancel<void | Work, never>;
+    function Promise(self: Work): Promise<void | Work>;
 }

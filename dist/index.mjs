@@ -1,4 +1,3 @@
-"use strict";
 var __defProp = Object.defineProperty;
 var __defNormalProp = (obj, key, value) => key in obj ? __defProp(obj, key, { enumerable: true, configurable: true, writable: true, value }) : obj[key] = value;
 var __publicField = (obj, key, value) => {
@@ -24,7 +23,6 @@ var __privateSet = (obj, member, value, setter) => {
   return value;
 };
 var _value, _a, _b, _c, _d, _e, _f, _g, _h, _i, _j, _k, _l, _m, _n, _o, _p, _q, _r, _s, _t, _u, _v, _w, _x, _y, _z, _A, _B, _C, _D, _E, _F, _G, _H, _I, _J, _K, _L, _M, _N, _O, _P;
-Object.defineProperty(exports, Symbol.toStringTag, { value: "Module" });
 var Deferred = function() {
   function Deferred2() {
     var _this = this;
@@ -8348,7 +8346,7 @@ const flatMap = flatMap$1;
 const raceAll = raceAll$1;
 const runCallback = unsafeRunEffect;
 const runPromise = unsafeRunPromiseEffect;
-exports.Work = void 0;
+var Work;
 (function(Work2) {
   function Seq(lhs, rhs) {
     return flatMap(lhs, (x) => x == null ? rhs : Work2.Seq(x, rhs));
@@ -8379,7 +8377,7 @@ exports.Work = void 0;
     return runPromise(self);
   }
   Work2.Promise = Promise2;
-})(exports.Work || (exports.Work = {}));
+})(Work || (Work = {}));
 class Cont extends Apply {
 }
 class Settler extends Cont {
@@ -8395,7 +8393,7 @@ class Allocator extends Settler {
           let a2 = x.apply(cont);
           return a2;
         });
-        let c = exports.Work.fromPromise(b);
+        let c = Work.fromPromise(b);
         return c;
       }));
     });
@@ -8409,13 +8407,13 @@ class Allocator extends Settler {
       var rhs = null;
       let work_left = self.apply(new Apply((ocI) => {
         lhs = ocI;
-        return exports.Work.ZERO;
+        return Work.ZERO;
       }));
       var work_right = that.apply(new Apply((ocII) => {
         rhs = ocII;
-        return exports.Work.ZERO;
+        return Work.ZERO;
       }));
-      return exports.Work.Seq(exports.Work.Par(work_left, work_right), f.apply(Promise.all([lhs, rhs]).then((values) => {
+      return Work.Seq(Work.Par(work_left, work_right), f.apply(Promise.all([lhs, rhs]).then((values) => {
         let tuple = [values[0], values[1]];
         return tuple;
       })));
@@ -8426,9 +8424,9 @@ class Junction extends Settler {
   receive(receiver) {
     return receiver.apply(new Apply((a) => {
       return this.apply(new Apply((b) => {
-        return exports.Work.fromPromise(a.then((v) => {
+        return Work.fromPromise(a.then((v) => {
           b.resolve(v);
-          return exports.Work.ZERO;
+          return Work.ZERO;
         }));
       }));
     }));
@@ -8483,13 +8481,13 @@ function forward(self, p) {
       return result;
     }));
     let snd = k.apply(deferred.promise);
-    return exports.Work.Seq(fst, snd);
+    return Work.Seq(fst, snd);
   });
 }
 function resolve(self, input) {
   let deferred = new Deferred_1();
   let cycle = self.defer(input, Junction.Pure(deferred));
-  let finish = exports.Work.Promise(cycle);
+  let finish = Work.Promise(cycle);
   return finish.then((_) => {
     return deferred.promise.then((x) => {
       return x;
@@ -8518,13 +8516,13 @@ class EventArrowlet {
       }
     };
     target.addEventListener(this.event_name, handler);
-    let canceller = exports.Work.fromThunk(() => {
+    let canceller = Work.fromThunk(() => {
       if (!event_handler_removed) {
         target.removeEventListener(this.event_name, handler);
       }
       return null;
     });
-    return exports.Work.Seq(cont.receive(Junction.later(deferred.promise)), canceller);
+    return Work.Seq(cont.receive(Junction.later(deferred.promise)), canceller);
   }
 }
 class Then {
@@ -8678,7 +8676,7 @@ class Arrow {
 function react(dispatch) {
   return new Anon((p, cont) => {
     dispatch(p);
-    return exports.Work.ZERO;
+    return Work.ZERO;
   });
 }
 function useReducerWithThunk(dispatch) {
@@ -8757,7 +8755,7 @@ class Callback {
     this.deferred(p, (r) => {
       d.resolve(r);
     });
-    return exports.Work.fromPromise(d.promise.then((x) => exports.Work.ZERO));
+    return Work.fromPromise(d.promise.then((x) => Work.ZERO));
   }
 }
 class Receiver {
@@ -8769,7 +8767,7 @@ class Receiver {
     return cont.receive(this.deferred);
   }
 }
-exports.Fletcher = void 0;
+var Fletcher;
 (function(Fletcher2) {
   function Junction$1() {
     return new Junction((a) => {
@@ -8855,7 +8853,7 @@ exports.Fletcher = void 0;
   Fletcher2.React = React;
   function Handler(self) {
     return (r) => {
-      exports.Work.Submit(self.defer(r, Fletcher2.Junction()));
+      Work.Submit(self.defer(r, Fletcher2.Junction()));
     };
   }
   Fletcher2.Handler = Handler;
@@ -8871,7 +8869,7 @@ exports.Fletcher = void 0;
       }
       const a = Fletcher2.Then(self, Fletcher2.Fun1R(handler));
       const b = Fletcher2.Then(self, Fletcher2.Fun1R(handler));
-      return exports.Work.fromPromise(Promise.any([Fletcher2.Resolve(a, p), Fletcher2.Resolve(b, p)]).then((_) => deferred.promise.then((r) => cont.receive(Junction.issue(r)))));
+      return Work.fromPromise(Promise.any([Fletcher2.Resolve(a, p), Fletcher2.Resolve(b, p)]).then((_) => deferred.promise.then((r) => cont.receive(Junction.issue(r)))));
     });
   }
   Fletcher2.Race = Race;
@@ -8919,7 +8917,7 @@ exports.Fletcher = void 0;
   Fletcher2.Timeout = Timeout;
   function Worker(work) {
     return Fletcher2.Anon((p, junc) => {
-      return exports.Work.Seq(junc.receive(Junction.issue(p)), work);
+      return Work.Seq(junc.receive(Junction.issue(p)), work);
     });
   }
   Fletcher2.Worker = Worker;
@@ -8946,7 +8944,7 @@ exports.Fletcher = void 0;
   function Loop(self) {
     return Fletcher2.Anon(function rec(pi, cont) {
       return forward(self, pi).flat_fold((r) => match$3({
-        onLeft: (pi2) => exports.Work.fromThunk(() => rec(pi2, cont)),
+        onLeft: (pi2) => Work.fromThunk(() => rec(pi2, cont)),
         //yay?
         onRight: (r2) => cont.receive(Junction.issue(r2))
       }));
@@ -8961,6 +8959,10 @@ exports.Fletcher = void 0;
     return new Receiver(self);
   }
   Fletcher2.Receiver = Receiver$1;
-})(exports.Fletcher || (exports.Fletcher = {}));
-exports.Apply = Apply;
-exports.Junction = Junction;
+})(Fletcher || (Fletcher = {}));
+export {
+  Apply,
+  Fletcher,
+  Junction,
+  Work
+};

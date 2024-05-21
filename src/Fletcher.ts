@@ -1,28 +1,30 @@
 import {Deferred} from "ts-deferred";
 import { Fun } from "./term/Fun";
-import { Anon } from "./term/Anon";
-import { Unit } from "./term/Unit";
+import { Anon as AnonCls} from "./term/Anon";
+import { Unit as UnitCls } from "./term/Unit";
 import { forward, resolve } from "./util";
 import { EventArrowlet } from "./term/Event";
-import { Arrow } from "./core/Arrow";
+import { Arrow as ArrowCls} from "./core/Arrow";
 import { react, useReducerWithThunk } from "./react_arw"
 import { ReactAsyncAction } from "./react_arw/ReactAsyncAction";
-import { Option as OptionArw } from "./term/Option";
-import { OptionM } from "./term/OptionM";
+import { Option as OptionCls } from "./term/Option";
+import { OptionM as OptionMCls} from "./term/OptionM";
 import * as O from 'fp-ts/Option';
-import { Arrowlet, Junction, Work, Apply } from "./Core";
+import { Arrowlet, Junction as JunctionCls, Work, Apply } from "./Core";
 import * as E from 'fp-ts/Either';
-import { Then } from "./term/Then";
+import { Then as ThenCls } from "./term/Then";
 import { Allocator } from "./core/Allocator";
-import { Effect, Either, pipe } from "effect";
+import { Effect as EffectNms, Either, pipe } from "effect";
+import { Callback as CallbackCls } from "./term/Callback";
+import { Receiver as ReceiverCls } from "./term/Receiver";
 /** Returns Work from Continuation */
 
 /**Takes a resolver to use later that may return Work to be done in a scheduler once all inputs are known*/
 
-export class Fletcher{
-  static Junction<P>(){
-    return new Junction(
-      (a:Apply<Deferred<P>,Work.Work>):Work.Work => {
+export namespace Fletcher{
+  export function Junction<R>():JunctionCls<R>{
+    return new JunctionCls(
+      (a:Apply<Deferred<R>,Work.Work>):Work.Work => {
         return a.apply(new Deferred());
       }
     )
@@ -36,11 +38,11 @@ export class Fletcher{
    * @return {*}  {Arrowlet<P,P>}
    * @memberof Fletcher
    */
-  static Unit<P>():Arrowlet<P,P>{
-    return new Unit();
+  export function Unit<P>():Arrowlet<P,P>{
+    return new UnitCls();
   }
-  static Arrow(){
-    return Arrow;
+  export function Arrow(){
+    return ArrowCls;
   }
   /**
    * Arrow of function `fn`
@@ -51,7 +53,7 @@ export class Fletcher{
    * @return {*}  {Arrowlet<Pi,Ri>}
    * @memberof Fletcher
    */
-  static Fun1R<Pi,Ri>(fn:(p:Pi)=>Ri):Arrowlet<Pi,Ri>{
+  export function Fun1R<Pi,Ri>(fn:(p:Pi)=>Ri):Arrowlet<Pi,Ri>{
     return new Fun(fn);
   }
   /**
@@ -64,7 +66,7 @@ export class Fletcher{
    * @return {*}  {Arrowlet<Pi,Ri>}
    * @memberof Fletcher
    */
-  static Pure<Pi,Ri>(r:Ri):Arrowlet<Pi,Ri>{
+  export function Pure<Pi,Ri>(r:Ri):Arrowlet<Pi,Ri>{
     return Fletcher.Fun1R((_:Pi) =>r);
   }
   /**
@@ -77,8 +79,8 @@ export class Fletcher{
    * @return {*} 
    * @memberof Fletcher
    */
-  static Anon<Pi,Ri>(fn:(p:Pi,cont:Junction<Ri>)=>Work.Work):Arrowlet<Pi,Ri>{
-    return new Anon(fn)
+  export function Anon<Pi,Ri>(fn:(p:Pi,cont:JunctionCls<Ri>)=>Work.Work):Arrowlet<Pi,Ri>{
+    return new AnonCls(fn)
   }
   /**
    * Runs Arrow and produces Promise result
@@ -91,7 +93,7 @@ export class Fletcher{
    * @return {*}  {Promise<R>}
    * @memberof Fletcher
    */
-  static Resolve<P,R>(self:Arrowlet<P,R>,input:P):Promise<R>{
+  export function Resolve<P,R>(self:Arrowlet<P,R>,input:P):Promise<R>{
     return resolve(self,input);
   }
   /**
@@ -105,7 +107,7 @@ export class Fletcher{
    * @return {*}  {Allocator<R>}
    * @memberof Fletcher
    */
-  static Forward<P,R>(self:Arrowlet<P,R>,input:P):Allocator<R>{
+  export function Forward<P,R>(self:Arrowlet<P,R>,input:P):Allocator<R>{
     return forward(self,input);
   }
   /**
@@ -117,7 +119,7 @@ export class Fletcher{
    * @return {*}  {Arrowlet<EventTarget,R>}
    * @memberof Fletcher
    */
-  static Event<R extends Event>(self:string):Arrowlet<EventTarget,R>{
+  export function Event<R extends Event>(self:string):Arrowlet<EventTarget,R>{
     return new EventArrowlet(self)
   }
   /**
@@ -131,8 +133,8 @@ export class Fletcher{
    * @return {*}  {Arrowlet<Pi,Rii>}
    * @memberof Fletcher
    */
-  static Then<Pi,Ri,Rii>(self:Arrowlet<Pi,Ri>,that:Arrowlet<Ri,Rii>):Arrowlet<Pi,Rii>{
-    return new Then(self,that);
+  export function Then<Pi,Ri,Rii>(self:Arrowlet<Pi,Ri>,that:Arrowlet<Ri,Rii>):Arrowlet<Pi,Rii>{
+    return new ThenCls(self,that);
   }
   /**
    * Arrow that takes a tuple [pi,pii] and produced [ri,rii]
@@ -147,7 +149,7 @@ export class Fletcher{
    * @return {*}  {Arrowlet<[Pi,Pii],[Ri,Rii]>}
    * @memberof Fletcher
    */
-  static Pair<Pi,Pii,Ri,Rii>(self:Arrowlet<Pi,Ri>,that:Arrowlet<Pii,Rii>):Arrowlet<[Pi,Pii],[Ri,Rii]>{
+  export function Pair<Pi,Pii,Ri,Rii>(self:Arrowlet<Pi,Ri>,that:Arrowlet<Pii,Rii>):Arrowlet<[Pi,Pii],[Ri,Rii]>{
     return Fletcher.Arrow().Pair(that).apply(self);
   }
   /**
@@ -162,7 +164,7 @@ export class Fletcher{
    * @return {*} 
    * @memberof Fletcher
    */
-  static FlatMap<Pi,Ri,Rii>(fn:(p:Ri)=>Arrowlet<Pi,Rii>):Arrow<Pi,Ri,Pi,Rii>{
+  export function FlatMap<Pi,Ri,Rii>(fn:(p:Ri)=>Arrowlet<Pi,Rii>):ArrowCls<Pi,Ri,Pi,Rii>{
     return Fletcher.Arrow().FlatMap(fn);
   }
    /**
@@ -175,7 +177,7 @@ export class Fletcher{
    * @return {*}  {Arrow<Pi,Ri,[Pi,Pii],[Ri,Pii]>}
    * @memberof Arrow
    */
-  static First<Pi,Ri>(self:Arrowlet<Pi,Ri>):Arrowlet<[Pi,Pi],[Pi,Ri]>{
+  export function First<Pi,Ri>(self:Arrowlet<Pi,Ri>):Arrowlet<[Pi,Pi],[Pi,Ri]>{
     return Fletcher.Arrow().First().apply(self);
   }
   /**
@@ -188,7 +190,7 @@ export class Fletcher{
    * @return {*}  {Arrow<Pi,Ri,[Pii,Pi],[Pii,Ri]>}
    * @memberof Arrow
    */
-  static Second<Pi,Ri,Pii>(self:Arrowlet<Pi,Ri>):Arrowlet<[Pi,Pi],[Pi,Ri]>{
+  export function Second<Pi,Ri,Pii>(self:Arrowlet<Pi,Ri>):Arrowlet<[Pi,Pi],[Pi,Ri]>{
     return Fletcher.Arrow().Second().apply(self);
   }
   /**
@@ -203,7 +205,7 @@ export class Fletcher{
    * @return {*}  {Arrowlet<Pi,[Ri,Rii]>}
    * @memberof Fletcher
    */
-  static Pinch<Pi,Ri,Rii>(self:Arrowlet<Pi,Ri>,that:Arrowlet<Pi,Rii>):Arrowlet<Pi,[Ri,Rii]>{
+  export function Pinch<Pi,Ri,Rii>(self:Arrowlet<Pi,Ri>,that:Arrowlet<Pi,Rii>):Arrowlet<Pi,[Ri,Rii]>{
     return Fletcher.Arrow().Pinch(that).apply(self);
   }
   /**
@@ -218,7 +220,7 @@ export class Fletcher{
    * @return {*}  {Arrowlet<Pi,[Ri,Rii]>}
    * @memberof Fletcher
    */
-  static Joint<Pi,Ri,Rii>(self:Arrowlet<Pi,Ri>,that:Arrowlet<Ri,Rii>):Arrowlet<Pi,[Ri,Rii]>{
+  export function Joint<Pi,Ri,Rii>(self:Arrowlet<Pi,Ri>,that:Arrowlet<Ri,Rii>):Arrowlet<Pi,[Ri,Rii]>{
     return Fletcher.Arrow().Joint(that).apply(self);
   }
   /**
@@ -233,7 +235,7 @@ export class Fletcher{
    * @return {*}  {Arrowlet<Pi,Rii>}
    * @memberof Fletcher
    */
-  static Bound<Pi,Ri,Rii>(self:Arrowlet<Pi,Ri>,that:Arrowlet<[Pi,Ri],Rii>):Arrowlet<Pi,Rii>{
+  export function Bound<Pi,Ri,Rii>(self:Arrowlet<Pi,Ri>,that:Arrowlet<[Pi,Ri],Rii>):Arrowlet<Pi,Rii>{
     return Fletcher.Arrow().Bound(that).apply(self);
   }
   /**
@@ -246,16 +248,16 @@ export class Fletcher{
    * @return {*}  {Arrowlet<Pi,[Pi,Ri]>}
    * @memberof Fletcher
    */
-  static Broach<Pi,Ri>(self:Arrowlet<Pi,Ri>):Arrowlet<Pi,[Pi,Ri]>{
+  export function Broach<Pi,Ri>(self:Arrowlet<Pi,Ri>):Arrowlet<Pi,[Pi,Ri]>{
     return Fletcher.Arrow().Broach().apply(self);
   }
-  static Next<Pi,Pii,Piii,Ri,Rii,Riii>(lhs:Arrow<Pi,Pii,Ri,Rii>,rhs:Arrow<Ri,Rii,Piii,Riii>){
+  export function Next<Pi,Pii,Piii,Ri,Rii,Riii>(lhs:ArrowCls<Pi,Pii,Ri,Rii>,rhs:ArrowCls<Ri,Rii,Piii,Riii>){
     return lhs.next(rhs);
   }
-  static React<R>(dispatch:Allocator<R>):Arrowlet<R,void>{  
+  export function React<R>(dispatch:Allocator<R>):Arrowlet<R,void>{  
     return react(useReducerWithThunk(dispatch));
   }
-  static Handler<R>(self:Arrowlet<R,void>):(r:R) => void{
+  export function Handler<R>(self:Arrowlet<R,void>):(r:R) => void{
     return (r:R) =>{
       Work.Submit(self.defer(r,Fletcher.Junction()));
     } 
@@ -271,9 +273,9 @@ export class Fletcher{
  * @return {*}  {Arrowlet<P,R>}
  * @memberof Fletcher
  */
-static Race<P,R>(self:Arrowlet<P,R>,that:Arrowlet<P,R>):Arrowlet<P,R>{
+export function Race<P,R>(self:Arrowlet<P,R>,that:Arrowlet<P,R>):Arrowlet<P,R>{
     return Fletcher.Anon(
-      (p:P,cont:Junction<R>) => {
+      (p:P,cont:JunctionCls<R>) => {
         const deferred  = new Deferred();
         var complete    = false;
         function handler(r:R){
@@ -287,7 +289,7 @@ static Race<P,R>(self:Arrowlet<P,R>,that:Arrowlet<P,R>):Arrowlet<P,R>{
         return Work.fromPromise(Promise.any([Fletcher.Resolve(a,p),Fletcher.Resolve(b,p)]).then(
           (_) => deferred.promise.then(
             (r:R) => cont.receive(
-              Junction.issue(r)
+              JunctionCls.issue(r)
             )
           )
         ));
@@ -306,9 +308,9 @@ static Race<P,R>(self:Arrowlet<P,R>,that:Arrowlet<P,R>):Arrowlet<P,R>{
    * @return {*}  {Arrowlet<P,R>}
    * @memberof Fletcher
    */
-  static Stage<P,R>(self:Arrowlet<P,R>,before:((p:P)=>void) | null, after:((r:R) => void) | null):Arrowlet<P,R>{
+  export function Stage<P,R>(self:Arrowlet<P,R>,before:((p:P)=>void) | null, after:((r:R) => void) | null):Arrowlet<P,R>{
     return Fletcher.Anon(
-      (p:P,cont:Junction<R>) => {
+      (p:P,cont:JunctionCls<R>) => {
         if(before){
           before(p)
         }
@@ -333,8 +335,8 @@ static Race<P,R>(self:Arrowlet<P,R>,that:Arrowlet<P,R>):Arrowlet<P,R>{
    * @return {*}  {Arrowlet<O.Option<P>,O.Option<R>>}
    * @memberof Fletcher
    */
-  static Option<P,R>(self:Arrowlet<P,R>):Arrowlet<O.Option<P>,O.Option<R>>{
-    return new OptionArw(self);
+  export function Option<P,R>(self:Arrowlet<P,R>):Arrowlet<O.Option<P>,O.Option<R>>{
+    return new OptionCls(self);
   }
   /**
    * Turns the flatMap function of an Option into an Option Arrow.
@@ -346,8 +348,8 @@ static Race<P,R>(self:Arrowlet<P,R>,that:Arrowlet<P,R>):Arrowlet<P,R>{
    * @return {*}  {Arrowlet<O.Option<P>,O.Option<R>>}
    * @memberof Fletcher
    */
-  static OptionM<P,R>(self:Arrowlet<P,O.Option<R>>):Arrowlet<O.Option<P>,O.Option<R>>{
-    return new OptionM(self);
+  export function OptionM<P,R>(self:Arrowlet<P,O.Option<R>>):Arrowlet<O.Option<P>,O.Option<R>>{
+    return new OptionMCls(self);
   }
   /**
    * Produces Some(p) if the predicate returns true, None otherwise
@@ -358,7 +360,7 @@ static Race<P,R>(self:Arrowlet<P,R>,that:Arrowlet<P,R>):Arrowlet<P,R>{
    * @return {*}  {Arrowlet<P,O.Option<P>>}
    * @memberof Fletcher
    */
-  static OptionP<P>(fn:(p:P)=>boolean):Arrowlet<P,O.Option<P>>{
+  export function OptionP<P>(fn:(p:P)=>boolean):Arrowlet<P,O.Option<P>>{
     return Fletcher.Fun1R(
       (p:P) => {
         if(fn(p)){
@@ -382,10 +384,10 @@ static Race<P,R>(self:Arrowlet<P,R>,that:Arrowlet<P,R>):Arrowlet<P,R>{
    * @return {*}  {Arrowlet<P,E.Either<E,R>>}
    * @memberof Fletcher
    */
-  static Timeout<P,R,E>(self:Arrowlet<P,R>,ms:number,error:E):Arrowlet<P,E.Either<E,R>>{
+  export function Timeout<P,R,E>(self:Arrowlet<P,R>,ms:number,error:E):Arrowlet<P,E.Either<E,R>>{
     return Fletcher.Race(
       Fletcher.Anon(
-        (p:P,junc:Junction<E.Either<E,R>>) => {
+        (p:P,junc:JunctionCls<E.Either<E,R>>) => {
           const deferred : Deferred<E.Either<E,R>> = new Deferred();
           setTimeout(
             () => {
@@ -393,7 +395,7 @@ static Race<P,R>(self:Arrowlet<P,R>,that:Arrowlet<P,R>):Arrowlet<P,R>{
             },
             ms
           );
-          return junc.receive(Junction.later(deferred.promise));
+          return junc.receive(JunctionCls.later(deferred.promise));
         }
       ),
       Fletcher.Then(self,Fletcher.Fun1R(E.right))
@@ -408,10 +410,10 @@ static Race<P,R>(self:Arrowlet<P,R>,that:Arrowlet<P,R>):Arrowlet<P,R>{
    * @return {*}  {Arrowlet<P,P>}
    * @memberof Fletcher
    */
-  static Worker<P>(work:Work.Work):Arrowlet<P,P>{
+  export function Worker<P>(work:Work.Work):Arrowlet<P,P>{
     return Fletcher.Anon(
-      (p:P,junc:Junction<P>) => {
-        return Work.Seq(junc.receive(Junction.issue(p)),work)
+      (p:P,junc:JunctionCls<P>) => {
+        return Work.Seq(junc.receive(JunctionCls.issue(p)),work)
       }
     );
   }
@@ -429,7 +431,7 @@ static Race<P,R>(self:Arrowlet<P,R>,that:Arrowlet<P,R>):Arrowlet<P,R>{
    * @return {*}  {Arrowlet<P,E.Either<E,R>>}
    * @memberof Fletcher
    */
-  static RaceWithTimeout<P,R,E>(l:Arrowlet<P,R>,r:Arrowlet<P,R>,ms,error:E):Arrowlet<P,E.Either<E,R>>{
+  export function RaceWithTimeout<P,R,E>(l:Arrowlet<P,R>,r:Arrowlet<P,R>,ms,error:E):Arrowlet<P,E.Either<E,R>>{
     const lhs : Arrowlet<P,E.Either<E,R>> = Fletcher.Timeout(l,ms,error);
     const rhs : Arrowlet<P,E.Either<E,R>> = Fletcher.Timeout(r,ms,error);
     return Fletcher.Race(lhs,rhs);
@@ -446,24 +448,33 @@ static Race<P,R>(self:Arrowlet<P,R>,that:Arrowlet<P,R>):Arrowlet<P,R>{
    * @return {*}  {Arrowlet<Pi,Ri>}
    * @memberof Fletcher
    */
-  static Map<Pi,R,Ri>(l:Arrowlet<Pi,R>,fn:(r:R) => Ri):Arrowlet<Pi,Ri>{
+  export function Map<Pi,R,Ri>(l:Arrowlet<Pi,R>,fn:(r:R) => Ri):Arrowlet<Pi,Ri>{
     return Fletcher.Then(l,Fletcher.Fun1R(fn));
   }
-  static Effect<Pi,R>(self:Arrowlet<Pi,R>):(pi:Pi) => Effect.Effect<R,any,Pi>{
+  export function Mapi<Pi,Pii,R>(self:Arrowlet<Pii,R>,fn:(pi:Pi) => Pii):Arrowlet<Pi,R>{
+    return Fletcher.Then(Fletcher.Fun1R(fn),self);
+  }
+  export function Effect<Pi,R>(self:Arrowlet<Pi,R>):(pi:Pi) => EffectNms.Effect<R,any,Pi>{
     return (pi:Pi) => {
-      return Effect.promise((signal:AbortSignal) => Fletcher.Resolve(self,pi));
+      return EffectNms.promise((signal:AbortSignal) => Fletcher.Resolve(self,pi));
     }
   }
-  static Loop<Pi,R>(self:Arrowlet<Pi,Either.Either<R,Pi>>):Arrowlet<Pi,R>{
+  export function Loop<Pi,R>(self:Arrowlet<Pi,Either.Either<R,Pi>>):Arrowlet<Pi,R>{
     return Fletcher.Anon(
-      function rec(pi:Pi,cont:Junction<R>){
+      function rec(pi:Pi,cont:JunctionCls<R>){
         return forward(self,pi).flat_fold(
           (r:Either.Either<R,Pi>) => Either.match({
             onLeft    : (pi:Pi)   => Work.fromThunk(() => rec(pi,cont)),//yay?
-            onRight   : (r:R)     => cont.receive(Junction.issue(r))
+            onRight   : (r:R)     => cont.receive(JunctionCls.issue(r))
           })
         )
       }
     );
+  }
+  export function Callback<P,R>(fn: (p:P,cb:(r:R) => void) => void){
+    return new CallbackCls(fn);
+  }
+  export function Receiver<R>(self:Allocator<R>):Arrowlet<void,R>{
+    return new ReceiverCls(self);
   }
 }
